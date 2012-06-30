@@ -21,7 +21,7 @@ class SupportPressAdmin extends SupportPress {
 	 * When updating an existing thread, you should be able to:
 	 *
 	 */
-	function action_add_meta_boxes() {
+	public function action_add_meta_boxes() {
 
 		remove_meta_box( 'commentstatusdiv', $this->post_type, 'normal' );
 	}
@@ -29,7 +29,7 @@ class SupportPressAdmin extends SupportPress {
 	/**
 	 * Filter the title field to request a subject
 	 */
-	function filter_enter_title_here( $orig ) {
+	public function filter_enter_title_here( $orig ) {
 		return __( 'Enter subject here', 'supportpress' );
 	}
 
@@ -38,7 +38,7 @@ class SupportPressAdmin extends SupportPress {
 	 *
 	 * @return string $pagenow Return the context for the screen we're in
 	 */
-	function is_edit_screen() {
+	public function is_edit_screen() {
 		global $pagenow;
 		
 		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) )

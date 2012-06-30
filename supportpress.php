@@ -31,7 +31,7 @@ class SupportPress {
 	 * - Register the thread post type
 	 * - Register the default custom post statuses
 	 */
-	function action_init() {
+	public function action_init() {
 
 		$args = array(
 				'label' => __( 'Threads', 'supportpress' ),
@@ -59,7 +59,7 @@ class SupportPress {
 	/**
 	 * Code to run on the 'admin_init' action:
 	 */
-	function action_admin_init() {
+	public function action_admin_init() {
 
 		// Initialize the admin class
 		$this->admin = new SupportPressAdmin();
@@ -69,21 +69,21 @@ class SupportPress {
 	/**
 	 * 
 	 */
-	function add_thread() {
+	public function add_thread() {
 
 	}
 
 	/**
 	 *
 	 */
-	function update_thread() {
+	public function update_thread() {
 
 	}
 
 	/**
 	 *
 	 */
-	function delete_thread() {
+	public function delete_thread() {
 
 	}
 
