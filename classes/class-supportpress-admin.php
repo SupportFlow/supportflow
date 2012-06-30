@@ -28,8 +28,9 @@ class SupportPressAdmin extends SupportPress {
 	 *
 	 */
 	public function action_add_meta_boxes() {
-
+		remove_meta_box( 'submitdiv',        SupportPress()->post_type, 'side' );
 		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
+		remove_meta_box( 'slugdiv',          SupportPress()->post_type, 'normal' );
 	}
 
 	/**
