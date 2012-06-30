@@ -6,7 +6,10 @@
 class SupportPressAdmin extends SupportPress {
 
 	function __construct() {
+		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
+	}
 
+	public function setup_actions() {
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 			add_filter( 'enter_title_here', array( $this, 'filter_enter_title_here' ) );
@@ -23,7 +26,7 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function action_add_meta_boxes() {
 
-		remove_meta_box( 'commentstatusdiv', $this->post_type, 'normal' );
+		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
 	}
 
 	/**
@@ -42,10 +45,12 @@ class SupportPressAdmin extends SupportPress {
 		global $pagenow;
 		
 		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) )
-			&& $_GET['post_type'] && $_GET['post_type'] == $this->post_type )
+			&& $_GET['post_type'] && $_GET['post_type'] == SupportPress()->post_type )
 			return $pagenow;
 		else
 			return false;
 
 	}
 }
+
+SupportPress()->extend->admin = new SupportPressAdmin();
