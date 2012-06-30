@@ -10,6 +10,9 @@ class SupportPressAdmin extends SupportPress {
 	}
 
 	public function setup_actions() {
+
+		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
+
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 			add_filter( 'enter_title_here', array( $this, 'filter_enter_title_here' ) );
@@ -34,6 +37,15 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function filter_enter_title_here( $orig ) {
 		return __( 'Enter subject here', 'supportpress' );
+	}
+
+	/**
+	 * Modifications to the columns appearing in the All Threads view
+	 */
+	public function filter_manage_post_columns( $columns ) {
+
+		$columns['title'] = __( 'Subject', 'supportpress' );
+		return $columns;
 	}
 
 	/**
