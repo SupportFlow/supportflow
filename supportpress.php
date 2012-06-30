@@ -194,7 +194,7 @@ class SupportPress {
 	 * @uses add_action() To add various actions
 	 */
 	private function setup_actions() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
 
 		do_action_ref_array( 'supportpress_after_setup_actions', array( &$this ) );
 	}
@@ -207,7 +207,7 @@ class SupportPress {
 	 * @uses apply_filters() Calls various filters to modify the arguments
 	 *                        sent to register_post_type()
 	 */
-	public function register_post_type() {
+	public function action_init_register_post_type() {
 		register_post_type( $this->post_type, array(
 			'labels' => array(
 				'name'               => __( 'Threads',                   'supportpress' ),
