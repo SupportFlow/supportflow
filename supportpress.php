@@ -154,21 +154,25 @@ class SupportPress {
 		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
 			'new'     => array(
 				'label'       => __( 'New', 'supportpress' ),
-				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>' ),
+				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportpress' ),
 			),
 			'open'    => array(
 				'label'       => __( 'Open', 'supportpress' ),
-				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>' ),
+				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportpress' ),
 			),
 			'pending' => array(
 				'label'       => __( 'Pending', 'supportpress' ),
-				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>' ),
+				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportpress' ),
 			),
 			'closed'  => array(
 				'label'       => __( 'Closed', 'supportpress' ),
-				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>' ),
+				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportpress' ),
 			),
 		) );
+
+		$this->post_meta_requester_id    = apply_filters( 'supportpress_post_meta_requester_id',    'supportpress_requester_id'    );
+		$this->post_meta_requester_name  = apply_filters( 'supportpress_post_meta_requester_name',  'supportpress_requester_name'  );
+		$this->post_meta_requester_email = apply_filters( 'supportpress_post_meta_requester_email', 'supportpress_requester_email' );
 
 		/** Misc **************************************************************/
 
@@ -188,7 +192,7 @@ class SupportPress {
 
 		/** Core **************************************************************/
 
-
+		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
 
 		/** Extensions ********************************************************/
 
@@ -256,8 +260,85 @@ class SupportPress {
 	 */
 	public function action_init_register_post_statuses() {
 		foreach ( $this->post_statuses as $post_status => $args ) {
+			$args['public'] = true;
 			register_post_status( 'sp_' . $post_status, $args );
 		}
+	}
+
+	/** Helper Functions ******************************************************/
+
+	/**
+	 * Validates a user ID
+	 */
+	public function validate_user( $user_ID_or_username ) {
+		if ( is_numeric( $user_ID_or_username ) ) {
+			$user = get_user_by( 'ID', $user_ID_or_username );
+
+			if ( ! $user )
+				return false;
+
+			return $user->data->ID;
+		} else {
+			$user = get_user_by( 'login', $user_ID_or_username );
+
+			if ( ! $user )
+				return false;
+
+			return $user->data->ID;
+		}
+	}
+
+	/** Thread Functions ******************************************************/
+
+	/**
+	 * Create a new thread
+	 */
+	public function create_thread( $args ) {
+		// The __get() magic doesn't allow key() usage so gotta copy it
+		$post_statuses = $this->post_statuses;
+
+		$defaults = array(
+			'subject'         => '',
+			'message'         => '',
+			'requester_id'    => 0,  // If the requester has a WordPress account (ID or username)
+			'requester_name'  => '', // Otherwise supply a name
+			'requester_email' => '', // And an e-mail address
+			'status'          => key( $post_statuses ),
+			'assignee'        => 0,  // WordPress user ID or username of ticket assignee/owner
+			'tags'            => array(),
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$post = array(
+			'post_type'    => $this->post_type,
+			'post_title'   => $args['subject'],
+			'post_content' => esc_html( $args['message'] ),
+			'post_author'  => $this->validate_user( $args['assignee'] ),
+			'tags_input'   => $args['tags'],
+		);
+
+		if ( ! get_post_status_object( $args['status'] ) )
+			$args['status'] = $defaults['status'];
+
+		$post['post_status'] = 'sp_' . $args['status'];
+
+		$thread_id = wp_insert_post( $post, true );
+
+		if ( is_wp_error( $thread_id ) )
+			return $thread_id;
+
+		if ( absint( $args['requester_id'] ) ) {
+			add_post_meta( $thread_id, $this->post_meta_requester_id, absint( $args['requester_id'] ) );
+		} else {
+			if ( ! empty( $args['requester_name'] ) )
+				add_post_meta( $thread_id, $this->post_meta_requester_name, strip_tags( $args['requester_name'] ) );
+
+			if ( ! empty( $args['requester_email'] ) && is_email( $args['requester_email'] ) )
+				add_post_meta( $thread_id, $this->post_meta_requester_email, $args['requester_email'] );
+		}
+
+		return $thread_id;
 	}
 }
 
@@ -277,3 +358,5 @@ function SupportPress() {
 }
 
 add_action( 'plugins_loaded', 'SupportPress' );
+
+?>
