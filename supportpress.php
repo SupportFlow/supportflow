@@ -149,11 +149,26 @@ class SupportPress {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type      = apply_filters( 'supportpress_thread_post_type', 'sp_thread' ); // TODO: Prefix with full "supportpress_" ?
+		$this->post_type      = apply_filters( 'supportpress_thread_post_type', 'sp_thread' );
 
-		// If you ADD to this list, you will need to take care of calling register_post_status() on your own.
-		// This filter is only meant for REMOVING default thread statuses.
-		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array( 'new', 'open', 'pending', 'closed' ) );
+		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
+			'new'     => array(
+				'label'       => __( 'New', 'supportpress' ),
+				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>' ),
+			),
+			'open'    => array(
+				'label'       => __( 'Open', 'supportpress' ),
+				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>' ),
+			),
+			'pending' => array(
+				'label'       => __( 'Pending', 'supportpress' ),
+				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>' ),
+			),
+			'closed'  => array(
+				'label'       => __( 'Closed', 'supportpress' ),
+				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>' ),
+			),
+		) );
 
 		/** Misc **************************************************************/
 
@@ -240,37 +255,8 @@ class SupportPress {
 	 * @uses apply_filters() To control what statuses are registered
 	 */
 	public function action_init_register_post_statuses() {
-
-		// New
-		if ( in_array( 'new', $this->post_statuses ) ) {
-			register_post_status( 'supportpress_new', array(
-				'label'       => __( 'New', 'supportpress' ),
-				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>' ),
-			) );
-		}
-
-		// Open
-		if ( in_array( 'open', $this->post_statuses ) ) {
-			register_post_status( 'supportpress_open', array(
-				'label'       => __( 'Open', 'supportpress' ),
-				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>' ),
-			) );
-		}
-
-		// Pending
-		if ( in_array( 'pending', $this->post_statuses ) ) {
-			register_post_status( 'supportpress_pending', array(
-				'label'       => __( 'Pending', 'supportpress' ),
-				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>' ),
-			) );
-		}
-
-		// Closed
-		if ( in_array( 'closed', $this->post_statuses ) ) {
-			register_post_status( 'supportpress_closed', array(
-				'label'       => __( 'Closed', 'supportpress' ),
-				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>' ),
-			) );
+		foreach ( $this->post_statuses as $post_status => $args ) {
+			register_post_status( 'sp_' . $post_status, $args );
 		}
 	}
 }
