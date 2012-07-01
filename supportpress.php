@@ -328,8 +328,8 @@ class SupportPress {
 		if ( is_wp_error( $thread_id ) )
 			return $thread_id;
 
-		if ( absint( $args['requester_id'] ) ) {
-			add_post_meta( $thread_id, $this->post_meta_requester_id, absint( $args['requester_id'] ) );
+		if ( ! empty( $args['requester_id'] ) && $requester_id = $this->validate_user( $args['requester_id'] ) ) {
+			add_post_meta( $thread_id, $this->post_meta_requester_id, $requester_id );
 		} else {
 			if ( ! empty( $args['requester_name'] ) )
 				add_post_meta( $thread_id, $this->post_meta_requester_name, strip_tags( $args['requester_name'] ) );
