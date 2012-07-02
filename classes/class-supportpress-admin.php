@@ -16,7 +16,16 @@ class SupportPressAdmin extends SupportPress {
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 			add_filter( 'enter_title_here', array( $this, 'filter_enter_title_here' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
 		}
+	}
+
+	/**
+	 * Add any CSS or JS we need for the admin
+	 */
+	public function action_admin_enqueue_scripts() {
+
+		wp_enqueue_style( 'supportpress-admin', SupportPress()->plugin_url . 'css/admin.css', array(), SupportPress()->version );
 	}
 
 	/**
@@ -29,7 +38,23 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function action_add_meta_boxes() {
 
+		remove_meta_box( 'submitdiv', SupportPress()->post_type, 'side' );
 		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
+
+		// @todo metabox for thread details
+		// @todo metabox for respondent
+		add_meta_box( 'supportpress-messages', __( 'Messages', 'supportpress' ), array( $this, 'meta_box_messages' ), SupportPress()->post_type, 'normal' );
+	}
+
+	/**
+	 * Standard listing of messages includes a form at the top
+	 * and any existing messages listed in reverse chronological order
+	 */
+	public function meta_box_messages() {
+
+		echo "<textarea placeholder='" . __( 'What do you need to communicate to the respondent?', 'supportpress' ) . "'>";
+		echo "</textarea>";
+
 	}
 
 	/**
