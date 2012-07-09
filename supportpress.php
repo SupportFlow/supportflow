@@ -118,8 +118,6 @@ class SupportPress {
 
 	/** Private Methods *******************************************************/
 
-	/** Private Methods *******************************************************/
-
 	/**
 	 * Set some smart defaults to class variables. Allow some of them to be
 	 * filtered to allow for early overriding.
@@ -211,8 +209,6 @@ class SupportPress {
 	 *
 	 * @since SupportPress 0.1
 	 * @access private
-	 * @uses register_activation_hook() To register the activation hook
-	 * @uses register_deactivation_hook() To register the deactivation hook
 	 * @uses add_action() To add various actions
 	 */
 	private function setup_actions() {
