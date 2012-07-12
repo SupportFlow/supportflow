@@ -83,7 +83,7 @@ class SupportPressAdmin extends SupportPress {
 	public function is_edit_screen() {
 		global $pagenow, $post;
 
-		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) ) && $_GET['post_type'] && $_GET['post_type'] == SupportPress()->post_type )
+		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) ) && ! empty( $_GET['post_type'] ) && $_GET['post_type'] == SupportPress()->post_type )
 			return $pagenow;
 		elseif ( 'post.php' == $pagenow && $post->post_type == SupportPress()->post_type )
 			return $pagenow;
