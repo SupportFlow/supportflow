@@ -175,6 +175,7 @@ class SupportPress {
 		/** Misc **************************************************************/
 
 		$this->extend         = new stdClass(); // Plugins add data here
+		$this->extend->ui     = new stdClass(); // For UI-related plugins
 		$this->errors         = new WP_Error(); // Feedback
 	}
 
