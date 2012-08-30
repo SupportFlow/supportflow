@@ -1,21 +1,36 @@
+#poststuff {
+	padding-top: 0;
+}
+
+#supportpress-subject.postbox,
+#supportpress-respondents.postbox {
+	border:none;
+	background:none;
+}
+
+#supportpress-subject.postbox .inside,
+#supportpress-respondents.postbox .inside {
+	padding: 0;
+}
+
 #supportpress-subject .handlediv,
 #supportpress-subject h3.hndle,
-#supportpress-messages .handlediv,
-#supportpress-messages h3.hndle,
 #supportpress-respondents .handlediv,
-#supportpress-respondents h3.hndle {
+#supportpress-respondents h3.hndle,
+#supportpress-messages .handlediv,
+#supportpress-messages h3.hndle {
 	display:none;
 }
 
-#supportpress-subject h4,
-#supportpress-messages h4,
-#supportpress-respondents h4 {
+#supportpress-subject-respondents h4,
+#supportpress-messages h4 {
 	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 	font-size: 13px;
 	font-weight: normal;
-	margin: 0;
-	padding-top:2px;
-	padding-bottom: 5px;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 10px;
+	margin-bottom: 6px;
 }
 
 #supportpress-subject.postbox input {

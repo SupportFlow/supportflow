@@ -51,19 +51,19 @@ class SupportPressAdmin extends SupportPress {
 	}
 
 	/**
-	 * Allow agents to assign one or more respondents to a thread
-	 * These are essentially the people who are being "supported"
+	 * A box that appears at the top 
 	 */
 	public function meta_box_subject() {
 
 		$placeholder = __( 'What is your conversation about?', 'supportpress' );
 		echo '<h4>' . __( 'Subject', 'supportpress' ) . '</h4>';
 		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
+		echo '<p class="description">' . __( 'Please describe what this thread is about in several words', 'supportpress' ) . '</p>';
+
 	}
 
 	/**
-	 * Allow agents to assign one or more respondents to a thread
-	 * These are essentially the people who are being "supported"
+	 * Add a form element where the user can change the respondents
 	 */
 	public function meta_box_respondents() {
 
@@ -72,6 +72,7 @@ class SupportPressAdmin extends SupportPress {
 		$placeholder = __( 'Who are you starting a conversation with?', 'supportpress' );
 		echo '<h4>' . __( 'Respondent(s)', 'supportpress' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
+		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportpress' ) . '</p>';
 	}
 
 	/**
@@ -133,8 +134,10 @@ class SupportPressAdmin extends SupportPress {
 		if( SupportPress()->post_type != get_post_type( $thread_id ) )
 			return;
 
-		$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
-		SupportPress()->update_thread_respondents( $thread_id, $respondents );
+		if ( isset( $_POST['respondents'] ) ) {
+			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
+			SupportPress()->update_thread_respondents( $thread_id, $respondents );
+		}
 
 	}
 }
