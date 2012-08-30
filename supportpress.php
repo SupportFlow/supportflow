@@ -228,10 +228,12 @@ class SupportPress {
 	public function action_init_register_post_type() {
 		register_post_type( $this->post_type, array(
 			'labels' => array(
+				'menu_name'          => __( 'SupportPress',              'supportpress' ),
 				'name'               => __( 'Threads',                   'supportpress' ),
 				'singular_name'      => __( 'Thread',                    'supportpress' ),
 				'all_items'          => __( 'All Threads',               'supportpress' ),
-				'add_new_item'       => __( 'Add New Thread',            'supportpress' ),
+				'add_new'            => __( 'Start New',                 'sp_thread' ),
+				'add_new_item'       => __( 'Start New Thread',          'supportpress' ),
 				'edit_item'          => __( 'Edit Thread',               'supportpress' ),
 				'new_item'           => __( 'New Thread',                'supportpress' ),
 				'view_item'          => __( 'View Thread',               'supportpress' ),
