@@ -244,7 +244,6 @@ class SupportPress {
 			'public'        => true,
 			'menu_position' => 3,
 			'supports'      => array(
-				'title',
 				'comments',
 			),
 		) );

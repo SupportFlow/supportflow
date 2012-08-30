@@ -1,5 +1,56 @@
+#supportpress-subject .handlediv,
+#supportpress-subject h3.hndle,
+#supportpress-messages .handlediv,
+#supportpress-messages h3.hndle,
+#supportpress-respondents .handlediv,
+#supportpress-respondents h3.hndle {
+	display:none;
+}
+
+#supportpress-subject h4,
+#supportpress-messages h4,
+#supportpress-respondents h4 {
+	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+	font-size: 13px;
+	font-weight: normal;
+	margin: 0;
+	padding-top:2px;
+	padding-bottom: 5px;
+}
+
+#supportpress-subject.postbox input {
+	width: 100%;
+	font-size: 1.7em;
+	padding: 8px 10px;
+}
+
+#supportpress-respondents.postbox input {
+	width: 100%;
+	padding: 8px;
+	font-size: 1.2em;
+}
+
 #supportpress-messages.postbox textarea {
 	width: 100%;
 	padding: 8px;
 	font-size: 1.1em;
+	font-size: 1.2em;
+}
+
+.metabox-holder .postbox-container .empty-container {
+	border: none;
+}
+
+input::-webkit-input-placeholder {
+	color:#BBB;
+}
+input:-moz-placeholder {
+	color:#BBB;
+}
+
+textarea::-webkit-input-placeholder {
+	color:#BBB;
+}
+textarea:-moz-placeholder {
+	color:#BBB;
 }

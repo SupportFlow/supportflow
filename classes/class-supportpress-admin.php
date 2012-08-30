@@ -14,7 +14,6 @@ class SupportPressAdmin extends SupportPress {
 
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
-			add_filter( 'enter_title_here', array( $this, 'filter_enter_title_here' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
 		}
 	}
@@ -43,9 +42,34 @@ class SupportPressAdmin extends SupportPress {
 		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
 		remove_meta_box( 'slugdiv',          SupportPress()->post_type, 'normal' );
 
-		// @todo metabox for thread details
-		// @todo metabox for respondent
+		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
+		add_meta_box( 'supportpress-respondents', __( 'Respondents', 'supportpress' ), array( $this, 'meta_box_respondents' ), SupportPress()->post_type, 'normal' );
 		add_meta_box( 'supportpress-messages', __( 'Messages', 'supportpress' ), array( $this, 'meta_box_messages' ), SupportPress()->post_type, 'normal' );
+		// @todo metabox for thread details
+	}
+
+	/**
+	 * Allow agents to assign one or more respondents to a thread
+	 * These are essentially the people who are being "supported"
+	 */
+	public function meta_box_subject() {
+		global $post;
+
+		$placeholder = __( 'What is your conversation about?', 'supportpress' );
+		echo '<h4>' . __( 'Subject', 'supportpress' ) . '</h4>';
+		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . esc_attr( $post->title ) . '" />';
+	}
+
+	/**
+	 * Allow agents to assign one or more respondents to a thread
+	 * These are essentially the people who are being "supported"
+	 */
+	public function meta_box_respondents() {
+
+		$respondents = implode( ', ', array() );
+		$placeholder = __( 'Who are you starting a conversation with?', 'supportpress' );
+		echo '<h4>' . __( 'Respondent(s)', 'supportpress' ) . '</h4>';
+		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents ) . '" />';
 	}
 
 	/**
@@ -54,16 +78,16 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function meta_box_messages() {
 
-		echo "<textarea placeholder='" . __( 'What do you need to communicate to the respondent?', 'supportpress' ) . "'>";
+		$placeholders = array(
+				__( "What's burning?",                              'supportpress' ),
+				__( 'What do you need to get off your chest?',      'supportpress' ),
+			);
+
+		$rand = array_rand( $placeholders );
+		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
+		echo "<textarea id='message' name='message' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 
-	}
-
-	/**
-	 * Filter the title field to request a subject
-	 */
-	public function filter_enter_title_here( $orig ) {
-		return ( $this->is_edit_screen() ) ? __( 'Enter subject here', 'supportpress' ) : $orig;
 	}
 
 	/**
