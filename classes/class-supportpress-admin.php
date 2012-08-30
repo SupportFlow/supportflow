@@ -12,6 +12,8 @@ class SupportPressAdmin extends SupportPress {
 	public function setup_actions() {
 		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
 
+		add_action( 'save_post', array( $this, 'action_save_post' ) );
+
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
@@ -53,11 +55,10 @@ class SupportPressAdmin extends SupportPress {
 	 * These are essentially the people who are being "supported"
 	 */
 	public function meta_box_subject() {
-		global $post;
 
 		$placeholder = __( 'What is your conversation about?', 'supportpress' );
 		echo '<h4>' . __( 'Subject', 'supportpress' ) . '</h4>';
-		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . esc_attr( $post->title ) . '" />';
+		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
 	}
 
 	/**
@@ -66,10 +67,11 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function meta_box_respondents() {
 
-		$respondents = implode( ', ', array() );
+		$respondents = SupportPress()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
+		$respondents_string = implode( ', ', $respondents );
 		$placeholder = __( 'Who are you starting a conversation with?', 'supportpress' );
 		echo '<h4>' . __( 'Respondent(s)', 'supportpress' ) . '</h4>';
-		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents ) . '" />';
+		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 	}
 
 	/**
@@ -87,6 +89,8 @@ class SupportPressAdmin extends SupportPress {
 		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
 		echo "<textarea id='message' name='message' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
+		$submit_text = __( 'Start Conversation', 'supportpress' );
+		submit_button( $submit_text );
 
 	}
 
@@ -115,6 +119,22 @@ class SupportPressAdmin extends SupportPress {
 		} else {
 			return false;
 		}
+
+	}
+
+	/**
+	 * When a thread is saved or updated, make sure we save the respondent
+	 * and new message data
+	 *
+	 * @todo nonce and cap checks
+	 */
+	public function action_save_post( $thread_id ) {
+
+		if( SupportPress()->post_type != get_post_type( $thread_id ) )
+			return;
+
+		$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
+		SupportPress()->update_thread_respondents( $thread_id, $respondents );
 
 	}
 }

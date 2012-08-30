@@ -37,6 +37,13 @@
 	font-size: 1.2em;
 }
 
+#supportpress-messages.postbox .inside p.submit {
+	float:none;
+	padding:0;
+	margin-top: 5px;
+	text-align: right;
+}
+
 .metabox-holder .postbox-container .empty-container {
 	border: none;
 }

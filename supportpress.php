@@ -147,7 +147,8 @@ class SupportPress {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type      = apply_filters( 'supportpress_thread_post_type', 'sp_thread' );
+		$this->post_type        = apply_filters( 'supportpress_thread_post_type', 'sp_thread' );
+		$this->respondents_tax  = apply_filters( 'supportpresss_respondents_taxonomy', 'sp_respondent' );
 
 		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
 			'new'     => array(
@@ -214,6 +215,7 @@ class SupportPress {
 	 */
 	private function setup_actions() {
 		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
+		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 
 		do_action_ref_array( 'supportpress_after_setup_actions', array( &$this ) );
@@ -234,7 +236,7 @@ class SupportPress {
 				'all_items'          => __( 'All Threads',               'supportpress' ),
 				'add_new'            => __( 'Start New',                 'sp_thread' ),
 				'add_new_item'       => __( 'Start New Thread',          'supportpress' ),
-				'edit_item'          => __( 'Edit Thread',               'supportpress' ),
+				'edit_item'          => __( 'Continue Thread',           'supportpress' ),
 				'new_item'           => __( 'New Thread',                'supportpress' ),
 				'view_item'          => __( 'View Thread',               'supportpress' ),
 				'search_item'        => __( 'Search Threads',            'supportpress' ),
@@ -247,6 +249,22 @@ class SupportPress {
 				'comments',
 			),
 		) );
+	}
+
+	/**
+	 * Register our custom taxonomies
+	 */
+	public function action_init_register_taxonomies() {
+
+		$args = array(
+			'label'                  => __( 'Respondents',                'supportpress' ),
+			'labels' => array(
+				),
+			'public'                 => false,
+			'show_in_nav_menus'      => true,
+			'rewrite'                => false,
+			);
+		register_taxonomy( $this->respondents_tax, $this->post_type, $args );
 	}
 
 	/**
@@ -337,6 +355,54 @@ class SupportPress {
 		}
 
 		return $thread_id;
+	}
+
+	/**
+	 * Get a thread's respondents
+	 *
+	 * @todo support retrieving more fields
+	 */
+	public function get_thread_respondents( $thread_id, $args = array() ) {
+
+		$default_args = array(
+				'fields' => 'all',          // 'all', 'emails'
+			);
+		$args = array_merge( $default_args, $args );
+
+		$raw_respondents = wp_get_object_terms( $thread_id, $this->respondents_tax );
+		if ( is_wp_error( $raw_respondents ) )
+			return array();
+
+		$respondents = array();
+		if ( 'emails' == $args['fields'] ) {
+			foreach( $raw_respondents as $raw_respondent ) {
+				$respondents[] = base64_decode( $raw_respondent->name );
+			}
+		}
+		return $respondents;
+	}
+
+	/**
+	 * Update a thread's respondents
+	 */
+	public function update_thread_respondents( $thread_id, $respondents ) {
+
+		$term_ids = array();
+		foreach( $respondents as $dirty_respondent ) {
+			// Create a term if it doesn't yet exist
+			$email = ( is_array( $dirty_respondent ) ) ? $dirty_respondent['user_email'] : $dirty_respondent;
+			$base64_email = base64_encode( $email );
+			if ( $term = get_term_by( 'name', $base64_email, $this->respondents_tax ) ) {
+				$term_ids[] = (int)$term->term_id;
+			} else {
+				$insert_term = array(
+						'slug' => $base64_email,
+					);
+				$term = wp_insert_term( $base64_email, $this->respondents_tax );
+				$term_ids[] = $term['term_id'];
+			}
+		}
+		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax );
 	}
 }
 
