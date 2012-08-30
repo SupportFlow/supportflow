@@ -80,6 +80,7 @@ class SupportPressAdmin extends SupportPress {
 	 * and any existing messages listed in reverse chronological order
 	 */
 	public function meta_box_messages() {
+		global $pagenow;
 
 		$placeholders = array(
 				__( "What's burning?",                              'supportpress' ),
@@ -90,7 +91,10 @@ class SupportPressAdmin extends SupportPress {
 		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
 		echo "<textarea id='message' name='message' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
-		$submit_text = __( 'Start Conversation', 'supportpress' );
+		if ( 'post-new.php' == $pagenow )
+			$submit_text = __( 'Start Thread', 'supportpress' );
+		else
+			$submit_text = __( 'Update Thread', 'supportpress' );
 		submit_button( $submit_text );
 
 	}
