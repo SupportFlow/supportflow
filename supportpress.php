@@ -376,7 +376,7 @@ class SupportPress {
 		$respondents = array();
 		if ( 'emails' == $args['fields'] ) {
 			foreach( $raw_respondents as $raw_respondent ) {
-				$respondents[] = base64_decode( $raw_respondent->name );
+				$respondents[] = $raw_respondent->name;
 			}
 		}
 		return $respondents;
@@ -389,16 +389,15 @@ class SupportPress {
 
 		$term_ids = array();
 		foreach( $respondents as $dirty_respondent ) {
+			if ( empty( $dirty_respondent ) )
+				continue;
 			// Create a term if it doesn't yet exist
 			$email = ( is_array( $dirty_respondent ) ) ? $dirty_respondent['user_email'] : $dirty_respondent;
-			$base64_email = base64_encode( $email );
-			if ( $term = get_term_by( 'name', $base64_email, $this->respondents_tax ) ) {
+			if ( $term = get_term_by( 'name', $email, $this->respondents_tax ) ) {
 				$term_ids[] = (int)$term->term_id;
 			} else {
-				$insert_term = array(
-						'slug' => $base64_email,
-					);
-				$term = wp_insert_term( $base64_email, $this->respondents_tax );
+				$base64_email = base64_encode( $email );
+				$term = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $base64_email ) );
 				$term_ids[] = $term['term_id'];
 			}
 		}
