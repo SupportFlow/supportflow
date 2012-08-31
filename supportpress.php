@@ -468,6 +468,7 @@ class SupportPress {
 	 * Add a comment to a given thread
 	 */
 	public function add_thread_comment( $thread_id, $comment_text, $details = array() ) {
+		global $wpdb;
 
 		$default_details = array(
 				'time'                   => current_time( 'mysql' ),
@@ -500,6 +501,10 @@ class SupportPress {
 			);
 		$comment = apply_filters( 'supportpress_pre_insert_thread_comment', $comment );
 		wp_insert_comment( $comment );
+
+		// Adding a thread comment updates the post modified time for the thread
+		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql') ), array( 'ID' => $thread_id ) );
+		clean_post_cache( $thread_id );
 	}
 
 }
