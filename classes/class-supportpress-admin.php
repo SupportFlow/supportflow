@@ -3,7 +3,7 @@
  *
  */
 
-class SupportPressAdmin extends SupportPress {
+class SupportPress_Admin extends SupportPress {
 
 	function __construct() {
 		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
@@ -562,4 +562,4 @@ class SupportPressAdmin extends SupportPress {
 	}
 }
 
-SupportPress()->extend->admin = new SupportPressAdmin();
+SupportPress()->extend->admin = new SupportPress_Admin();

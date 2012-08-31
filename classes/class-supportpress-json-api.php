@@ -1,19 +1,18 @@
 <?php
-/**
- *
- */
 
-class SupportPressJSONAPI extends SupportPress {
+class SupportPress_JSON_API extends SupportPress {
+
+	public $action = 'supportpress_json';
 
 	function __construct() {
 		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	public function setup_actions() {
-		add_action( 'wp_ajax_supportpress', array( $this, 'action_wp_ajax_supportpress' ) );
+		add_action( 'wp_ajax_' . $this->action, array( $this, 'action_wp_ajax_supportpress_json' ) );
 	}
 
-	public function action_wp_ajax_supportpress() {
+	public function action_wp_ajax_supportpress_json() {
 		global $current_user;
 
 		if ( empty( $_REQUEST['spaction'] ) )
@@ -36,4 +35,4 @@ class SupportPressJSONAPI extends SupportPress {
 	}
 }
 
-SupportPress()->extend->jsonapi = new SupportPressJSONAPI();
+SupportPress()->extend->jsonapi = new SupportPress_JSON_API();
