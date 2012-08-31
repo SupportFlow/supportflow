@@ -12,35 +12,21 @@
  * Domain Path: /languages/
  */
 
-add_action( 'wp_enqueue_scripts', function() {
+add_action( 'wp_footer', function() {
+	$query_arg = 'supportpress_widget';
+
+	// If being run on the same site as SupportPress, prevent infinite widgets
+	if ( ! empty( $_GET[$query_arg] ) )
+		return;
 
 	/**
 	 * This variable will need to be replaced with a UI or whatnot
 	 * so that this plugin here can run on a different blog than
 	 * the blog that SupportPress is running on.
 	 */
-	$supportpress_url = site_url();
+	$supportpress_install_url = home_url();
 
-
-	$script_slug = 'supportpress-user-widget';
-
-	wp_enqueue_script(
-		$script_slug,
-		$supportpress_url . '/wp-content/plugins/supportpress/js/supportpress-user-widget.js',
-		array( 'jquery' ),
-		mt_rand(), // For cache busting during development
-		true
-	);
-
-	wp_localize_script(
-		$script_slug,
-		'SupportPressUserWidgetVars',
-		array(
-			'supportpressurl' => $supportpress_url,
-		)
-	);
-} );
-
-add_action( 'wp_footer', function() {
-	echo '<div id="supportpress-widget" style="width:300px;height:500px;position:fixed;bottom:0px;right:0px;background-color:white;padding:25px;z-index:10000;border:10px solid black;">Loading...</div>';
+	echo '<div id="supportpress-widget" style="width:400px;height:500px;position:fixed;bottom:0px;right:0px;background-color:white;z-index:10000;border:10px solid black;">';
+	echo '<iframe width="100%" height="100%" src="' . esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ) . '"></iframe>';
+	echo '</div>';
 } );

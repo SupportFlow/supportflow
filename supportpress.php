@@ -198,6 +198,7 @@ class SupportPress {
 		/** Extensions ********************************************************/
 
 		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-widget.php' );
 
 		# TODO: Akismet plugin?
 
