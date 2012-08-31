@@ -111,18 +111,51 @@ class SupportPressAdmin extends SupportPress {
 	function action_pre_get_posts( $query ) {
 		global $pagenow;
 
-		if ( 'edit.php' != $pagenow )
+		if ( 'edit.php' != $pagenow || !$query->is_main_query() )
 			return;
 
-		$statuses = SupportPress()->post_statuses;
-		$status_slugs = array_keys( $statuses );
+		// Do our own custom search handling so we can search against comment text
+		if ( $search = $query->get( 's' ) ) {
+			// Get any comments that match our results
+			$args = array(
+					'search'                   => $search,
+					'comment_approved'         => 'any',
+				);
+			$matching_comments = SupportPress()->get_comments( $args );
+			$post_ids = wp_list_pluck( $matching_comments, 'comment_post_ID' );
+
+			$args = array(
+					's'                        => $search,
+					'post_type'                => SupportPress()->post_type,
+					'no_found_rows'            => true,
+					'update_post_meta_cache'   => false,
+					'update_post_term_cache'   => false,
+					'fields'                   => 'ids',
+				);
+			$post_query = new WP_Query( $args );
+			if ( !is_wp_error( $post_query ) )
+				$post_ids = array_merge( $post_ids, $post_query->posts );
+
+			$query->set( 'post__in', $post_ids );
+			// Ignore the original search query
+			add_filter( 'posts_search', array( $this, 'filter_posts_search' ) );
+		}
 
 		// Only show threads with the last status if the last status is set
+		$statuses = SupportPress()->post_statuses;
+		$status_slugs = array_keys( $statuses );
 		$last_status = array_pop( $status_slugs );
 		$post_status = $query->get( 'post_status' );
-		if ( empty( $post_status ) )
+		if ( !$query->get( 's' ) && empty( $post_status ) )
 			$query->set( 'post_status', $status_slugs );
 
+	}
+
+	/**
+	 * Sometimes we want to ignore the original search query because we do our own
+	 */
+	public function filter_posts_search( $posts_search ) {
+		return '';
 	}
 
 	/**

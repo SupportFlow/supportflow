@@ -410,18 +410,46 @@ class SupportPress {
 	 */
 	public function get_thread_comments( $thread_id, $args = array() ) {
 
+		$args['post_id'] = $thread_id;
+		$thread_comments = SupportPress()->get_comments( $args );
+		return $thread_comments;
+	}
+
+	/**
+	 * Get all comments based on various arguments
+	 */
+	public function get_comments( $args ) {
+
 		$default_args = array(
-				'comment_approved' => 'public',
+				'comment_approved'       => 'public', // 'public', 'private', 'all'
+				'post_id'                => '',
+				'search'                 => '',
 			);
 
 		$args = array_merge( $default_args, $args );
 		$comment_args = array(
-				'post_id'                => $thread_id,
+				'search'                 => $args['search'],
+				'post_id'                => $args['post_id'],
 				'comment_approved'       => $args['comment_approved'],
 				'comment_type'           => $this->comment_type,
 			);
+		if ( 'any' == $args['comment_approved'] )
+			add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
 		$thread_comments = get_comments( $comment_args );
+		if ( 'any' == $args['comment_approved'] )
+			remove_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
 		return $thread_comments;
+	}
+
+	/**
+	 * Convert 'any' comment_approved requests to the proper SQL
+	 */
+	public function filter_comment_clauses( $clauses ) {
+		global $wpdb;
+		$old_comment_approved = 'comment_approved = \'any\'';
+		$new_comment_approved = "comment_approved IN ( 'private', 'public' )";
+		$clauses['where'] = str_replace( $old_comment_approved, $new_comment_approved, $clauses['where'] );
+		return $clauses;
 	}
 
 	/**
