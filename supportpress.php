@@ -397,8 +397,8 @@ class SupportPress {
 			if ( $term = get_term_by( 'name', $email, $this->respondents_tax ) ) {
 				$term_ids[] = (int)$term->term_id;
 			} else {
-				$base64_email = base64_encode( $email );
-				$term = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $base64_email ) );
+				$md5_email = md5( $email );
+				$term = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $md5_email ) );
 				$term_ids[] = $term['term_id'];
 			}
 		}
