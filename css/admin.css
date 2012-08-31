@@ -1,4 +1,4 @@
-.wp-list-table.fixed .column-messages {
+.wp-list-table.fixed .column-sp_comments {
 	text-align: left;
 	width: 4em;
 }
@@ -31,14 +31,14 @@
 #supportpress-subject h3.hndle,
 #supportpress-respondents .handlediv,
 #supportpress-respondents h3.hndle,
-#supportpress-messages .handlediv,
-#supportpress-messages h3.hndle {
+#supportpress-comments .handlediv,
+#supportpress-comments h3.hndle {
 	display:none;
 }
 
 #supportpress-subject h4,
 #supportpress-respondents h4,
-#supportpress-messages h4 {
+#supportpress-comments h4 {
 	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 	font-size: 13px;
 	font-weight: normal;
@@ -60,41 +60,41 @@
 	font-size: 1.2em;
 }
 
-#supportpress-messages.postbox .message-reply {
+#supportpress-comments.postbox .comment-reply {
 	width: 100%;
 }
 
-#supportpress-messages.postbox textarea {
+#supportpress-comments.postbox textarea {
 	width: 100%;
 	padding: 8px;
 	font-size: 1.1em;
 	font-size: 1.2em;
 }
 
-#supportpress-messages.postbox .inside p.submit {
+#supportpress-comments.postbox .inside p.submit {
 	float:none;
 	padding:0;
 	margin-top: 5px;
 	text-align: right;
 }
 
-#supportpress-messages.postbox ul.thread-messages li {
+#supportpress-comments.postbox ul.thread-comments li {
 	clear:left;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-#supportpress-messages.postbox ul.thread-messages li .message-avatar {
+#supportpress-comments.postbox ul.thread-comments li .comment-avatar {
 	float: left;
 }
 
-#supportpress-messages.postbox ul.thread-messages li .message-author {
+#supportpress-comments.postbox ul.thread-comments li .comment-author {
 	margin: 0;
 	font-size: 0.9em;
 	color: #666666;
 }
 
-#supportpress-messages.postbox ul.thread-messages li .thread-message {
+#supportpress-comments.postbox ul.thread-comments li .thread-comment {
 	background-color: #FFFFFF;
 	margin-left: 105px;
 	min-height: 80px;
@@ -106,7 +106,7 @@
 	border-radius: 3px;
 }
 
-#supportpress-messages.postbox ul.thread-messages li .thread-meta {
+#supportpress-comments.postbox ul.thread-comments li .thread-meta {
 	margin-left: 105px;
 	font-size: 0.9em;
 	color: #666666;

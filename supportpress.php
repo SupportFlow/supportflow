@@ -406,24 +406,24 @@ class SupportPress {
 	}
 
 	/**
-	 * Get all of the messages associated with a thread
+	 * Get all of the comments associated with a thread
 	 */
-	public function get_thread_messages( $thread_id ) {
+	public function get_thread_comments( $thread_id ) {
 
 		$args = array(
 				'post_id'                => $thread_id,
 				'comment_approved'       => $this->comment_type,
 			);
-		$thread_messages = get_comments( $args );
-		return $thread_messages;
+		$thread_comments = get_comments( $args );
+		return $thread_comments;
 	}
 
 	/**
-	 * Get the total number of messages associated with a thread
+	 * Get the total number of comments associated with a thread
 	 *
 	 * @todo support filtering to specific types or commenters
 	 */
-	public function get_thread_message_count( $thread_id, $args = array() ) {
+	public function get_thread_comment_count( $thread_id, $args = array() ) {
 		global $wpdb;
 
 		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_post_ID =%s AND comment_approved = %s", $thread_id, $this->comment_type ) );
@@ -431,9 +431,9 @@ class SupportPress {
 	}
 
 	/**
-	 * Add a message to a given thread
+	 * Add a comment to a given thread
 	 */
-	public function add_thread_message( $thread_id, $message_text, $details = array() ) {
+	public function add_thread_comment( $thread_id, $comment_text, $details = array() ) {
 
 		$default_details = array(
 				'time'                   => current_time( 'mysql' ),
@@ -452,8 +452,8 @@ class SupportPress {
 
 		$details = array_merge( $default_details, $details );
 
-		$message = array(
-				'comment_content'        => esc_sql( $message_text ),
+		$comment = array(
+				'comment_content'        => esc_sql( $comment_text ),
 				'comment_post_ID'        => (int)$thread_id,
 				'comment_approved'       => esc_sql( $this->comment_type ),
 				'comment_type'           => esc_sql( $this->comment_type ),
@@ -463,8 +463,8 @@ class SupportPress {
 				'comment_author_url'     => esc_sql( $details['comment_author_url'] ),
 				'user_id'                => (int)$details['user_id'],
 			);
-		$message = apply_filters( 'supportpress_pre_insert_thread_message', $message );
-		wp_insert_comment( $message );
+		$comment = apply_filters( 'supportpress_pre_insert_thread_comment', $comment );
+		wp_insert_comment( $comment );
 	}
 
 }

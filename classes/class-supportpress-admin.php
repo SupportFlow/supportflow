@@ -94,7 +94,7 @@ class SupportPressAdmin extends SupportPress {
 
 		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
 		add_meta_box( 'supportpress-respondents', __( 'Respondents', 'supportpress' ), array( $this, 'meta_box_respondents' ), SupportPress()->post_type, 'normal' );
-		add_meta_box( 'supportpress-messages', __( 'Messages', 'supportpress' ), array( $this, 'meta_box_messages' ), SupportPress()->post_type, 'normal' );
+		add_meta_box( 'supportpress-comments', __( 'Commentss', 'supportpress' ), array( $this, 'meta_box_comments' ), SupportPress()->post_type, 'normal' );
 		// @todo metabox for thread details
 	}
 
@@ -124,10 +124,10 @@ class SupportPressAdmin extends SupportPress {
 	}
 
 	/**
-	 * Standard listing of messages includes a form at the top
-	 * and any existing messages listed in reverse chronological order
+	 * Standard listing of comments includes a form at the top
+	 * and any existing comments listed in reverse chronological order
 	 */
-	public function meta_box_messages() {
+	public function meta_box_comments() {
 		global $pagenow;
 
 		$placeholders = array(
@@ -137,8 +137,8 @@ class SupportPressAdmin extends SupportPress {
 
 		$rand = array_rand( $placeholders );
 		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
-		echo '<div class="message-reply">';
-		echo "<textarea id='message' name='message' class='thread-message' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
+		echo '<div class="comment-reply">';
+		echo "<textarea id='comment' name='comment' class='thread-comment' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 		echo '</div>';
 		if ( 'post-new.php' == $pagenow )
@@ -147,21 +147,21 @@ class SupportPressAdmin extends SupportPress {
 			$submit_text = __( 'Update Thread', 'supportpress' );
 		submit_button( $submit_text );
 
-		$this->display_thread_messages();
+		$this->display_thread_comments();
 	}
 
-	public function display_thread_messages() {
+	public function display_thread_comments() {
 
-		$messages = SupportPress()->get_thread_messages( get_the_ID() );
-		echo '<ul class="thread-messages">';
-		foreach( $messages as $message ) {
+		$comments = SupportPress()->get_thread_comments( get_the_ID() );
+		echo '<ul class="thread-comments">';
+		foreach( $comments as $comment ) {
 			echo '<li>';
-			echo '<div class="message-avatar">' . get_avatar( $message->comment_author_email, 72 );
-			echo '<p class="message-author">' . esc_html( $message->comment_author ) .'</p>';
+			echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
+			echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
 			echo '</div>';
-			echo '<div class="thread-message">' . wpautop( $message->comment_content ) . '</div>';
-			$message_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $message->comment_ID ), get_comment_date( get_option( 'time_format' ), $message->comment_ID ) );
-			echo '<div class="thread-meta"><span class="message-timestamp">' . esc_html( $message_timestamp ) . '</span></div>';
+			echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
+			$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
+			echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 			echo '</li>';
 		}
 		echo '</ul>';
@@ -178,7 +178,7 @@ class SupportPressAdmin extends SupportPress {
 		$new_columns = array(
 				'title'               => __( 'Subject', 'supportpress' ),
 				'author'              => __( 'Agent', 'supportpress' ),
-				'messages'            => '<span class="vers"><img alt="' . esc_attr__( 'Messages', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
 				// 'updated'             => __( 'Updated', 'supportpress' ),
 				// 'created'             => __( 'Created', 'support' ),
 			);
@@ -191,10 +191,10 @@ class SupportPressAdmin extends SupportPress {
 	function action_manage_posts_custom_column( $column_name, $thread_id ) {
 
 		switch( $column_name ) {
-			case 'messages':
-				$messages = SupportPress()->get_thread_message_count( $thread_id );
+			case 'sp_comments':
+				$comments = SupportPress()->get_thread_comment_count( $thread_id );
 				echo '<div class="post-com-count-wrapper">';
-				echo "<span class='comment-count'>{$messages}</span>";
+				echo "<span class='comment-count'>{$comments}</span>";
 				echo '</div>';
 				break;
 		}
@@ -221,7 +221,7 @@ class SupportPressAdmin extends SupportPress {
 
 	/**
 	 * When a thread is saved or updated, make sure we save the respondent
-	 * and new message data
+	 * and new comment data
 	 *
 	 * @todo nonce and cap checks
 	 */
@@ -235,9 +235,9 @@ class SupportPressAdmin extends SupportPress {
 			SupportPress()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['message'] ) && !empty( $_POST['message' ] ) ) {
-			$message = wp_filter_nohtml_kses( $_POST['message'] );
-			SupportPress()->add_thread_message( $thread_id, $message );
+		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
+			$comment = wp_filter_nohtml_kses( $_POST['comment'] );
+			SupportPress()->add_thread_comment( $thread_id, $comment );
 		}
 
 	}
