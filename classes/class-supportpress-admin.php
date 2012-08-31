@@ -85,16 +85,29 @@ class SupportPressAdmin extends SupportPress {
 		$statuses = SupportPress()->post_statuses;
 		$status_slugs = array_keys( $statuses );
 		$last_status = array_pop( $status_slugs );
-		if ( !in_array( get_query_var( 'post_status' ), array( 'trash', $last_status ) ) ) {
+		if ( !in_array( get_query_var( 'post_status' ), array( 'trash' ) ) ) {
+
+			if ( $last_status == get_post_status( $post->ID ) )
+				$change_to = $status_slugs[2];
+			else
+				$change_to = $last_status;
+
 			$args = array(
 					'action'          => 'change_status',
 					'sp_nonce'        => wp_create_nonce( 'sp-change-status' ),
-					'post_status'     => $last_status,
+					'post_status'     => $change_to,
 					'thread_id'       => $post->ID,
 					'post_type'       => SupportPress()->post_type,
 				);
-			$close_link = add_query_arg( $args, admin_url( 'edit.php' ) );
-			$row_actions['close'] = '<a href="' . esc_url( $close_link ) . '" title="' . esc_attr__( 'Close Thread', 'supportpress' ) . '">' . __( 'Close', 'supportpress' ) . '</a>';
+			$action_link = add_query_arg( $args, admin_url( 'edit.php' ) );
+			if ( $last_status == $change_to ) {
+				$title_attr = esc_attr__( 'Close Thread', 'supportpress' );
+				$action_text = esc_html__( 'Close', 'supportpress' );
+			} else {
+				$title_attr = esc_attr__( 'Reopen Thread', 'supportpress' );
+				$action_text = esc_html__( 'Reopen', 'supportpress' );
+			}
+			$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
 		}
 
 		// Actions we don't want
