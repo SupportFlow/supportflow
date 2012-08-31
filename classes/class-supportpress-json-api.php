@@ -1,7 +1,4 @@
 <?php
-/**
- *
- */
 
 class SupportPress_JSON_API extends SupportPress {
 
@@ -10,10 +7,10 @@ class SupportPress_JSON_API extends SupportPress {
 	}
 
 	public function setup_actions() {
-		add_action( 'wp_ajax_supportpress', array( $this, 'action_wp_ajax_supportpress' ) );
+		add_action( 'wp_ajax_supportpress_json', array( $this, 'action_wp_ajax_supportpress_json' ) );
 	}
 
-	public function action_wp_ajax_supportpress() {
+	public function action_wp_ajax_supportpress_json() {
 		global $current_user;
 
 		if ( empty( $_REQUEST['spaction'] ) )

@@ -13,7 +13,7 @@ var supportpress = {};
 	};
 
 	supportpress.get_ajax_url = function( action ) {
-		return SupportPressUserWidgetVars.supportpressurl + '/wp-admin/admin-ajax.php?action=supportpress&spaction=' + action;
+		return SupportPressUserWidgetVars.supportpressurl + '/wp-admin/admin-ajax.php?action=supportpress_json&spaction=' + action;
 	};
 
 	supportpress.populate_my_threads = function() {
