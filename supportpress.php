@@ -193,9 +193,11 @@ class SupportPress {
 
 		/** Core **************************************************************/
 
-		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportpress-json-api.php' );
 
 		/** Extensions ********************************************************/
+
+		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
 
 		# TODO: Akismet plugin?
 
@@ -261,7 +263,7 @@ class SupportPress {
 			'label'                  => __( 'Respondents',                'supportpress' ),
 			'labels' => array(
 				),
-			'public'                 => false,
+			'public'                 => true,
 			'show_in_nav_menus'      => true,
 			'rewrite'                => false,
 			);
@@ -287,22 +289,36 @@ class SupportPress {
 	/**
 	 * Validates a user ID
 	 */
-	public function validate_user( $user_ID_or_username ) {
-		if ( is_numeric( $user_ID_or_username ) ) {
-			$user = get_user_by( 'ID', $user_ID_or_username );
-
-			if ( ! $user )
-				return false;
-
-			return $user->data->ID;
-		} else {
-			$user = get_user_by( 'login', $user_ID_or_username );
-
-			if ( ! $user )
-				return false;
-
-			return $user->data->ID;
+	public function validate_user( $user ) {
+		// User ID
+		if ( is_numeric( $user ) ) {
+			$user_object = get_user_by( 'ID', $user );
 		}
+		// User e-mail address
+		elseif ( is_email( $user ) ) {
+			$user_object = get_user_by( 'email', $user );
+		}
+		// User login
+		else {
+			$user_object = get_user_by( 'login', $user );
+		}
+
+		if ( ! $user_object )
+			return false;
+
+		return $user_object->data->ID;
+	}
+
+	/**
+	 * Standardizes and validates an e-mail address
+	 */
+	public function standardize_and_validate_email( $email ) {
+		$email = strtolower( trim( $email ) );
+
+		if ( ! is_email( $email ) )
+			return false;
+
+		return $email;
 	}
 
 	/** Thread Functions ******************************************************/
@@ -403,6 +419,30 @@ class SupportPress {
 			}
 		}
 		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax );
+	}
+
+	/**
+	 * Get a respondent's threads
+	 */
+	public function get_threads_for_respondent( $email = null ) {
+		$email = $this->standardize_and_validate_email( $email );
+
+		$threads = new WP_Query( array(
+			'post_type' => $this->post_type,
+			'post_status' => 'any',
+			'tax_query' => array(
+				array(
+					'taxonomy' => $this->respondents_tax,
+					'field'    => 'slug',
+					'terms'    => md5( $email ),
+				),
+			),
+		) );
+
+		if ( ! $threads->have_posts() )
+			return array();
+
+		return $threads->posts;
 	}
 
 	/**
