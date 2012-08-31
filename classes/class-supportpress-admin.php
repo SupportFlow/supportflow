@@ -24,6 +24,7 @@ class SupportPressAdmin extends SupportPress {
 
 		// Manage threads view
 		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
+		add_filter( 'manage_edit-' . SupportPress()->post_type . '_sortable_columns', array( $this, 'manage_sortable_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
@@ -113,6 +114,11 @@ class SupportPressAdmin extends SupportPress {
 
 		if ( 'edit.php' != $pagenow || !$query->is_main_query() )
 			return;
+
+		// Order posts by post_modified if there's no orderby set
+		if ( !$query->get( 'orderby' ) ) {
+			$query->set( 'orderby', 'post_modified' );
+		}
 
 		// Do our own custom search handling so we can search against comment text
 		if ( $search = $query->get( 's' ) ) {
@@ -347,19 +353,30 @@ class SupportPressAdmin extends SupportPress {
 
 	/**
 	 * Modifications to the columns appearing in the All Threads view
+	 *
+	 * @todo maybe add 'Created' column
 	 */
 	public function filter_manage_post_columns( $columns ) {
 
 		$new_columns = array(
 				'cb'                  => $columns['cb'],
+				'updated'             => __( 'Updated', 'supportpress' ),
 				'title'               => __( 'Subject', 'supportpress' ),
 				'status'              => __( 'Status', 'supportpress' ),
 				'author'              => __( 'Agent', 'supportpress' ),
 				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
-				// 'updated'             => __( 'Updated', 'supportpress' ),
-				// 'created'             => __( 'Created', 'support' ),
+				'created'             => __( 'Created', 'support' ),
 			);
 		return $new_columns;
+	}
+
+	/**
+	 * Make some other columns sortable too
+	 */
+	public function manage_sortable_columns( $columns ) {
+		$columns['updated'] = 'post_modified';
+		$columns['created'] = 'post_date';
+		return $columns;
 	}
 
 	/**
@@ -368,6 +385,10 @@ class SupportPressAdmin extends SupportPress {
 	function action_manage_posts_custom_column( $column_name, $thread_id ) {
 
 		switch( $column_name ) {
+			case 'updated':
+				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
+				echo sprintf( __( '%s ago', 'supportpress' ), human_time_diff( $modified_gmt ) );
+				break;
 			case 'status':
 				$post_status = get_post_status( $thread_id );
 				$args = array(
@@ -383,6 +404,11 @@ class SupportPressAdmin extends SupportPress {
 				echo '<div class="post-com-count-wrapper">';
 				echo "<span class='comment-count'>{$comments}</span>";
 				echo '</div>';
+				break;
+			case 'created':
+				$created_time = get_the_time( get_option( 'time_format' ) . ' T', $thread_id );
+				$created_date = get_the_time( get_option( 'date_format' ), $thread_id );
+				echo sprintf( __( '%s<br />%s', 'supportpress' ), $created_time, $created_date );
 				break;
 		}
 	}
