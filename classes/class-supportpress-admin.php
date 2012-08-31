@@ -19,6 +19,7 @@ class SupportPressAdmin extends SupportPress {
 			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
 			// Modify the messages that appear when saving or creating
 			add_filter( 'post_updated_messages', array( $this, 'filter_post_updated_messages' ) );
+			add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
 		}
 	}
 
@@ -51,6 +52,22 @@ class SupportPressAdmin extends SupportPress {
 			10 => __( 'Thread updated.', 'supportpress' ),
 		);
 		return $messages;
+	}
+
+	/**
+	 * Filter the actions available to the agent on the post type
+	 */
+	function filter_post_row_actions( $row_actions, $post ) {
+
+		// Rename these actions
+		if ( isset( $row_actions['edit'] ) )
+			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Continue Thread', 'supportpress' ), str_replace( __( 'Edit this item' ), __( 'Continue Thread', 'supportpress' ), $row_actions['edit'] ) );
+
+		// Actions we don't want
+		unset( $row_actions['inline hide-if-no-js'] );
+		unset( $row_actions['view'] );
+
+		return $row_actions;
 	}
 
 	/**
