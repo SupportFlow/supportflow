@@ -3,7 +3,7 @@
  *
  */
 
-class SupportPressJSONAPI extends SupportPress {
+class SupportPress_JSON_API extends SupportPress {
 
 	function __construct() {
 		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
@@ -36,4 +36,4 @@ class SupportPressJSONAPI extends SupportPress {
 	}
 }
 
-SupportPress()->extend->jsonapi = new SupportPressJSONAPI();
+SupportPress()->extend->jsonapi = new SupportPress_JSON_API();
