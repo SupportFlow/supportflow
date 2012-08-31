@@ -424,7 +424,7 @@ class SupportPress {
 	/**
 	 * Get a respondent's threads
 	 */
-	public function get_threads_for_respondent( $email = null ) {
+	public function get_threads_for_respondent( $email ) {
 		$email = $this->standardize_and_validate_email( $email );
 
 		$threads = new WP_Query( array(
