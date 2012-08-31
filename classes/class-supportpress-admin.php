@@ -93,10 +93,56 @@ class SupportPressAdmin extends SupportPress {
 		remove_meta_box( 'slugdiv',          SupportPress()->post_type, 'normal' );
 		remove_meta_box( 'commentsdiv',          SupportPress()->post_type, 'normal' );
 
+		add_meta_box( 'supportpress-details', __( 'Details', 'supportpress' ), array( $this, 'meta_box_details' ), SupportPress()->post_type, 'side' );
 		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
 		add_meta_box( 'supportpress-respondents', __( 'Respondents', 'supportpress' ), array( $this, 'meta_box_respondents' ), SupportPress()->post_type, 'normal' );
 		add_meta_box( 'supportpress-comments', __( 'Commentss', 'supportpress' ), array( $this, 'meta_box_comments' ), SupportPress()->post_type, 'normal' );
-		// @todo metabox for thread details
+	}
+
+	/**
+	 * Show details about the thread, and allow the post status and agent to be changed
+	 */
+	public function meta_box_details() {
+		global $pagenow;
+
+		echo '<div id="misc-publishing-actions">';
+		// Post status dropdown
+		$current_status = get_post_status( get_the_ID() );
+		echo '<div class="misc-pub-section">';
+		echo '<label for="post_status">' . __( 'Status', 'supportpress' ) . ':</label>';
+		echo '<select id="post_status" name="post_status">';
+		foreach( SupportPress()->post_statuses as $slug => $post_status ) {
+			echo '<option value="' . esc_attr( $slug ) . '" ' . selected( $current_status, $slug ) . '>' . esc_html( $post_status['label'] ) . '</option>';
+		}
+		echo '</select>';
+		echo '</div>';
+		// Agent assignment dropdown
+		$post_author = get_post( get_the_ID() )->post_author;
+		echo '<div class="misc-pub-section">';
+		echo '<label for="post_author">' . __( 'Owner', 'supportpress' ) . ':</label>';
+		$args = array(
+				'show_option_none'    => __( '-- Unassigned --', 'supportpress' ),
+				'selected'            => $post_author,
+				'id'                  => 'post_author',
+				'name'                => 'post_author',
+				'who'                 => 'author',
+			);
+		wp_dropdown_users( $args );
+		echo '</div>';
+
+		echo '</div>';
+
+		if ( 'post-new.php' == $pagenow )
+			$submit_text = __( 'Start Thread', 'supportpress' );
+		else
+			$submit_text = __( 'Update Thread', 'supportpress' );
+		echo '<div id="major-publishing-actions">';
+		echo '<div id="publishing-action">';
+		submit_button( $submit_text, 'primary', 'save', false );
+		echo '</div>';
+		echo '<div class="clear"></div>';
+		echo '</div>';
+
 	}
 
 	/**
@@ -149,7 +195,7 @@ class SupportPressAdmin extends SupportPress {
 		echo '<p class="submit">';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportpress' ) . '</label>';
-		submit_button( $submit_text, 'primary', 'publish', false );
+		submit_button( $submit_text, 'primary', 'save', false );
 		echo '</p>';
 
 		$this->display_thread_comments();
@@ -188,7 +234,7 @@ class SupportPressAdmin extends SupportPress {
 			echo '</ul>';
 		}
 
-		echo '<div class="clear-left"></div>';
+		echo '<div class="clear"></div>';
 
 	}
 

@@ -152,19 +152,19 @@ class SupportPress {
 		$this->comment_type     = apply_filters( 'supportpress_thread_comment_type', 'sp_comment' );
 
 		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
-			'new'     => array(
+			'sp_new'     => array(
 				'label'       => __( 'New', 'supportpress' ),
 				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportpress' ),
 			),
-			'open'    => array(
+			'sp_open'    => array(
 				'label'       => __( 'Open', 'supportpress' ),
 				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportpress' ),
 			),
-			'pending' => array(
+			'sp_pending' => array(
 				'label'       => __( 'Pending', 'supportpress' ),
 				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportpress' ),
 			),
-			'closed'  => array(
+			'sp_closed'  => array(
 				'label'       => __( 'Closed', 'supportpress' ),
 				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportpress' ),
 			),
@@ -278,7 +278,7 @@ class SupportPress {
 	public function action_init_register_post_statuses() {
 		foreach ( $this->post_statuses as $post_status => $args ) {
 			$args['public'] = true;
-			register_post_status( 'sp_' . $post_status, $args );
+			register_post_status( $post_status, $args );
 		}
 	}
 

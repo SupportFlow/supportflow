@@ -12,10 +12,6 @@
 	padding-top: 0;
 }
 
-.clear-left {
-	clear:left;
-}
-
 #supportpress-subject.postbox,
 #supportpress-respondents.postbox {
 	border:none;
@@ -27,6 +23,8 @@
 	padding: 0;
 }
 
+#supportpress-details .handlediv,
+#supportpress-details h3.hndle,
 #supportpress-subject .handlediv,
 #supportpress-subject h3.hndle,
 #supportpress-respondents .handlediv,
@@ -34,6 +32,14 @@
 #supportpress-comments .handlediv,
 #supportpress-comments h3.hndle {
 	display:none;
+}
+
+#supportpress-details #misc-publishing-actions label {
+	padding-right: 5px;
+}
+
+#supportpress-details #misc-publishing-actions select#post_status {
+	width: 100px;
 }
 
 #supportpress-subject h4,
