@@ -199,6 +199,7 @@ class SupportPressAdmin extends SupportPress {
 
 		$new_columns = array(
 				'title'               => __( 'Subject', 'supportpress' ),
+				'status'              => __( 'Status', 'supportpress' ),
 				'author'              => __( 'Agent', 'supportpress' ),
 				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
 				// 'updated'             => __( 'Updated', 'supportpress' ),
@@ -213,6 +214,16 @@ class SupportPressAdmin extends SupportPress {
 	function action_manage_posts_custom_column( $column_name, $thread_id ) {
 
 		switch( $column_name ) {
+			case 'status':
+				$post_status = get_post_status( $thread_id );
+				$args = array(
+						'post_type'       => SupportPress()->post_type,
+						'post_status'     => $post_status,
+					);
+				$status_name = get_post_status_object( $post_status )->label;
+				$filter_link = add_query_arg( $args, admin_url( 'edit.php' ) );
+				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
+				break;
 			case 'sp_comments':
 				$comments = SupportPress()->get_thread_comment_count( $thread_id );
 				echo '<div class="post-com-count-wrapper">';
