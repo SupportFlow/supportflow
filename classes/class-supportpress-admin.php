@@ -11,6 +11,10 @@ class SupportPressAdmin extends SupportPress {
 
 	public function setup_actions() {
 
+		// Creating or updating a thread
+		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
+		add_action( 'save_post', array( $this, 'action_save_post' ) );
+
 		if ( !$this->is_edit_screen() )
 			return;
 
@@ -22,10 +26,6 @@ class SupportPressAdmin extends SupportPress {
 		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
-
-		// Creating or updating a thread
-		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
-		add_action( 'save_post', array( $this, 'action_save_post' ) );
 
 	}
 
@@ -91,6 +91,7 @@ class SupportPressAdmin extends SupportPress {
 		remove_meta_box( 'submitdiv', SupportPress()->post_type, 'side' );
 		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
 		remove_meta_box( 'slugdiv',          SupportPress()->post_type, 'normal' );
+		remove_meta_box( 'commentsdiv',          SupportPress()->post_type, 'normal' );
 
 		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
 		add_meta_box( 'supportpress-respondents', __( 'Respondents', 'supportpress' ), array( $this, 'meta_box_respondents' ), SupportPress()->post_type, 'normal' );
@@ -144,27 +145,48 @@ class SupportPressAdmin extends SupportPress {
 		if ( 'post-new.php' == $pagenow )
 			$submit_text = __( 'Start Thread', 'supportpress' );
 		else
-			$submit_text = __( 'Update Thread', 'supportpress' );
-		submit_button( $submit_text );
+			$submit_text = __( 'Send Message', 'supportpress' );
+		echo '<p class="submit">';
+		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
+		echo '<label for="mark-private">' . __( 'Mark private', 'supportpress' ) . '</label>';
+		submit_button( $submit_text, 'primary', 'publish', false );
+		echo '</p>';
 
 		$this->display_thread_comments();
 	}
 
 	public function display_thread_comments() {
 
-		$comments = SupportPress()->get_thread_comments( get_the_ID() );
-		echo '<ul class="thread-comments">';
-		foreach( $comments as $comment ) {
-			echo '<li>';
-			echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
-			echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
-			echo '</div>';
-			echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
-			$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
-			echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
-			echo '</li>';
+		$private_comments = SupportPress()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'private' ) );
+		if ( !empty( $private_comments ) ) {
+			echo '<ul class="private-comments">';
+			foreach( $private_comments as $comment ) {
+				echo '<li>';
+				echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
+				$comment_date = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
+				$comment_time = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
+				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportpress' ), $comment->comment_author, $comment_date, $comment_time );
+				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
+				echo '</li>';
+			}
+			echo '</ul>';
 		}
-		echo '</ul>';
+
+		$comments = SupportPress()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'public' ) );
+		if ( !empty( $comments ) ) {
+			echo '<ul class="thread-comments">';
+			foreach( $comments as $comment ) {
+				echo '<li>';
+				echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
+				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
+				echo '</div>';
+				echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
+				$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
+				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
+				echo '</li>';
+			}
+			echo '</ul>';
+		}
 
 		echo '<div class="clear-left"></div>';
 
@@ -237,7 +259,8 @@ class SupportPressAdmin extends SupportPress {
 
 		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
 			$comment = wp_filter_nohtml_kses( $_POST['comment'] );
-			SupportPress()->add_thread_comment( $thread_id, $comment );
+			$visibility = ( !empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
+			SupportPress()->add_thread_comment( $thread_id, $comment, array( 'comment_approved' => $visibility ) );
 		}
 
 	}

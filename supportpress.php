@@ -408,11 +408,17 @@ class SupportPress {
 	/**
 	 * Get all of the comments associated with a thread
 	 */
-	public function get_thread_comments( $thread_id ) {
+	public function get_thread_comments( $thread_id, $args = array() ) {
 
-		$args = array(
+		$default_args = array(
+				'comment_approved' => 'public',
+			);
+
+		$args = array_merge( $default_args, $args );
+		$comment_args = array(
 				'post_id'                => $thread_id,
-				'comment_approved'       => $this->comment_type,
+				'comment_approved'       => $args['comment_approved'],
+				'comment_type'           => $this->comment_type,
 			);
 		$thread_comments = get_comments( $args );
 		return $thread_comments;
@@ -426,7 +432,7 @@ class SupportPress {
 	public function get_thread_comment_count( $thread_id, $args = array() ) {
 		global $wpdb;
 
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_post_ID =%s AND comment_approved = %s", $thread_id, $this->comment_type ) );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_post_ID =%s AND comment_type = %s", $thread_id, $this->comment_type ) );
 		return (int)$count;
 	}
 
@@ -442,6 +448,7 @@ class SupportPress {
 				'comment_author_email'   => '',
 				'comment_author_url'     => '',
 				'user_id'                => '',
+				'comment_approved'       => 'public',
 			);
 		if ( $user = wp_get_current_user() ) {
 			$default_details['comment_author'] = $user->display_name;
@@ -455,7 +462,7 @@ class SupportPress {
 		$comment = array(
 				'comment_content'        => esc_sql( $comment_text ),
 				'comment_post_ID'        => (int)$thread_id,
-				'comment_approved'       => esc_sql( $this->comment_type ),
+				'comment_approved'       => esc_sql( $details['comment_approved'] ),
 				'comment_type'           => esc_sql( $this->comment_type ),
 				// 'status'                 => $details['status'],
 				'comment_author'         => esc_sql( $details['comment_author'] ),
