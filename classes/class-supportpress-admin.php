@@ -27,6 +27,7 @@ class SupportPressAdmin extends SupportPress {
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
+		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
 
 	}
 
@@ -70,9 +71,36 @@ class SupportPressAdmin extends SupportPress {
 		if ( isset( $row_actions['edit'] ) )
 			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discuss', 'supportpress' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportpress' ), $row_actions['edit'] ) );
 
+		// Save the trash action for the end
+		if ( isset( $row_actions['trash'] ) ) {
+			$trash_action = $row_actions['trash'];
+			unset( $row_actions['trash'] );
+		} else {
+			$trash_action = false;
+		}
+
+		// Allow an agent to easily close a ticket
+		$statuses = SupportPress()->post_statuses;
+		$status_slugs = array_keys( $statuses );
+		$last_status = array_pop( $status_slugs );
+		if ( !in_array( get_query_var( 'post_status' ), array( 'trash', $last_status ) ) ) {
+			$args = array(
+					'action'          => 'change_status',
+					'sp_nonce'        => wp_create_nonce( 'sp-change-status' ),
+					'post_status'     => $last_status,
+					'thread_id'       => $post->ID,
+					'post_type'       => SupportPress()->post_type,
+				);
+			$close_link = add_query_arg( $args, admin_url( 'edit.php' ) );
+			$row_actions['close'] = '<a href="' . esc_url( $close_link ) . '" title="' . esc_attr__( 'Close Thread', 'supportpress' ) . '">' . __( 'Close', 'supportpress' ) . '</a>';
+		}
+
 		// Actions we don't want
 		unset( $row_actions['inline hide-if-no-js'] );
 		unset( $row_actions['view'] );
+
+		if ( $trash_action )
+			$row_actions['trash'] = $trash_action;
 
 		return $row_actions;
 	}
@@ -95,6 +123,31 @@ class SupportPressAdmin extends SupportPress {
 		if ( empty( $post_status ) )
 			$query->set( 'post_status', $status_slugs );
 
+	}
+
+	/**
+	 * Handle $_GET actions in the admin
+	 *
+	 * @todo need a caps check too to make sure this user can edit the thread
+	 */
+	function handle_action_change_status() {
+
+		if ( ! isset( $_GET['action'], $_GET['sp_nonce'], $_GET['post_status'], $_GET['thread_id'] ) )
+			return;
+
+		if ( ! wp_verify_nonce( $_GET['sp_nonce'], 'sp-change-status' ) )
+			wp_die( __( "Doin' something phishy, huh?", 'supportpress' ) );
+
+		$post_status = sanitize_key( $_GET['post_status'] );
+		$thread_id = (int)$_GET['thread_id'];
+
+		$new_thread = array(
+				'ID'               => $thread_id,
+				'post_status'      => $post_status,
+			);
+		wp_update_post( $new_thread );
+		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
