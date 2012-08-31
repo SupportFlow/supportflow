@@ -10,17 +10,23 @@ class SupportPressAdmin extends SupportPress {
 	}
 
 	public function setup_actions() {
-		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
 
+		if ( !$this->is_edit_screen() )
+			return;
+
+		// Everything
+		add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
+		add_filter( 'post_updated_messages', array( $this, 'filter_post_updated_messages' ) );
+
+		// Manage threads view
+		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
+		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
+		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
+
+		// Creating or updating a thread
+		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 
-		if ( $this->is_edit_screen() ) {
-			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
-			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
-			// Modify the messages that appear when saving or creating
-			add_filter( 'post_updated_messages', array( $this, 'filter_post_updated_messages' ) );
-			add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
-		}
 	}
 
 	/**
@@ -169,8 +175,29 @@ class SupportPressAdmin extends SupportPress {
 	 */
 	public function filter_manage_post_columns( $columns ) {
 
-		$columns['title'] = __( 'Subject', 'supportpress' );
-		return $columns;
+		$new_columns = array(
+				'title'               => __( 'Subject', 'supportpress' ),
+				'author'              => __( 'Agent', 'supportpress' ),
+				'messages'            => '<span class="vers"><img alt="' . esc_attr__( 'Messages', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+				// 'updated'             => __( 'Updated', 'supportpress' ),
+				// 'created'             => __( 'Created', 'support' ),
+			);
+		return $new_columns;
+	}
+
+	/**
+	 * Produce the column values for the custom columns we created
+	 */
+	function action_manage_posts_custom_column( $column_name, $thread_id ) {
+
+		switch( $column_name ) {
+			case 'messages':
+				$messages = SupportPress()->get_thread_message_count( $thread_id );
+				echo '<div class="post-com-count-wrapper">';
+				echo "<span class='comment-count'>{$messages}</span>";
+				echo '</div>';
+				break;
+		}
 	}
 
 	/**

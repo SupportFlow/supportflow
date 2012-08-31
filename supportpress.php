@@ -419,6 +419,18 @@ class SupportPress {
 	}
 
 	/**
+	 * Get the total number of messages associated with a thread
+	 *
+	 * @todo support filtering to specific types or commenters
+	 */
+	public function get_thread_message_count( $thread_id, $args = array() ) {
+		global $wpdb;
+
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_post_ID =%s AND comment_approved = %s", $thread_id, $this->comment_type ) );
+		return (int)$count;
+	}
+
+	/**
 	 * Add a message to a given thread
 	 */
 	public function add_thread_message( $thread_id, $message_text, $details = array() ) {
