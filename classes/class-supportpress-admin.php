@@ -136,7 +136,7 @@ class SupportPressAdmin extends SupportPress {
 			echo '<div class="message-avatar">' . get_avatar( $message->comment_author_email, 72 );
 			echo '<p class="message-author">' . esc_html( $message->comment_author ) .'</p>';
 			echo '</div>';
-			echo '<div class="thread-message">' . $message->comment_content . '</div>';
+			echo '<div class="thread-message">' . wpautop( $message->comment_content ) . '</div>';
 			$message_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $message->comment_ID ), get_comment_date( get_option( 'time_format' ), $message->comment_ID ) );
 			echo '<div class="thread-meta"><span class="message-timestamp">' . esc_html( $message_timestamp ) . '</span></div>';
 			echo '</li>';
