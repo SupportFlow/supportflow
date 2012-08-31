@@ -26,6 +26,7 @@ class SupportPressAdmin extends SupportPress {
 		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
+		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 
 	}
 
@@ -74,6 +75,26 @@ class SupportPressAdmin extends SupportPress {
 		unset( $row_actions['view'] );
 
 		return $row_actions;
+	}
+
+	/**
+	 * Handle which threads are show on the Manage Threads view when
+	 */
+	function action_pre_get_posts( $query ) {
+		global $pagenow;
+
+		if ( 'edit.php' != $pagenow )
+			return;
+
+		$statuses = SupportPress()->post_statuses;
+		$status_slugs = array_keys( $statuses );
+
+		// Only show threads with the last status if the last status is set
+		$last_status = array_pop( $status_slugs );
+		$post_status = $query->get( 'post_status' );
+		if ( empty( $post_status ) )
+			$query->set( 'post_status', $status_slugs );
+
 	}
 
 	/**
