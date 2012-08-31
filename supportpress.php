@@ -472,7 +472,6 @@ class SupportPress {
 
 		$default_details = array(
 				'time'                   => current_time( 'mysql' ),
-				// 'status'                 => 'public',
 				'comment_author'         => '',
 				'comment_author_email'   => '',
 				'comment_author_url'     => '',
@@ -493,7 +492,6 @@ class SupportPress {
 				'comment_post_ID'        => (int)$thread_id,
 				'comment_approved'       => esc_sql( $details['comment_approved'] ),
 				'comment_type'           => esc_sql( $this->comment_type ),
-				// 'status'                 => $details['status'],
 				'comment_author'         => esc_sql( $details['comment_author'] ),
 				'comment_author_email'   => esc_sql( $details['comment_author_email'] ),
 				'comment_author_url'     => esc_sql( $details['comment_author_url'] ),
