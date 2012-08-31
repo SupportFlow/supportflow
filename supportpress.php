@@ -237,7 +237,7 @@ class SupportPress {
 				'all_items'          => __( 'All Threads',               'supportpress' ),
 				'add_new'            => __( 'Start New',                 'sp_thread' ),
 				'add_new_item'       => __( 'Start New Thread',          'supportpress' ),
-				'edit_item'          => __( 'Continue Thread',           'supportpress' ),
+				'edit_item'          => __( 'Discuss Thread',           'supportpress' ),
 				'new_item'           => __( 'New Thread',                'supportpress' ),
 				'view_item'          => __( 'View Thread',               'supportpress' ),
 				'search_item'        => __( 'Search Threads',            'supportpress' ),
