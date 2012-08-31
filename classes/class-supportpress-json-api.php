@@ -2,12 +2,14 @@
 
 class SupportPress_JSON_API extends SupportPress {
 
+	public $action = 'supportpress_json';
+
 	function __construct() {
 		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	public function setup_actions() {
-		add_action( 'wp_ajax_supportpress_json', array( $this, 'action_wp_ajax_supportpress_json' ) );
+		add_action( 'wp_ajax_' . $this->action, array( $this, 'action_wp_ajax_supportpress_json' ) );
 	}
 
 	public function action_wp_ajax_supportpress_json() {

@@ -31,7 +31,7 @@ class SupportPress_UI_Widget extends SupportPress {
 			$this->script_slug,
 			'SupportPressUserWidgetVars',
 			array(
-				'ajaxurl' => admin_url( 'admin-ajax.php?action=supportpress_json' ),
+				'ajaxurl' => add_query_arg( 'action', SupportPress()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) ),
 			)
 		);
 
