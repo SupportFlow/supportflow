@@ -27,6 +27,7 @@ class SupportPressAdmin extends SupportPress {
 		add_filter( 'manage_edit-' . SupportPress()->post_type . '_sortable_columns', array( $this, 'manage_sortable_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
+		add_filter( 'bulk_actions-edit-' . SupportPress()->post_type, array( $this, 'filter_bulk_actions' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
 
@@ -104,6 +105,14 @@ class SupportPressAdmin extends SupportPress {
 			$row_actions['trash'] = $trash_action;
 
 		return $row_actions;
+	}
+
+	/**
+	 * Remove the 'edit' bulk action. Doesn't do much for us
+	 */
+	public function filter_bulk_actions( $actions ) {
+		unset( $actions['edit'] );
+		return $actions;
 	}
 
 	/**
