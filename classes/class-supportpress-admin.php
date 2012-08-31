@@ -39,6 +39,47 @@ class SupportPressAdmin extends SupportPress {
 	public function action_admin_enqueue_scripts() {
 
 		wp_enqueue_style( 'supportpress-admin', SupportPress()->plugin_url . 'css/admin.css', array(), SupportPress()->version );
+		wp_enqueue_script( 'supportpress-plupload', SupportPress()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
+		self::add_default_plupload_settings();
+	}
+
+	/**
+	 * Sets up some default Plupload settings so we can upload media 
+	 */
+	private static function add_default_plupload_settings() {
+		global $wp_scripts;
+
+		$defaults = array(
+			'runtimes'            => 'html5,silverlight,flash,html4',
+			'file_data_name'      => 'async-upload',
+			'multiple_queues'     => true,
+			'url'                 => admin_url( 'admin-ajax.php', 'relative' ),
+			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
+			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
+			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*') ),
+			'multipart'           => true,
+			'urlstream_upload'    => true,
+			'multipart_params'    => array(
+				'action'          => 'upload-attachment',
+				'_wpnonce'        => wp_create_nonce( 'media-form' )
+			)
+		);
+
+		$settings = array(
+			'defaults' => $defaults,
+			'browser'  => array(
+				'mobile'    => wp_is_mobile(),
+				'supported' => _device_can_upload(),
+			)
+		);
+
+		$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
+		$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
+
+		if ( ! empty( $data ) )
+			$script = "$data\n$script";
+
+		$wp_scripts->add_data( 'wp-plupload', 'data', $script );
 	}
 
 	/**
@@ -326,15 +367,27 @@ class SupportPressAdmin extends SupportPress {
 		echo "<textarea id='comment' name='comment' class='thread-comment' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 		echo '</div>';
+
+	
+		echo '<div id="message-tools">';
+		echo '<div id="comment-attachments-wrap">';
+		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it' ) . '</div>';
+		echo '<ul id="comment-attachments-list">';
+		echo '</ul>';
+		echo '<input type="hidden" id="comment-attachments" name="comment-attachments" />';
+		echo '</div>';
+		echo '<div id="submit-action">';
+		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
+		echo '<label for="mark-private">' . __( 'Mark private', 'supportpress' ) . '</label>';
 		if ( 'post-new.php' == $pagenow )
 			$submit_text = __( 'Start Thread', 'supportpress' );
 		else
 			$submit_text = __( 'Send Message', 'supportpress' );
-		echo '<p class="submit">';
-		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
-		echo '<label for="mark-private">' . __( 'Mark private', 'supportpress' ) . '</label>';
 		submit_button( $submit_text, 'primary', 'save', false );
-		echo '</p>';
+		echo '</div>';
+		echo '</div>';
+
+		echo '<div class="clear"></div>';
 
 		$this->display_thread_comments();
 	}
@@ -346,7 +399,18 @@ class SupportPressAdmin extends SupportPress {
 			echo '<ul class="private-comments">';
 			foreach( $private_comments as $comment ) {
 				echo '<li>';
-				echo '<div class="thread-comment">' . wpautop( stripslashes( $comment->comment_content ) ) . '</div>';
+				echo '<div class="thread-comment">';
+				echo wpautop( stripslashes( $comment->comment_content ) );
+				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
+					echo '<ul class="thread-comment-attachments">';
+					foreach( $attachment_ids as $attachment_id ) {
+						$attachment_link = wp_get_attachment_url( $attachment_id );
+						$attachment_name = basename( get_attached_file( $attachment_id ) );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment_name ) . '</a></li>';
+					}
+					echo '</ul>';
+				}
+				echo '</div>';
 				$comment_date = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
 				$comment_time = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
 				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportpress' ), $comment->comment_author, $comment_date, $comment_time );
@@ -364,7 +428,18 @@ class SupportPressAdmin extends SupportPress {
 				echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
 				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
 				echo '</div>';
-				echo '<div class="thread-comment">' . wpautop( stripslashes( $comment->comment_content ) ) . '</div>';
+				echo '<div class="thread-comment">';
+				echo wpautop( stripslashes( $comment->comment_content ) );
+				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
+					echo '<ul class="thread-comment-attachments">';
+					foreach( $attachment_ids as $attachment_id ) {
+						$attachment_link = wp_get_attachment_url( $attachment_id );
+						$attachment_name = basename( get_attached_file( $attachment_id ) );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment_name ) . '</a></li>';
+					}
+					echo '</ul>';
+				}
+				echo '</div>';
 				$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
 				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 				echo '</li>';
@@ -476,7 +551,12 @@ class SupportPressAdmin extends SupportPress {
 		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
 			$comment = wp_filter_nohtml_kses( $_POST['comment'] );
 			$visibility = ( !empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
-			SupportPress()->add_thread_comment( $thread_id, $comment, array( 'comment_approved' => $visibility ) );
+			$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['comment-attachments'], ',' ) ) );
+			$comment_args = array(
+					'comment_approved'        => $visibility,
+					'attachment_ids'          => $attachment_ids,
+				);
+			SupportPress()->add_thread_comment( $thread_id, $comment, $comment_args );
 		}
 
 	}

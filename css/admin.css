@@ -65,7 +65,6 @@
 	padding: 8px;
 	font-size: 1.2em;
 }
-
 #supportpress-comments.postbox .comment-reply {
 	width: 100%;
 }
@@ -77,15 +76,29 @@
 	font-size: 1.2em;
 }
 
-#supportpress-comments.postbox .inside p.submit {
-	float:none;
+#supportpress-comments.postbox .inside #message-tools #submit-action {
 	padding:0;
 	margin-top: 5px;
-	text-align: right;
+	float: right;
 }
 
-#supportpress-comments.postbox .inside p.submit label {
-	padding-top: 5px;
+#supportpress-comments.postbox .inside #message-tools #comment-attachments-wrap {
+	float: left;
+}
+
+#supportpress-comments #upload-messages,
+#supportpress-comments #comment-attachments-list {
+	margin-top: 9px;
+	margin-left: 2px;
+	color: #666666;
+}
+
+#supportpress-comments.postbox .inside #message-tools #submit-action input[type="checkbox"] {
+	margin-top: -1px;
+}
+
+#supportpress-comments.postbox .inside #message-tools #submit-action label {
+	padding-top: 2px;
 	padding-left: 5px;
 	padding-right: 25px;
 }
@@ -116,6 +129,13 @@
 	clear:left;
 	margin-top: 20px;
 	margin-bottom: 20px;
+}
+
+#supportpress-comments.postbox ul.thread-comments li .thread-comment-attachments li,
+#supportpress-comments.postbox ul.private-comments li .thread-comment-attachments li {
+	margin-top: 3px;
+	margin-bottom: 3px;
+	font-size: 0.9em;
 }
 
 #supportpress-comments.postbox ul.thread-comments li .comment-avatar {

@@ -527,6 +527,12 @@ class SupportPress {
 
 		$details = array_merge( $default_details, $details );
 
+		// If there are attachments, store them for later
+		if ( isset( $details['attachment_ids'] ) ) {
+			$attachment_ids = $details['attachment_ids'];
+			unset( $details['attachment_ids'] );
+		}
+
 		$comment = array(
 				'comment_content'        => esc_sql( $comment_text ),
 				'comment_post_ID'        => (int)$thread_id,
@@ -538,11 +544,16 @@ class SupportPress {
 				'user_id'                => (int)$details['user_id'],
 			);
 		$comment = apply_filters( 'supportpress_pre_insert_thread_comment', $comment );
-		wp_insert_comment( $comment );
+		$comment_id = wp_insert_comment( $comment );
+
+		// If there are attachment IDs store them as meta
+		add_comment_meta( $comment_id, 'attachment_ids', $attachment_ids, true );
 
 		// Adding a thread comment updates the post modified time for the thread
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql') ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
+
+		return $comment_id;
 	}
 
 }
