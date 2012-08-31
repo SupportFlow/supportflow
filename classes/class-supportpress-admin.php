@@ -17,6 +17,8 @@ class SupportPressAdmin extends SupportPress {
 		if ( $this->is_edit_screen() ) {
 			add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
+			// Modify the messages that appear when saving or creating
+			add_filter( 'post_updated_messages', array( $this, 'filter_post_updated_messages' ) );
 		}
 	}
 
@@ -26,6 +28,29 @@ class SupportPressAdmin extends SupportPress {
 	public function action_admin_enqueue_scripts() {
 
 		wp_enqueue_style( 'supportpress-admin', SupportPress()->plugin_url . 'css/admin.css', array(), SupportPress()->version );
+	}
+
+	/**
+	 * Filter the messages that appear to the user after they perform an action on a thread
+	 */
+	public function filter_post_updated_messages( $messages ) {
+		global $post;
+
+		$messages[SupportPress()->post_type] = array(
+			0 => '', // Unused. Messages start at index 1.
+			1 => __( 'Thread updated.', 'supportpress' ),
+			2 => __( 'Custom field updated.', 'supportpress' ),
+			3 => __( 'Custom field deleted.', 'supportpress' ),
+			4 => __( 'Thread updated.', 'supportpress' ),
+			/* translators: %s: date and time of the revision */
+			5 => isset($_GET['revision']) ? sprintf( __( 'Thread restored to revision from %s', 'supportpress' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6 => __( 'Thread updated.', 'supportpress' ),
+			7 => __( 'Thread updated.', 'supportpress' ),
+			8 => __( 'Thread updated.', 'supportpress' ),
+			9 => __( 'Thread updated.', 'supportpress' ),
+			10 => __( 'Thread updated.', 'supportpress' ),
+		);
+		return $messages;
 	}
 
 	/**
