@@ -126,7 +126,10 @@ class SupportPressAdmin extends SupportPress {
 
 		// Order posts by post_modified if there's no orderby set
 		if ( !$query->get( 'orderby' ) ) {
-			$query->set( 'orderby', 'post_modified' );
+			$query->set( 'orderby', 'modified' );
+			$query->set( 'order', 'asc' );
+			$_GET['orderby'] = 'modified';
+			$_GET['order'] = 'asc';
 		}
 
 		// Do our own custom search handling so we can search against comment text
@@ -383,8 +386,8 @@ class SupportPressAdmin extends SupportPress {
 	 * Make some other columns sortable too
 	 */
 	public function manage_sortable_columns( $columns ) {
-		$columns['updated'] = 'post_modified';
-		$columns['created'] = 'post_date';
+		$columns['updated'] = 'modified';
+		$columns['created'] = 'date';
 		return $columns;
 	}
 
