@@ -420,7 +420,7 @@ class SupportPress {
 				'comment_approved'       => $args['comment_approved'],
 				'comment_type'           => $this->comment_type,
 			);
-		$thread_comments = get_comments( $args );
+		$thread_comments = get_comments( $comment_args );
 		return $thread_comments;
 	}
 
