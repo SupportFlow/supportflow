@@ -351,6 +351,7 @@ class SupportPressAdmin extends SupportPress {
 	public function filter_manage_post_columns( $columns ) {
 
 		$new_columns = array(
+				'cb'                  => $columns['cb'],
 				'title'               => __( 'Subject', 'supportpress' ),
 				'status'              => __( 'Status', 'supportpress' ),
 				'author'              => __( 'Agent', 'supportpress' ),
