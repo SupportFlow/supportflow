@@ -149,6 +149,7 @@ class SupportPress {
 
 		$this->post_type        = apply_filters( 'supportpress_thread_post_type', 'sp_thread' );
 		$this->respondents_tax  = apply_filters( 'supportpresss_respondents_taxonomy', 'sp_respondent' );
+		$this->comment_type     = apply_filters( 'supportpress_thread_comment_type', 'sp_comment' );
 
 		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
 			'new'     => array(
@@ -403,6 +404,57 @@ class SupportPress {
 		}
 		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax );
 	}
+
+	/**
+	 * Get all of the messages associated with a thread
+	 */
+	public function get_thread_messages( $thread_id ) {
+
+		$args = array(
+				'post_id'                => $thread_id,
+				'comment_approved'       => $this->comment_type,
+			);
+		$thread_messages = get_comments( $args );
+		return $thread_messages;
+	}
+
+	/**
+	 * Add a message to a given thread
+	 */
+	public function add_thread_message( $thread_id, $message_text, $details = array() ) {
+
+		$default_details = array(
+				'time'                   => current_time( 'mysql' ),
+				// 'status'                 => 'public',
+				'comment_author'         => '',
+				'comment_author_email'   => '',
+				'comment_author_url'     => '',
+				'user_id'                => '',
+			);
+		if ( $user = wp_get_current_user() ) {
+			$default_details['comment_author'] = $user->display_name;
+			$default_details['comment_author_email'] = $user->user_email;
+			$default_details['comment_author_url'] = $user->user_url;
+			$default_details['user_id'] = $user->ID;
+		}
+
+		$details = array_merge( $default_details, $details );
+
+		$message = array(
+				'comment_content'        => esc_sql( $message_text ),
+				'comment_post_ID'        => (int)$thread_id,
+				'comment_approved'       => esc_sql( $this->comment_type ),
+				'comment_type'           => esc_sql( $this->comment_type ),
+				// 'status'                 => $details['status'],
+				'comment_author'         => esc_sql( $details['comment_author'] ),
+				'comment_author_email'   => esc_sql( $details['comment_author_email'] ),
+				'comment_author_url'     => esc_sql( $details['comment_author_url'] ),
+				'user_id'                => (int)$details['user_id'],
+			);
+		$message = apply_filters( 'supportpress_pre_insert_thread_message', $message );
+		wp_insert_comment( $message );
+	}
+
 }
 
 /**

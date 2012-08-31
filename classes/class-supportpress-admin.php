@@ -89,13 +89,36 @@ class SupportPressAdmin extends SupportPress {
 
 		$rand = array_rand( $placeholders );
 		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
-		echo "<textarea id='message' name='message' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
+		echo '<div class="message-reply">';
+		echo "<textarea id='message' name='message' class='thread-message' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
+		echo '</div>';
 		if ( 'post-new.php' == $pagenow )
 			$submit_text = __( 'Start Thread', 'supportpress' );
 		else
 			$submit_text = __( 'Update Thread', 'supportpress' );
 		submit_button( $submit_text );
+
+		$this->display_thread_messages();
+	}
+
+	public function display_thread_messages() {
+
+		$messages = SupportPress()->get_thread_messages( get_the_ID() );
+		echo '<ul class="thread-messages">';
+		foreach( $messages as $message ) {
+			echo '<li>';
+			echo '<div class="message-avatar">' . get_avatar( $message->comment_author_email, 72 );
+			echo '<p class="message-author">' . esc_html( $message->comment_author ) .'</p>';
+			echo '</div>';
+			echo '<div class="thread-message">' . $message->comment_content . '</div>';
+			$message_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $message->comment_ID ), get_comment_date( get_option( 'time_format' ), $message->comment_ID ) );
+			echo '<div class="thread-meta"><span class="message-timestamp">' . esc_html( $message_timestamp ) . '</span></div>';
+			echo '</li>';
+		}
+		echo '</ul>';
+
+		echo '<div class="clear-left"></div>';
 
 	}
 
@@ -141,6 +164,11 @@ class SupportPressAdmin extends SupportPress {
 		if ( isset( $_POST['respondents'] ) ) {
 			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
 			SupportPress()->update_thread_respondents( $thread_id, $respondents );
+		}
+
+		if ( isset( $_POST['message'] ) && !empty( $_POST['message' ] ) ) {
+			$message = wp_filter_nohtml_kses( $_POST['message'] );
+			SupportPress()->add_thread_message( $thread_id, $message );
 		}
 
 	}

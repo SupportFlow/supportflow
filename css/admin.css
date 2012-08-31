@@ -2,6 +2,10 @@
 	padding-top: 0;
 }
 
+.clear-left {
+	clear:left;
+}
+
 #supportpress-subject.postbox,
 #supportpress-respondents.postbox {
 	border:none;
@@ -22,7 +26,8 @@
 	display:none;
 }
 
-#supportpress-subject-respondents h4,
+#supportpress-subject h4,
+#supportpress-respondents h4,
 #supportpress-messages h4 {
 	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 	font-size: 13px;
@@ -45,6 +50,10 @@
 	font-size: 1.2em;
 }
 
+#supportpress-messages.postbox .message-reply {
+	width: 100%;
+}
+
 #supportpress-messages.postbox textarea {
 	width: 100%;
 	padding: 8px;
@@ -57,6 +66,41 @@
 	padding:0;
 	margin-top: 5px;
 	text-align: right;
+}
+
+#supportpress-messages.postbox ul.thread-messages li {
+	clear:left;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#supportpress-messages.postbox ul.thread-messages li .message-avatar {
+	float: left;
+}
+
+#supportpress-messages.postbox ul.thread-messages li .message-author {
+	margin: 0;
+	font-size: 0.9em;
+	color: #666666;
+}
+
+#supportpress-messages.postbox ul.thread-messages li .thread-message {
+	background-color: #FFFFFF;
+	margin-left: 105px;
+	min-height: 80px;
+	padding: 10px;
+	font-size: 1.1em;
+	border: 1px solid #DFDFDF;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#supportpress-messages.postbox ul.thread-messages li .thread-meta {
+	margin-left: 105px;
+	font-size: 0.9em;
+	color: #666666;
+	margin-top: 5px;
 }
 
 .metabox-holder .postbox-container .empty-container {
