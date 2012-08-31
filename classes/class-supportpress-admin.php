@@ -208,7 +208,7 @@ class SupportPressAdmin extends SupportPress {
 			echo '<ul class="private-comments">';
 			foreach( $private_comments as $comment ) {
 				echo '<li>';
-				echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
+				echo '<div class="thread-comment">' . wpautop( stripslashes( $comment->comment_content ) ) . '</div>';
 				$comment_date = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
 				$comment_time = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
 				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportpress' ), $comment->comment_author, $comment_date, $comment_time );
@@ -226,7 +226,7 @@ class SupportPressAdmin extends SupportPress {
 				echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
 				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
 				echo '</div>';
-				echo '<div class="thread-comment">' . wpautop( $comment->comment_content ) . '</div>';
+				echo '<div class="thread-comment">' . wpautop( stripslashes( $comment->comment_content ) ) . '</div>';
 				$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
 				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 				echo '</li>';
