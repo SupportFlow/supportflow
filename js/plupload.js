@@ -3,14 +3,14 @@ jQuery(document).ready(function($) {
 
 		/* Selectors */
 		browser:   '#upload-indicator',
-		dropzone:  '#comment',
+		dropzone:  '#comment-reply',
 
 		/* Callbacks */
 		success  : function( attachment ) {
 			$( '#comment-attachments' ).val( $( '#comment-attachments' ).val() + ',' + attachment.id );
 			$( '#upload-messages' ).hide();
 			$( '<li>', {
-				html: attachment.filename,
+				html: '<a target="_blank" href="' + attachment.url + '">' + attachment.filename + '</a>',
 			 } ).appendTo( $( 'ul#comment-attachments-list' ) );
 			$( '#upload-messages' ).removeClass( 'uploading' );
 		},

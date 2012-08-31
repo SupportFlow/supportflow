@@ -363,12 +363,11 @@ class SupportPress_Admin extends SupportPress {
 
 		$rand = array_rand( $placeholders );
 		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
-		echo '<div class="comment-reply">';
+		echo '<div id="comment-reply">';
+
 		echo "<textarea id='comment' name='comment' class='thread-comment' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
-		echo '</div>';
 
-	
 		echo '<div id="message-tools">';
 		echo '<div id="comment-attachments-wrap">';
 		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it' ) . '</div>';
@@ -385,6 +384,8 @@ class SupportPress_Admin extends SupportPress {
 			$submit_text = __( 'Send Message', 'supportpress' );
 		submit_button( $submit_text, 'primary', 'save', false );
 		echo '</div>';
+		echo '</div>';
+
 		echo '</div>';
 
 		echo '<div class="clear"></div>';

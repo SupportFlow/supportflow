@@ -65,7 +65,7 @@
 	padding: 8px;
 	font-size: 1.2em;
 }
-#supportpress-comments.postbox .comment-reply {
+#supportpress-comments.postbox #comment-reply {
 	width: 100%;
 }
 
