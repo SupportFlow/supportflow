@@ -71,7 +71,7 @@ class SupportPressAdmin extends SupportPress {
 
 		// Rename these actions
 		if ( isset( $row_actions['edit'] ) )
-			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discuss', 'supportpress' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportpress' ), $row_actions['edit'] ) );
+			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discussion', 'supportpress' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportpress' ), $row_actions['edit'] ) );
 
 		// Save the trash action for the end
 		if ( isset( $row_actions['trash'] ) ) {
