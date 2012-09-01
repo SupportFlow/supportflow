@@ -12,11 +12,15 @@
  * Domain Path: /languages/
  */
 
-add_action( 'wp_enqueue_scripts', function() {
+add_action( 'wp_enqueue_scripts',      'sp_user_widget_enqueue_scripts' );
+add_action( 'admin_enqueue_scripts',   'sp_user_widget_enqueue_scripts' );
+function sp_user_widget_enqueue_scripts() {
 	wp_enqueue_script( 'jquery' );
-} );
+}
 
-add_action( 'wp_footer', function() {
+add_action( 'wp_footer',        'sp_user_widget_load_footer' );
+add_action( 'admin_footer',     'sp_user_widget_load_footer' );
+function sp_user_widget_load_footer() {
 	$query_arg = 'supportpress_widget';
 
 	// If being run on the same site as SupportPress, prevent infinite widgets
@@ -39,4 +43,4 @@ add_action( 'wp_footer', function() {
 <button id="supportpress-help" style="color: #fff;position: fixed;bottom: 0;right: 0;margin: 0 25px -1px 0;z-index: 10000;font: bold 14px Helvetica, Arial, sans-serif;padding: 10px;background-color: #21759b;border: 1px solid #fff;border-bottom: none;-moz-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);-webkit-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);box-shadow: 0px 0px 2px rgba(102, 102, 102, .6);-webkit-border-top-left-radius: 10px;-webkit-border-top-right-radius: 10px;-moz-border-radius-topleft: 10px;-moz-border-radius-topright: 10px;border-top-left-radius: 10px;border-top-right-radius: 10px;" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
 
 <?php
-} );
+}
