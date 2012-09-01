@@ -21,6 +21,7 @@ class SupportPress_Admin extends SupportPress {
 		// Everything
 		add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
 		add_filter( 'post_updated_messages', array( $this, 'filter_post_updated_messages' ) );
+		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 
 		// Manage threads view
 		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
@@ -31,6 +32,17 @@ class SupportPress_Admin extends SupportPress {
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
 
+	}
+
+	/**
+	 * Re-sort the custom statuses so trash appears last
+	 */
+	function action_admin_init() {
+		global $wp_post_statuses;
+
+		$trash_status = $wp_post_statuses['trash'];
+		unset( $wp_post_statuses['trash'] );
+		$wp_post_statuses['trash'] = $trash_status;
 	}
 
 	/**
