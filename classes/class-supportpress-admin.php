@@ -272,7 +272,9 @@ class SupportPress_Admin extends SupportPress {
 		if ( ! $this->is_edit_screen() )
 			return;
 
+		$respondents_box = 'tagsdiv-' . SupportPress()->respondents_tax;
 		remove_meta_box( 'submitdiv',               SupportPress()->post_type, 'side' );
+		remove_meta_box( $respondents_box,          SupportPress()->post_type, 'side' );
 		remove_meta_box( 'commentstatusdiv',        SupportPress()->post_type, 'normal' );
 		remove_meta_box( 'slugdiv',                 SupportPress()->post_type, 'normal' );
 		remove_meta_box( 'commentsdiv',             SupportPress()->post_type, 'normal' );
