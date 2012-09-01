@@ -8,6 +8,10 @@
 	width: 10%;
 }
 
+.subsubsub li.trash a {
+	color: #BC0B0B;
+}
+
 #poststuff {
 	padding-top: 0;
 }
