@@ -32,11 +32,45 @@ add_action( 'wp_footer', function() {
 
 ?>
 
-<div id="supportpress-widget" style="display:none;  position:fixed;bottom:0px;right:0px;z-index:10000; width:400px;height:90%;  border: 5px solid black;">
+<div id="supportpress-widget" style="display:none;">
 	<iframe width="100%" height="100%" src="<?php echo esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ); ?>"></iframe>
 </div>
 
-<button style="position:fixed;bottom:10px;right:10px;z-index:10000;" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
+<style>
+#supportpress-help {
+	color: #fff;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	margin: 0 25px -1px 0;
+	z-index: 10000;
+	font: bold 14px Helvetica, Arial, sans-serif;
+	padding: 10px;
+	-webkit-border-top-left-radius: 10px;
+	-webkit-border-top-right-radius: 10px;
+	-moz-border-radius-topleft: 10px;
+	-moz-border-radius-topright: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	background-color: #21759b;
+	border: 1px solid #fff;
+	border-bottom: none;
+}
+#supportpress-help:hover,
+#supportpress-help:active {
+	background-color: #13455b;
+}
+#supportpress-widget {
+	position: fixed;
+	bottom: 0px;
+	right: 0px;
+	z-index: 10000;
+	width: 400px;
+	height: 96%;
+}
+</style>
+
+<button id="supportpress-help" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
 
 <?php
 } );

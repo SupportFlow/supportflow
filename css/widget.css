@@ -34,3 +34,24 @@ body {
 #supportpress-newthread-form textarea {
 	width: 100%;
 }
+
+button#supportpress-help {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	z-index: 10000;
+	padding: 10px;
+	font-size: 14px;
+	font-family: Helvetica, Arial, sans-serif;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	background-color: #989898;
+	border: 1px solid #e1e1e1;
+	border-bottom: none;
+	color: #fff;
+	font-weight: bold;
+}
