@@ -178,12 +178,20 @@ class SupportPress_Admin extends SupportPress {
 		if ( 'edit.php' != $pagenow || !$query->is_main_query() )
 			return;
 
+		$statuses = SupportPress()->post_statuses;
+		$status_slugs = array_keys( $statuses );
+		$last_status = array_pop( $status_slugs );
+
 		// Order posts by post_modified if there's no orderby set
 		if ( !$query->get( 'orderby' ) ) {
-			$query->set( 'orderby', 'modified' );
-			$query->set( 'order', 'asc' );
-			$_GET['orderby'] = 'modified';
-			$_GET['order'] = 'asc';
+			$sort_order = array(
+					'orderby'       => 'modified',
+				);
+			$sort_order['order'] = ( in_array( $query->get( 'post_status' ), array( 'trash', $last_status ) ) ) ? 'desc' : 'asc';
+			foreach( $sort_order as $key => $value ) {
+				$query->set( $key, $value );
+				$_GET[$key] = $value;
+			}
 		}
 
 		// Do our own custom search handling so we can search against comment text
@@ -214,9 +222,6 @@ class SupportPress_Admin extends SupportPress {
 		}
 
 		// Only show threads with the last status if the last status is set
-		$statuses = SupportPress()->post_statuses;
-		$status_slugs = array_keys( $statuses );
-		$last_status = array_pop( $status_slugs );
 		$post_status = $query->get( 'post_status' );
 		if ( !$query->get( 's' ) && empty( $post_status ) )
 			$query->set( 'post_status', $status_slugs );
