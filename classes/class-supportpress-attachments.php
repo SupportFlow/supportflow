@@ -17,14 +17,22 @@ class SupportPress_Attachments extends SupportPress {
 		// Handle delivery of the secure file
 		add_action( 'template_redirect', array( $this, 'handle_file_delivery' ) );
 
-		add_filter( 'wp_handle_upload_prefilter', array( $this, 'wp_handle_upload_prefilter' ) );
-		add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
+		// Only apply to files that are uploaded to a thread
+		if ( isset( $_REQUEST['post_id'] ) && SupportPress()->is_thread( (int)$_REQUEST['post_id'] ) ) {
+			add_filter( 'wp_handle_upload_prefilter', array( $this, 'wp_handle_upload_prefilter' ) );
+			add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
+		}
 
 	}
 
-	public function filter_wp_get_attachment_url( $url, $post_id ) {
+	public function filter_wp_get_attachment_url( $url, $attachment_id ) {
 
-		return get_post( $post_id )->guid;
+		if ( $attachment = get_post( $attachment_id ) ) {
+			if ( SupportPress()->is_thread( $attachment->post_parent ) )
+				return $attachment->guid;
+
+		}
+		return $url;
 	}
 
 	public function handle_file_delivery( $template ) {

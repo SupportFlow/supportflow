@@ -334,6 +334,13 @@ class SupportPress {
 	/** Thread Functions ******************************************************/
 
 	/**
+	 * Check whether a post_id is a thread
+	 */
+	public function is_thread( $post ) {
+		return (bool) ( $this->post_type == get_post_type( $post ) );
+	}
+
+	/**
 	 * Create a new thread
 	 */
 	public function create_thread( $args ) {
