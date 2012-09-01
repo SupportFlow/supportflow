@@ -35,6 +35,13 @@ class SupportPress_UI_Widget extends SupportPress {
 			)
 		);
 
+		wp_enqueue_style(
+			$this->script_slug,
+			plugins_url( 'css/widget.css', dirname( __FILE__ ) ),
+			array(),
+			mt_rand() // For cache busting during development
+		);
+
 		// @todo: Templating or something I guess
 ?>
 <html>

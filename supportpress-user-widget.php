@@ -12,6 +12,10 @@
  * Domain Path: /languages/
  */
 
+add_action( 'wp_enqueue_scripts', function() {
+	wp_enqueue_script( 'jquery' );
+} );
+
 add_action( 'wp_footer', function() {
 	$query_arg = 'supportpress_widget';
 
@@ -26,7 +30,13 @@ add_action( 'wp_footer', function() {
 	 */
 	$supportpress_install_url = home_url();
 
-	echo '<div id="supportpress-widget" style="width:400px;height:500px;position:fixed;bottom:0px;right:0px;background-color:white;z-index:10000;border:10px solid black;">';
-	echo '<iframe width="100%" height="100%" src="' . esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ) . '"></iframe>';
-	echo '</div>';
+?>
+
+<div id="supportpress-widget" style="display:none;  position:fixed;bottom:0px;right:0px;z-index:10000; width:400px;height:90%;  border: 5px solid black;">
+	<iframe width="100%" height="100%" src="<?php echo esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ); ?>"></iframe>
+</div>
+
+<button type="button" style="position:fixed;bottom:10px;right:10px;z-index:10000;" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
+
+<?php
 } );
