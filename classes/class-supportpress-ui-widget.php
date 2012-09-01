@@ -61,8 +61,8 @@ class SupportPress_UI_Widget extends SupportPress {
 		<button id="supportpress-newthread"><?php _e( 'Start a new thread', 'supportpress' ); ?></button>
 		<form id="supportpress-newthread-form">
 			<input type="text" name="subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportpress' ); ?>" />
-			<textarea name="message" cols="25" rows="10" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportpress' ); ?>"></textarea>
-			<input type="submit" name="submit" value="<?php esc_attr_e( 'Send reply', 'supportpress' ); ?>" />
+			<textarea name="message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportpress' ); ?>"></textarea>
+			<input id="send-help" type="submit" name="submit" value="<?php esc_attr_e( 'Send message', 'supportpress' ); ?>" />
 		</form>
 	</div>
 

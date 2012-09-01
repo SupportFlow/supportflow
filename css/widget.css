@@ -1,7 +1,7 @@
 body {
 	margin: 10px;
 	padding: 0;
-	background-color: white;
+	background-color: #f5f5f5;
 }
 
 .title,
@@ -11,47 +11,56 @@ body {
 }
 
 .title {
-	background-color: gray;
+	border-bottom: 1px solid #ececec;
+	font: 23px/29px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
+	margin: 0;
+	padding: 0 15px 4px 9px;
 }
 
 #supportpress-newthread-box {
-	padding: 25px 0;
+	padding: 10px 0;
 }
-
+#supportpress-newthread,
+#send-help {
+	background-color: #eee;
+	border: 1px solid #999;
+	font-family: sans-serif;
+	font-size: 14px;
+	line-height: 19px;
+	text-align: center;
+	padding: 5px 10px;
+	white-space: nowrap;
+	-webkit-border-radius: 15px;
+}
+#supportpress-newthread:hover,
+#supportpress-newthread:active {
+	border-color: #666;
+}
 #supportpress-open-tickets .thread .time {
 	color: gray;
 }
-
 #supportpress-open-tickets .nothreads {
 	font-weight: bold;
 }
-
 #supportpress-newthread-form {
 	display: none;
 }
-
+#supportpress-newthread-form input[name="subject"] {
+	margin-bottom: 6px;
+}
+#supportpress-newthread-form input[type="text"] {
+	font-size: 14px;
+	line-height: 150%;
+}
+#supportpress-newthread-form textarea {
+	font-size: 13px;
+}
 #supportpress-newthread-form input[type="text"],
 #supportpress-newthread-form textarea {
+	border: 1px solid #ccc;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	color: #333;
+	padding: 3px 8px;
 	width: 100%;
-}
-
-button#supportpress-help {
-	position: fixed;
-	bottom: 0;
-	right: 0;
-	z-index: 10000;
-	padding: 10px;
-	font-size: 14px;
-	font-family: Helvetica, Arial, sans-serif;
-	-webkit-border-top-left-radius: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-moz-border-radius-topright: 5px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	background-color: #989898;
-	border: 1px solid #e1e1e1;
-	border-bottom: none;
-	color: #fff;
-	font-weight: bold;
 }
