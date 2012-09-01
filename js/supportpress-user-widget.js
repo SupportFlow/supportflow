@@ -7,30 +7,25 @@ var supportpress = {};
 ( function( $ ) {
 
 	supportpress.init = function() {
-		supportpress.$widget_container = $( '#supportpress-widget' );
-
-		supportpress.populate_my_threads();
+		$('#supportpress-newthread'     ).click( supportpress.show_new_thread_form );
+		$('#supportpress-newthread-form').submit( supportpress.submit_new_thread_form );
 	};
 
 	supportpress.get_ajax_url = function( action ) {
 		return SupportPressUserWidgetVars.ajaxurl + '&spaction=' + action;
 	};
 
-	supportpress.populate_my_threads = function() {
-		$.getJSON( supportpress.get_ajax_url( 'mythreads' ), function( data ) {
-			var items = [];
+	supportpress.show_new_thread_form = function() {
+		$(this).hide();
+		$('#supportpress-newthread-form').slideDown();
+	};
 
-			$.each( data, function( key, thread ) {
-				items.push('<li id="' + thread.ID + '"><a href="' + thread.permalink + '">' + thread.post_title + '</a></li>');
-			});
+	supportpress.submit_new_thread_form = function( e ) {
+		e.preventDefault();
 
-			supportpress.$widget_container.html( '<strong>My Tickets</strong>' );
+		alert( "Doesn't work yet :)" );
 
-			$( '<ul/>', {
-				'class': 'mythreads',
-				html: items.join('')
-			}).appendTo( supportpress.$widget_container );
-		} );
+		// Submit form via AJAX here
 	};
 
 	// Initialize everything!

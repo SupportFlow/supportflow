@@ -17,6 +17,8 @@ class SupportPress_UI_Widget extends SupportPress {
 
 	// @todo: Pretty URLs
 	public function action_template_redirect() {
+		global $current_user;
+
 		if ( empty( $_GET['supportpress_widget'] ) )
 			return;
 
@@ -46,14 +48,47 @@ class SupportPress_UI_Widget extends SupportPress {
 ?>
 <html>
 <head>
-	<title>SupportPress</title>
+	<title><?php _e( 'Support', 'supportpress' ); ?></title>
 
 	<?php wp_head(); ?>
 </head>
 <body>
 
 <div id="supportpress-widget">
+	<h1 class="title"><?php _e( 'Support', 'supportpress' ); ?></h1>
 
+	<div id="supportpress-newthread-box">
+		<button id="supportpress-newthread"><?php _e( 'Start a new thread', 'supportpress' ); ?></button>
+		<form id="supportpress-newthread-form">
+			<input type="text" name="subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportpress' ); ?>" />
+			<textarea name="message" cols="25" rows="10" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportpress' ); ?>"></textarea>
+			<input type="submit" name="submit" value="<?php esc_attr_e( 'Send reply', 'supportpress' ); ?>" />
+		</form>
+	</div>
+
+	<div id="supportpress-open-tickets">
+<?php
+		$threads = SupportPress()->get_threads_for_respondent( $current_user->user_email );
+
+		if ( $threads->have_posts() ) {
+			while ( $threads->have_posts() ) {
+				$threads->the_post();
+?>
+		<div class="thread">
+			<h3><?php the_title(); ?></h3>
+
+			<p>Output ticket details here. I'll leave this to Daniel -- running out of time.</p>
+
+			<span class="time"><?php printf( __( '%s @ %s', 'supportpress' ), get_the_date(), get_the_time() ); ?></span>
+		</div>
+<?php
+			} // while
+			wp_reset_postdata();
+		} else {
+			echo '<div class="thread nothreads">' . __( 'No open threads found.', 'supportpress' ) . '</div>';
+		}
+?>
+	</div>
 </div>
 
 </body>

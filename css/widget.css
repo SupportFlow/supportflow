@@ -3,3 +3,34 @@ body {
 	padding: 0;
 	background-color: white;
 }
+
+.title,
+#supportpress-newthread-box,
+#supportpress-open-tickets .thread {
+	border-bottom: 1px solid gray;
+}
+
+.title {
+	background-color: gray;
+}
+
+#supportpress-newthread-box {
+	padding: 25px 0;
+}
+
+#supportpress-open-tickets .thread .time {
+	color: gray;
+}
+
+#supportpress-open-tickets .nothreads {
+	font-weight: bold;
+}
+
+#supportpress-newthread-form {
+	display: none;
+}
+
+#supportpress-newthread-form input[type="text"],
+#supportpress-newthread-form textarea {
+	width: 100%;
+}

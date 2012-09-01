@@ -440,10 +440,7 @@ class SupportPress {
 			),
 		) );
 
-		if ( ! $threads->have_posts() )
-			return array();
-
-		return $threads->posts;
+		return $threads;
 	}
 
 	/**
