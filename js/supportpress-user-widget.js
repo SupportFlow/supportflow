@@ -10,19 +10,22 @@ var supportpress = {};
 		supportpress.widget_title = $('h1#widget-title');
 
 		// Creating a new thread
+		supportpress.new_thread_button = $('#supportpress-newthread');
 		supportpress.new_thread_form = $('#supportpress-newthread-form');
 		supportpress.new_thread_subject = supportpress.new_thread_form.find('#new-thread-subject' );
 		supportpress.new_thread_message = supportpress.new_thread_form.find('#new-thread-message' );
 		supportpress.new_thread_submit = supportpress.new_thread_form.find('#new-thread-submit' );
 
+		supportpress.new_thread_button.click( supportpress.show_new_thread_form );
+
 		// Viewing all threads
 		supportpress.all_threads_view = $('#supportpress-all-threads');
+		supportpress.all_threads_view.find('li').click( supportpress.show_single_thread_view );
 
 		// Viewing an existing thread
 		supportpress.single_thread_view = $('#supportpress-single-thread');
 		supportpress.single_thread_body = supportpress.single_thread_view.find('#supportpress-thread-body');
 
-		$('#supportpress-newthread'     ).click( supportpress.show_new_thread_form );
 		$('#supportpress-newthread-form').submit( supportpress.submit_new_thread_form );
 	};
 
@@ -39,6 +42,20 @@ var supportpress = {};
 
 	}
 
+	supportpress.show_single_thread_view = function( e ) {
+		e.preventDefault();
+
+		supportpress.new_thread_button.hide();
+		supportpress.all_threads_view.attr('opacity', '0.5');
+		var thread_id = $(this).attr('id').replace('thread-','');
+		var data = {
+			thread_id:               thread_id,
+			supportpress_widget:     true,
+		}
+		$.get( supportpress.get_ajax_url( 'get-thread' ), data, supportpress.handle_new_thread_response );
+
+	}
+
 	supportpress.submit_new_thread_form = function( e ) {
 		e.preventDefault();
 
@@ -50,7 +67,7 @@ var supportpress = {};
 			supportpress_widget:     true,
 		}
 		$.post( supportpress.get_ajax_url( 'create-thread' ), data, supportpress.handle_new_thread_response );
-	};
+	}
 
 	supportpress.enable_new_thread_form = function( clear_form, submit_text ) {
 		supportpress.new_thread_subject.removeAttr('disabled');

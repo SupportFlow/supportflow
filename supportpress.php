@@ -497,6 +497,7 @@ class SupportPress {
 				'comment_approved'       => 'public', // 'public', 'private', 'all'
 				'post_id'                => '',
 				'search'                 => '',
+				'order'                  => 'DESC',   // 'DESC', 'ASC',
 			);
 
 		$args = array_merge( $default_args, $args );
@@ -505,6 +506,7 @@ class SupportPress {
 				'post_id'                => $args['post_id'],
 				'comment_approved'       => $args['comment_approved'],
 				'comment_type'           => $this->comment_type,
+				'order'                  => $args['order'],
 			);
 		if ( 'any' == $args['comment_approved'] )
 			add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );

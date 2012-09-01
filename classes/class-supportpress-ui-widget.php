@@ -25,6 +25,7 @@ class SupportPress_UI_Widget extends SupportPress {
 
 		switch( $response['api-action'] ) {
 			case 'create-thread':
+			case 'get-thread':
 				$response['widget_title'] = get_the_title( (int)$response['thread_id'] );
 				$response['html'] = $this->render_single_thread_comments_html( (int)$response['thread_id'] );
 				break;
@@ -34,10 +35,10 @@ class SupportPress_UI_Widget extends SupportPress {
 
 	public function render_single_thread_comments_html( $thread_id ) {
 
-		$comments = SupportPress()->get_thread_comments( $thread_id, array( 'comment_type' => 'public' ) );
-		
+		$comments = SupportPress()->get_thread_comments( $thread_id, array( 'comment_approved' => 'public', 'order' => 'ASC' ) );
+
 		$output = '<ul class="thread-comments">';
-		foreach( $comments as $commnent ) {
+		foreach( $comments as $comment ) {
 			$output .= '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
 		}
 		$output .= '</ul>';
@@ -67,11 +68,11 @@ class SupportPress_UI_Widget extends SupportPress {
 		} else {
 			$output = '<ul id="respondent-threads">';
 			foreach( $threads as $thread ) {
-				$output .= '<li>';
+				$output .= '<li id="thread-' . $thread->ID . '">';
 				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
 				$output .= '<div class="thread-comments">';
-				$comments = SupportPress()->get_thread_comments( $thread->ID, array( 'comment_type' => 'public' ) );
-				$last_comment = array_pop( $comments );
+				$comments = SupportPress()->get_thread_comments( $thread->ID, array( 'comment_approved' => 'public' ) );
+				$last_comment = array_shift( $comments );
 				$output .= $this->render_single_comment_html( $last_comment );
 				$output .= '</div>';
 				$output .= '</li>';

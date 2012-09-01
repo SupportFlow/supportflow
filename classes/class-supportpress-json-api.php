@@ -53,8 +53,10 @@ class SupportPress_JSON_API extends SupportPress {
 				
 				break;
 
-			case 'get-respondent-single-thread':
-
+			case 'get-thread':
+				$thread_id = (int)$_REQUEST['thread_id'];
+				$response['status'] = 'ok';
+				$response['thread_id'] = $thread_id;
 				break;
 		}
 
