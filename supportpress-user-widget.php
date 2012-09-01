@@ -37,6 +37,7 @@ function sp_user_widget_load_footer() {
 ?>
 
 <div id="supportpress-widget" style="display:none;  position:fixed;bottom:0px;right:0px;z-index:10000; width:350px;height:96%;background-color:#f9f9f9;box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);-webkit-box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);-moz-box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);">
+	<button id="supportpress-widget-close" style="position:absolute;top:12px;right:10px;" onclick="jQuery('#supportpress-widget').slideUp(function(){jQuery('#supportpress-help').fadeIn();});"><?php _e( 'Close', 'supportpress-user-widget' ); ?></button>
 	<iframe width="100%" height="100%" src="<?php echo esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ); ?>"></iframe>
 </div>
 
