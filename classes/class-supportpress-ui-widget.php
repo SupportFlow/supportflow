@@ -29,6 +29,10 @@ class SupportPress_UI_Widget extends SupportPress {
 				$response['widget_title'] = get_the_title( (int)$response['thread_id'] );
 				$response['html'] = $this->render_single_thread_comments_html( (int)$response['thread_id'] );
 				break;
+			case 'add-thread-comment':
+				$comment = get_comment( $response['comment_id'] );
+				$response['html'] = '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
+				break;
 		}
 		return $response;
 	}
@@ -135,9 +139,9 @@ class SupportPress_UI_Widget extends SupportPress {
 	<div id="supportpress-newthread-box">
 		<button id="supportpress-newthread"><?php _e( 'Start a new thread', 'supportpress' ); ?></button>
 		<form id="supportpress-newthread-form">
-			<input type="text" id="new-thread-subject" name="new-thread-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportpress' ); ?>" autocomplete="off" />
-			<textarea id="new-thread-message" name="new-thread-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportpress' ); ?>" autocomplete="off"></textarea>
-			<input id="new-thread-submit" type="submit" name="new-thread-submit" value="<?php echo esc_attr( $start_thread_text ); ?>" />
+			<input type="text" id="new-thread-subject" name="new-thread-subject" class="thread-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportpress' ); ?>" autocomplete="off" />
+			<textarea id="new-thread-message" name="new-thread-message" class="thread-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportpress' ); ?>" autocomplete="off"></textarea>
+			<input id="new-thread-submit" type="submit" name="new-thread-submit" class="submit-button" value="<?php echo esc_attr( $start_thread_text ); ?>" />
 		</form>
 	</div>
 
@@ -149,9 +153,9 @@ class SupportPress_UI_Widget extends SupportPress {
 		<div id="supportpress-thread-body">
 		</div>
 		<form id="supportpress-existing-thread-form">
-			<textarea id="existing-thread-message" name="existing-thread-message" cols="25" rows="6" autocomplete="off"></textarea>
-			<input id="existing-thread-submit" type="submit" name="existing-thread-submit" value="<?php echo esc_attr( $send_reply_text ); ?>" />
-			<input id="thread-id" name="thread-id" type="hidden" />
+			<textarea id="existing-thread-message" name="existing-thread-message" class="thread-message" cols="25" rows="6" autocomplete="off"></textarea>
+			<input id="existing-thread-submit" type="submit" name="existing-thread-submit" class="submit-button" value="<?php echo esc_attr( $send_reply_text ); ?>" />
+			<input id="existing-thread-id" name="thread-id" type="hidden" />
 		</form>
 	</div>
 </div>
