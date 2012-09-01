@@ -46,15 +46,18 @@ add_action( 'wp_footer', function() {
 	z-index: 10000;
 	font: bold 14px Helvetica, Arial, sans-serif;
 	padding: 10px;
+	background-color: #21759b;
+	border: 1px solid #fff;
+	border-bottom: none;
+	-moz-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);
+	-webkit-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);
+	box-shadow: 0px 0px 2px rgba(102, 102, 102, .6);
 	-webkit-border-top-left-radius: 10px;
 	-webkit-border-top-right-radius: 10px;
 	-moz-border-radius-topleft: 10px;
 	-moz-border-radius-topright: 10px;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
-	background-color: #21759b;
-	border: 1px solid #fff;
-	border-bottom: none;
 }
 #supportpress-help:hover,
 #supportpress-help:active {
@@ -67,6 +70,9 @@ add_action( 'wp_footer', function() {
 	z-index: 10000;
 	width: 400px;
 	height: 96%;
+	-moz-box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);
+	-webkit-box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);
+	box-shadow: -2px 0px 6px rgba(102, 102, 102, .6);
 }
 </style>
 
