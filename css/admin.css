@@ -35,7 +35,8 @@
 }
 
 #supportpress-details #misc-publishing-actions label {
-	padding-right: 5px;
+	width: 50px;
+	display: inline-block;
 }
 
 #supportpress-details #misc-publishing-actions select#post_status {
