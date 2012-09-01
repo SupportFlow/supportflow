@@ -272,10 +272,10 @@ class SupportPress_Admin extends SupportPress {
 		if ( ! $this->is_edit_screen() )
 			return;
 
-		remove_meta_box( 'submitdiv', SupportPress()->post_type, 'side' );
-		remove_meta_box( 'commentstatusdiv', SupportPress()->post_type, 'normal' );
-		remove_meta_box( 'slugdiv',          SupportPress()->post_type, 'normal' );
-		remove_meta_box( 'commentsdiv',          SupportPress()->post_type, 'normal' );
+		remove_meta_box( 'submitdiv',               SupportPress()->post_type, 'side' );
+		remove_meta_box( 'commentstatusdiv',        SupportPress()->post_type, 'normal' );
+		remove_meta_box( 'slugdiv',                 SupportPress()->post_type, 'normal' );
+		remove_meta_box( 'commentsdiv',             SupportPress()->post_type, 'normal' );
 
 		add_meta_box( 'supportpress-details', __( 'Details', 'supportpress' ), array( $this, 'meta_box_details' ), SupportPress()->post_type, 'side' );
 		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
