@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
 			$( '#comment-attachments' ).val( $( '#comment-attachments' ).val() + ',' + attachment.id );
 			$( '#upload-messages' ).hide();
 			$( '<li>', {
-				html: '<a target="_blank" href="' + attachment.url + '">' + attachment.filename + '</a>',
+				html: '<a target="_blank" href="' + attachment.url + '">' + attachment.title + '</a>',
 			 } ).appendTo( $( 'ul#comment-attachments-list' ) );
 			$( '#upload-messages' ).removeClass( 'uploading' );
 		},

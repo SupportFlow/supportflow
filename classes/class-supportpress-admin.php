@@ -406,8 +406,7 @@ class SupportPress_Admin extends SupportPress {
 					echo '<ul class="thread-comment-attachments">';
 					foreach( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
-						$attachment_name = basename( get_attached_file( $attachment_id ) );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment_name ) . '</a></li>';
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -435,8 +434,7 @@ class SupportPress_Admin extends SupportPress {
 					echo '<ul class="thread-comment-attachments">';
 					foreach( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
-						$attachment_name = basename( get_attached_file( $attachment_id ) );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment_name ) . '</a></li>';
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}

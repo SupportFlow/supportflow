@@ -194,6 +194,7 @@ class SupportPress {
 		/** Core **************************************************************/
 
 		require_once( $this->plugin_dir . 'classes/class-supportpress-json-api.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportpress-attachments.php' );
 
 		/** Extensions ********************************************************/
 
