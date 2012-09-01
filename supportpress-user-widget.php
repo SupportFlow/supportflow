@@ -41,7 +41,7 @@ function sp_user_widget_load_footer() {
 	<iframe width="100%" height="100%" src="<?php echo esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ); ?>"></iframe>
 </div>
 
-<button id="supportpress-help" style="color: #fff;position: fixed;bottom: 0;right: 0;margin: 0 25px -1px 0;z-index: 10000;font: bold 14px Helvetica, Arial, sans-serif;padding: 10px;background-color: #21759b;border: 1px solid #fff;border-bottom: none;-moz-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);-webkit-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);box-shadow: 0px 0px 2px rgba(102, 102, 102, .6);-webkit-border-top-left-radius: 10px;-webkit-border-top-right-radius: 10px;-moz-border-radius-topleft: 10px;-moz-border-radius-topright: 10px;border-top-left-radius: 10px;border-top-right-radius: 10px;" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
+<button id="supportpress-help" style="cursor:pointer;color: #fff;position: fixed;bottom: 0;right: 0;margin: 0 25px -1px 0;z-index: 10000;font: bold 14px Helvetica, Arial, sans-serif;padding: 10px;background-color: #21759b;border: 1px solid #fff;border-bottom: none;-moz-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);-webkit-box-shadow: 0px 0px 6px rgba(102, 102, 102, .6);box-shadow: 0px 0px 2px rgba(102, 102, 102, .6);-webkit-border-top-left-radius: 10px;-webkit-border-top-right-radius: 10px;-moz-border-radius-topleft: 10px;-moz-border-radius-topright: 10px;border-top-left-radius: 10px;border-top-right-radius: 10px;" onclick="jQuery(this).hide();jQuery('#supportpress-widget').slideDown();">Support</button>
 
 <?php
 }
