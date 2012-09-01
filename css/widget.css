@@ -65,3 +65,7 @@ body {
 	padding: 3px 8px;
 	width: 100%;
 }
+#supportpress-help:hover,
+#supportpress-help:active {
+	background-color: #13455b;
+}
