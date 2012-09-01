@@ -341,47 +341,56 @@ class SupportPress {
 		$post_statuses = $this->post_statuses;
 
 		$defaults = array(
-			'subject'         => '',
-			'message'         => '',
-			'requester_id'    => 0,  // If the requester has a WordPress account (ID or username)
-			'requester_name'  => '', // Otherwise supply a name
-			'requester_email' => '', // And an e-mail address
-			'status'          => key( $post_statuses ),
-			'assignee'        => 0,  // WordPress user ID or username of ticket assignee/owner
-			'tags'            => array(),
+			'subject'                  => '',
+			'message'                  => '',
+			'respondent_id'            => 0,  // If the requester has a WordPress account (ID or username)
+			'respondent_name'          => '', // Otherwise supply a name
+			'respondent_email'         => '', // And an e-mail address
+			'status'                   => key( $post_statuses ),
+			'assignee'                 => 0,  // WordPress user ID or username of ticket assignee/owner
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$post = array(
-			'post_type'    => $this->post_type,
-			'post_title'   => $args['subject'],
-			'post_content' => esc_html( $args['message'] ),
-			'post_author'  => $this->validate_user( $args['assignee'] ),
-			'tags_input'   => $args['tags'],
+		$thread = array(
+			'post_type'                => $this->post_type,
+			'post_title'               => $args['subject'],
+			'post_author'              => $args['assignee'],
 		);
 
+		// Validate the thread status
 		if ( ! get_post_status_object( $args['status'] ) )
 			$args['status'] = $defaults['status'];
+		$thread['post_status'] = $args['status'];
 
-		$post['post_status'] = 'sp_' . $args['status'];
-
-		$thread_id = wp_insert_post( $post, true );
+		$thread_id = wp_insert_post( $thread, true );
 
 		if ( is_wp_error( $thread_id ) )
 			return $thread_id;
 
-		if ( ! empty( $args['requester_id'] ) && $requester_id = $this->validate_user( $args['requester_id'] ) ) {
-			add_post_meta( $thread_id, $this->post_meta_requester_id, $requester_id );
-		} else {
-			if ( ! empty( $args['requester_name'] ) )
-				add_post_meta( $thread_id, $this->post_meta_requester_name, strip_tags( $args['requester_name'] ) );
+		// Assign the respondent(s)
+		if ( !empty( $args['respondent_email'] ) ) {
+			$this->update_thread_respondents( $thread_id, $args['respondent_email'] );
+		}
 
-			if ( ! empty( $args['requester_email'] ) && is_email( $args['requester_email'] ) )
-				add_post_meta( $thread_id, $this->post_meta_requester_email, $args['requester_email'] );
+		// If there was a message, add it to the thread
+		if ( !empty( $args['message'] ) && !empty( $args['respondent_email'] ) ) {
+			$comment_details = array(
+					'comment_author'             => $args['respondent_name'],
+					'comment_author_email'       => $args['respondent_email'],
+					'user_id'                    => $args['respondent_id'],
+				);
+			$this->add_thread_comment( $thread_id, $args['message'], $comment_details );
 		}
 
 		return $thread_id;
+	}
+
+	/**
+	 * @todo This should produce an object with thread details, respondents, and comments
+	 */
+	public function get_thread( $thread_id ) {
+
 	}
 
 	/**
@@ -413,6 +422,10 @@ class SupportPress {
 	 * Update a thread's respondents
 	 */
 	public function update_thread_respondents( $thread_id, $respondents ) {
+
+		if ( is_string( $respondents ) ) {
+			$respondents = array( $respondents );
+		}
 
 		$term_ids = array();
 		foreach( $respondents as $dirty_respondent ) {
@@ -518,14 +531,15 @@ class SupportPress {
 				'time'                   => current_time( 'mysql' ),
 				'comment_author'         => '',
 				'comment_author_email'   => '',
-				'comment_author_url'     => '',
 				'user_id'                => '',
 				'comment_approved'       => 'public',
 			);
+
+		// @todo This actually probably shouldn't default to current user, so 
+		// we don't have to mandate the arguments be assigned each time
 		if ( $user = wp_get_current_user() ) {
 			$default_details['comment_author'] = $user->display_name;
 			$default_details['comment_author_email'] = $user->user_email;
-			$default_details['comment_author_url'] = $user->user_url;
 			$default_details['user_id'] = $user->ID;
 		}
 
@@ -546,7 +560,6 @@ class SupportPress {
 				'comment_type'           => esc_sql( $this->comment_type ),
 				'comment_author'         => esc_sql( $details['comment_author'] ),
 				'comment_author_email'   => esc_sql( $details['comment_author_email'] ),
-				'comment_author_url'     => esc_sql( $details['comment_author_url'] ),
 				'user_id'                => (int)$details['user_id'],
 			);
 		$comment = apply_filters( 'supportpress_pre_insert_thread_comment', $comment );

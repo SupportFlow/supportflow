@@ -13,25 +13,55 @@ class SupportPress_JSON_API extends SupportPress {
 	}
 
 	public function action_wp_ajax_supportpress_json() {
-		global $current_user;
+		
+		$current_user = wp_get_current_user();
 
-		if ( empty( $_REQUEST['spaction'] ) )
-			die( 'invalid sp action' ); // @todo: change back to 0
+		$response = array(
+				'api-action'           => ( ! empty( $_REQUEST['api-action'] ) ) ? sanitize_key( $_REQUEST['api-action'] ) : '',
+				'status'              => 'error',
+				'message'             => '',
+				'html'                => '',
+			);
+		switch ( $response['api-action'] ) {
 
-		switch ( $_REQUEST['spaction'] ) {
+			case 'create-thread':
 
-			case 'mythreads':
-				$threads = SupportPress()->get_threads_for_respondent( $current_user->user_email );
-
-				foreach ( $threads as $key => $thread ) {
-					$threads[$key]->permalink = get_permalink( $thread->ID );
+				$thread_args = array(
+						'subject'                    => sanitize_text_field( $_REQUEST['subject'] ),
+						'message'                    => wp_filter_nohtml_kses( $_REQUEST['message'] ),
+					);
+				if ( !empty( $_REQUEST['respondent_email'] ) && is_email( $_REQUEST['respondent_email'] ) ) {
+					$thread_args['respondent_email'] = sanitize_email( $_REQUEST['respondent_email'] );
+					if ( !empty( $_REQUEST['respondent_name'] ) )
+						$thread_args['respondent_name'] = sanitize_text_field( $_REQUEST['respondent_name'] );
+				} else {
+					$thread_args['respondent_email'] = $current_user->user_email;
+					$thread_args['respondent_name'] = $current_user->display_name;
+					$thread_args['respondent_id'] = $current_user->ID;
 				}
 
-				//var_dump( $threads ); exit();
+				$thread_id = SupportPress()->create_thread( $thread_args );
+				if ( is_wp_error( $thread_id ) ) {
+					$response['message'] = $thread_id->get_error_message();
+				} else {
+					$response['status'] = 'ok';
+					$response['thread_id'] = $thread_id;
+				}
+				break;
 
-				// @todo: Strip out some unnecessary data for size reasons
-				wp_send_json( $threads );
+			case 'get-respondent-threads':
+				
+				break;
+
+			case 'get-respondent-single-thread':
+
+				break;
 		}
+
+		$response = apply_filters( 'supportpress_json_api_response', $response );
+		@header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+		echo json_encode( $response );
+		die();
 	}
 }
 

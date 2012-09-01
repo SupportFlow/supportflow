@@ -3,7 +3,7 @@ body {
 	padding: 0;
 	background-color: #f9f9f9;
 }
-.title {
+#widget-title {
 	border-bottom: 1px solid #ececec;
 	font: 23px/29px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
 	margin: 0;
@@ -13,7 +13,7 @@ body {
 	padding: 10px 0;
 }
 #supportpress-newthread,
-#send-help {
+#new-thread-submit {
 	background-color: #fff;
 	border: 1px solid #bbb;
 	font-family: sans-serif;
@@ -24,19 +24,62 @@ body {
 	white-space: nowrap;
 	-webkit-border-radius: 15px;
 }
-#send-help {
+#new-thread-submit {
 	margin-top: 10px;
 }
+
+#supportpress-existing-thread-form input[type='text'] {
+	width: 100%;
+}
+
+#supportpress-newthread-form textarea,
+#supportpress-existing-thread-form textarea {
+	width: 100%;
+	font-family: "Helvetica Neue", sans-serif;
+	font-size: 16px;
+	font-weight:200;
+	border: 1px solid #BBB;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	color: #333;
+	padding: 3px 8px;
+}
+
+#supportpress-newthread-form input[type='submit'],
+#supportpress-existing-thread-form input[type='submit'] {
+	width: 100%;
+	font-size: 16px;
+	padding-top: 5px;
+	border: none;
+	color: #222;
+	font-weight: 200;
+	font-family: "Helvetica Neue", sans-serif;
+	background-color: #EEE;
+	padding-bottom: 5px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border: 1px solid #BBB;
+}
+
+#supportpress-newthread-form input[type='submit']:hover,
+#supportpress-existing-thread-form input[type='submit']:hover {
+	cursor:pointer;
+	border-color: #888;
+	color: #111;
+}
+
 #supportpress-newthread:hover,
 #supportpress-newthread:active,
-#send-help:hover,
-#send-help:active {
+#new-thread-submit:hover,
+#new-thread-submit:active {
 	border-color: #666;
 }
-#supportpress-open-tickets .thread .time {
+#supportpress-all-threads .thread .time {
 	color: gray;
 }
-#supportpress-open-tickets .nothreads {
+#supportpress-all-threads .nothreads {
 	border-bottom: 1px solid #989898;
 	border-top: 1px solid #989898;
 	color: #333;
@@ -55,11 +98,7 @@ body {
 	font-size: 14px;
 	line-height: 150%;
 }
-#supportpress-newthread-form textarea {
-	font-size: 13px;
-}
-#supportpress-newthread-form input[type="text"],
-#supportpress-newthread-form textarea {
+#supportpress-newthread-form input[type="text"] {
 	border: 1px solid #ccc;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
@@ -70,4 +109,8 @@ body {
 #supportpress-help:hover,
 #supportpress-help:active {
 	background-color: #13455b;
+}
+
+#supportpress-single-thread {
+	display:none;
 }
