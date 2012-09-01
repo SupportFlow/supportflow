@@ -7,7 +7,7 @@ var supportpress = {};
 ( function( $ ) {
 
 	supportpress.init = function() {
-		supportpress.widget_title = $('h1#widget_title');
+		supportpress.widget_title = $('h1#widget-title');
 
 		// Creating a new thread
 		supportpress.new_thread_form = $('#supportpress-newthread-form');

@@ -2,6 +2,8 @@ body {
 	margin: 10px;
 	padding: 0;
 	background-color: #f9f9f9;
+	font-family: sans-serif;
+	color: #333;
 }
 #widget-title {
 	border-bottom: 1px solid #ececec;
@@ -35,7 +37,6 @@ body {
 #supportpress-newthread-form textarea,
 #supportpress-existing-thread-form textarea {
 	width: 100%;
-	font-family: "Helvetica Neue", sans-serif;
 	font-size: 16px;
 	font-weight:200;
 	border: 1px solid #BBB;
@@ -113,4 +114,36 @@ body {
 
 #supportpress-single-thread {
 	display:none;
+}
+
+#supportpress-single-thread ul.thread-comments {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#supportpress-single-thread ul.thread-comments li {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border-top: 1px solid #ECECEC;
+}
+
+#supportpress-single-thread ul.thread-comments li:first-child {
+	border-top: none;
+	padding-top: 0;
+}
+
+#supportpress-single-thread ul.thread-comments li .thread-comment-meta {
+	font-size: 12px;
+	color: #888;
+}
+
+#supportpress-single-thread ul.thread-comments li .thread-comment-meta .thread-comment-author {
+	font-weight: bold;
+}
+
+#supportpress-single-thread ul.thread-comments li .thread-comment-meta .thread-comment-timestamp {
+	float: right;
 }

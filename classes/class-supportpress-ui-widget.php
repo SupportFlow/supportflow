@@ -40,12 +40,12 @@ class SupportPress_UI_Widget extends SupportPress {
 		setup_postdata( $thread );
 		ob_start();
 ?><ul class="thread-comments">
-<?php foreach( $comments as $comment ): ?>
-	<li>
-		<div class="thread-comment-meta"><?php echo esc_html( $comment->comment_author ); ?></div>
+<?php foreach( $comments as $comment ):
+	$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
+?><li>
+		<div class="thread-comment-meta"><span class="thread-comment-author"><?php echo esc_html( $comment->comment_author ); ?></span><span class="thread-comment-timestamp"><?php echo esc_html( $comment_timestamp ); ?></span></div>
 		<div class="thread-comment-body"><?php echo wpautop( stripslashes( $comment->comment_content ) ); ?></div>
-	</li>
-<?php endforeach; ?>
+	</li><?php endforeach; ?>
 </ul><?php
 		wp_reset_postdata();
 		return ob_get_clean();
