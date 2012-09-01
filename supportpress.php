@@ -264,6 +264,10 @@ class SupportPress {
 		$args = array(
 			'label'                  => __( 'Respondents',                'supportpress' ),
 			'labels' => array(
+				'search_items' => __( 'Search Respondents' ),
+				'edit_item' => __( 'Edit Respondent' ), 
+			    'update_item' => __( 'Update Respondent' ),
+				'add_new_item' => __( 'Add New Respondent' ),
 				),
 			'public'                 => true,
 			'show_in_nav_menus'      => true,
