@@ -32,7 +32,7 @@ add_action( 'wp_footer', function() {
 
 ?>
 
-<div id="supportpress-widget" style="display:aaaaaanone;  position:fixed;bottom:0px;right:0px;z-index:10000; width:400px;height:90%;  border: 5px solid black;">
+<div id="supportpress-widget" style="display:none;  position:fixed;bottom:0px;right:0px;z-index:10000; width:400px;height:90%;  border: 5px solid black;">
 	<iframe width="100%" height="100%" src="<?php echo esc_url( add_query_arg( $query_arg, 1, $supportpress_install_url ) ); ?>"></iframe>
 </div>
 

@@ -26,6 +26,7 @@ var supportpress = {};
 		alert( "Doesn't work yet :)" );
 
 		// Submit form via AJAX here
+		// Use the JSON API to do this
 	};
 
 	// Initialize everything!
