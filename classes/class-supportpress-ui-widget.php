@@ -85,7 +85,7 @@ class SupportPress_UI_Widget extends SupportPress {
 			} // while
 			wp_reset_postdata();
 		} else {
-			echo '<div class="thread nothreads">' . __( 'No open threads found.', 'supportpress' ) . '</div>';
+			echo '<div class="thread nothreads">' . __( 'No open threads.', 'supportpress' ) . '</div>';
 		}
 ?>
 	</div>
