@@ -28,7 +28,9 @@ body {
 	margin-top: 10px;
 }
 #supportpress-newthread:hover,
-#supportpress-newthread:active {
+#supportpress-newthread:active,
+#send-help:hover,
+#send-help:active {
 	border-color: #666;
 }
 #supportpress-open-tickets .thread .time {
