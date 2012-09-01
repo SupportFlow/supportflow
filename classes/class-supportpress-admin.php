@@ -557,7 +557,10 @@ class SupportPress_Admin extends SupportPress {
 		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
 			$comment = wp_filter_nohtml_kses( $_POST['comment'] );
 			$visibility = ( !empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
-			$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['comment-attachments'], ',' ) ) );
+			if ( !empty( $_POST['comment-attachments'] ) )
+				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['comment-attachments'], ',' ) ) );
+			else
+				$attachment_ids = '';
 			$comment_args = array(
 					'comment_approved'        => $visibility,
 					'attachment_ids'          => $attachment_ids,
