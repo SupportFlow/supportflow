@@ -116,13 +116,15 @@ body {
 	display:none;
 }
 
-#supportpress-single-thread ul.thread-comments {
+#supportpress-single-thread ul,
+#supportpress-all-threads ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
 
-#supportpress-single-thread ul.thread-comments li {
+#supportpress-single-thread ul li,
+#supportpress-all-threads ul li {
 	padding-top: 5px;
 	padding-bottom: 5px;
 	margin-top: 5px;
@@ -130,20 +132,31 @@ body {
 	border-top: 1px solid #ECECEC;
 }
 
-#supportpress-single-thread ul.thread-comments li:first-child {
+#supportpress-single-thread ul li:first-child
+#supportpress-all-threads ul li:first-child {
 	border-top: none;
 	padding-top: 0;
 }
 
-#supportpress-single-thread ul.thread-comments li .thread-comment-meta {
+#supportpress-all-threads ul li:hover {
+	cursor: pointer
+}
+
+#supportpress-all-threads ul li h4 {
+	font-weight: normal;
+	font-weight: 200;
+	font-family: "Helvetica Neue", sans-serif;
+}
+
+.thread-comments .thread-comment-meta {
 	font-size: 12px;
 	color: #888;
 }
 
-#supportpress-single-thread ul.thread-comments li .thread-comment-meta .thread-comment-author {
+.thread-comments .thread-comment-meta .thread-comment-author {
 	font-weight: bold;
 }
 
-#supportpress-single-thread ul.thread-comments li .thread-comment-meta .thread-comment-timestamp {
+.thread-comments .thread-comment-meta .thread-comment-timestamp {
 	float: right;
 }

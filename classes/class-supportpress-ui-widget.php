@@ -34,21 +34,52 @@ class SupportPress_UI_Widget extends SupportPress {
 
 	public function render_single_thread_comments_html( $thread_id ) {
 
-		// @todo there's no get_thread() method right now
-		$thread = get_post( $thread_id );
 		$comments = SupportPress()->get_thread_comments( $thread_id, array( 'comment_type' => 'public' ) );
-		setup_postdata( $thread );
-		ob_start();
-?><ul class="thread-comments">
-<?php foreach( $comments as $comment ):
-	$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
-?><li>
-		<div class="thread-comment-meta"><span class="thread-comment-author"><?php echo esc_html( $comment->comment_author ); ?></span><span class="thread-comment-timestamp"><?php echo esc_html( $comment_timestamp ); ?></span></div>
-		<div class="thread-comment-body"><?php echo wpautop( stripslashes( $comment->comment_content ) ); ?></div>
-	</li><?php endforeach; ?>
-</ul><?php
-		wp_reset_postdata();
-		return ob_get_clean();
+		
+		$output = '<ul class="thread-comments">';
+		foreach( $comments as $commnent ) {
+			$output .= '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
+		}
+		$output .= '</ul>';
+		return $output;
+	}
+
+	public function render_single_comment_html( $comment ) {
+		$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
+
+		$output = '<div class="thread-comment-meta">'
+				. '<span class="thread-comment-author">' . esc_html( $comment->comment_author ) . '</span>'
+				. '<span class="thread-comment-timestamp">' . esc_html( $comment_timestamp ) . '</span>'
+				. '</div>'
+				. '<div class="thread-comment-body">'
+				. wpautop( stripslashes( $comment->comment_content ) )
+				. '</div>';
+		return $output;
+	}
+
+	public function render_all_threads_html() {
+		$user = wp_get_current_user();
+
+		$threads = SupportPress()->get_threads( array( 'respondent_email' => $user->user_email ) );
+
+		if ( empty( $threads ) ) {
+			$output = '<div class="thread nothreads">' . __( 'No open threads.', 'supportpress' ) . '</div>';
+		} else {
+			$output = '<ul id="respondent-threads">';
+			foreach( $threads as $thread ) {
+				$output .= '<li>';
+				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
+				$output .= '<div class="thread-comments">';
+				$comments = SupportPress()->get_thread_comments( $thread->ID, array( 'comment_type' => 'public' ) );
+				$last_comment = array_pop( $comments );
+				$output .= $this->render_single_comment_html( $last_comment );
+				$output .= '</div>';
+				$output .= '</li>';
+			}
+			$output .= '</ul>';
+		}
+		return $output;
+
 	}
 
 	// @todo: Pretty URLs
@@ -88,10 +119,7 @@ class SupportPress_UI_Widget extends SupportPress {
 			plugins_url( 'css/widget.css', dirname( __FILE__ ) ),
 			array(),
 			mt_rand() // For cache busting during development
-		);
-
-		// @todo: Templating or something I guess
-?>
+		); ?>
 <html>
 <head>
 	<title><?php _e( 'Support', 'supportpress' ); ?></title>
@@ -113,27 +141,7 @@ class SupportPress_UI_Widget extends SupportPress {
 	</div>
 
 	<div id="supportpress-all-threads">
-<?php
-		$threads = SupportPress()->get_threads_for_respondent( $current_user->user_email );
-
-		if ( $threads->have_posts() ) {
-			while ( $threads->have_posts() ) {
-				$threads->the_post();
-?>
-		<div class="thread">
-			<h3><?php the_title(); ?></h3>
-
-			<p>Output ticket details here. I'll leave this to Daniel -- running out of time.</p>
-
-			<span class="time"><?php printf( __( '%s @ %s', 'supportpress' ), get_the_date(), get_the_time() ); ?></span>
-		</div>
-<?php
-			} // while
-			wp_reset_postdata();
-		} else {
-			echo '<div class="thread nothreads">' . __( 'No open threads.', 'supportpress' ) . '</div>';
-		}
-?>
+<?php echo $this->render_all_threads_html(); ?>
 	</div>
 
 	<div id="supportpress-single-thread">

@@ -394,6 +394,41 @@ class SupportPress {
 	}
 
 	/**
+	 * @todo This should produce a series of thread objects with respondents, comments, etc.
+	 */
+	public function get_threads( $args = array() ) {
+
+		$defaults = array(
+				'respondent_email'         => '',
+				'post_status'              => '',
+				'orderby'                  => 'modified',
+			);
+		$args = array_merge( $defaults, $args );
+
+		$thread_args = array();
+		if ( empty( $args['post_status'] ) )
+			$thread_args['post_status'] = array_keys( $this->post_statuses );
+
+		if ( !empty( $args['respondent_email'] ) )
+			$thread_args['tax_query'] = array(
+					array(
+						'taxonomy' => $this->respondents_tax,
+						'field'    => 'slug',
+						'terms'    => $this->get_email_hash( $args['respondent_email'] ),
+					),
+			);
+
+		$thread_args['post_type'] = $this->post_type;
+		$thread_args['orderby'] = $args['orderby'];
+
+		$threads = new WP_Query( $thread_args );
+		if ( is_wp_error( $threads ) )
+			return $threads;
+
+		return $threads->posts;
+	}
+
+	/**
 	 * Get a thread's respondents
 	 *
 	 * @todo support retrieving more fields
@@ -441,25 +476,6 @@ class SupportPress {
 			}
 		}
 		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax );
-	}
-
-	/**
-	 * Get a respondent's threads
-	 */
-	public function get_threads_for_respondent( $email ) {
-		$threads = new WP_Query( array(
-			'post_type' => $this->post_type,
-			'post_status' => 'any',
-			'tax_query' => array(
-				array(
-					'taxonomy' => $this->respondents_tax,
-					'field'    => 'slug',
-					'terms'    => $this->get_email_hash( $email ),
-				),
-			),
-		) );
-
-		return $threads;
 	}
 
 	/**
