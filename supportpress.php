@@ -151,6 +151,8 @@ class SupportPress {
 		$this->respondents_tax  = apply_filters( 'supportpresss_respondents_taxonomy', 'sp_respondent' );
 		$this->comment_type     = apply_filters( 'supportpress_thread_comment_type', 'sp_comment' );
 
+		$this->email_term_prefix = 'sp-';
+
 		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
 			'sp_new'     => array(
 				'label'       => __( 'New', 'supportpress' ),
@@ -316,13 +318,15 @@ class SupportPress {
 	}
 
 	/**
-	 * Standardizes and validates an e-mail address
+	 * Turns an e-mail address into a term hash, or false on failure
 	 */
-	public function standardize_and_validate_email( $email ) {
+	public function get_email_hash( $email ) {
 		$email = strtolower( trim( $email ) );
 
 		if ( ! is_email( $email ) )
 			return false;
+
+		$email = $this->email_term_prefix . md5( $email );
 
 		return $email;
 	}
@@ -419,8 +423,7 @@ class SupportPress {
 			if ( $term = get_term_by( 'name', $email, $this->respondents_tax ) ) {
 				$term_ids[] = (int)$term->term_id;
 			} else {
-				$md5_email = md5( $email );
-				$term = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => 'sp-' . $md5_email ) );
+				$term = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $this->get_email_hash( $email ) ) );
 				$term_ids[] = $term['term_id'];
 			}
 		}
@@ -431,8 +434,6 @@ class SupportPress {
 	 * Get a respondent's threads
 	 */
 	public function get_threads_for_respondent( $email ) {
-		$email = $this->standardize_and_validate_email( $email );
-
 		$threads = new WP_Query( array(
 			'post_type' => $this->post_type,
 			'post_status' => 'any',
@@ -440,7 +441,7 @@ class SupportPress {
 				array(
 					'taxonomy' => $this->respondents_tax,
 					'field'    => 'slug',
-					'terms'    => 'sp-' . md5( $email ),
+					'terms'    => $this->get_email_hash( $email ),
 				),
 			),
 		) );
