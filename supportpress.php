@@ -355,7 +355,7 @@ class SupportPress {
 			'respondent_name'          => '', // Otherwise supply a name
 			'respondent_email'         => '', // And an e-mail address
 			'status'                   => key( $post_statuses ),
-			'assignee'                 => 0,  // WordPress user ID or username of ticket assignee/owner
+			'assignee'                 => -1,  // WordPress user ID or username of ticket assignee/owner
 		);
 
 		$args = wp_parse_args( $args, $defaults );
