@@ -115,46 +115,38 @@ body {
 #supportpress-single-thread {
 	display:none;
 }
-
 #supportpress-single-thread ul,
 #supportpress-all-threads ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
-
 #supportpress-single-thread ul li,
 #supportpress-all-threads ul li {
-	border-top: 1px solid #ECECEC;
+	border-bottom: 1px solid #ECECEC;
 	margin-bottom: 5px;
-	padding: 5px 0;
+	padding: 5px;
 }
-
-#supportpress-single-thread ul li:first-child
 #supportpress-all-threads ul li:first-child {
-	border-top: none;
+	border-top: 1px solid #ECECEC;
 	padding-top: 0;
 }
-
 #supportpress-all-threads ul li:hover {
-	cursor: pointer
+	background-color: #fff;
+	cursor: pointer;
 }
-
 #supportpress-all-threads ul li h4 {
 	font-weight: normal;
 	font-family: "Helvetica Neue", sans-serif;
 	margin: 5px 0;
 }
-
 .thread-comments .thread-comment-meta {
 	font-size: 12px;
 	color: #888;
 }
-
 .thread-comments .thread-comment-meta .thread-comment-author {
 	font-weight: bold;
 }
-
 .thread-comments .thread-comment-meta .thread-comment-timestamp {
 	float: right;
 }
