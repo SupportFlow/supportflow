@@ -480,6 +480,7 @@ class SupportPress_Admin extends SupportPress {
 				'cb'                  => $columns['cb'],
 				'updated'             => __( 'Updated', 'supportpress' ),
 				'title'               => __( 'Subject', 'supportpress' ),
+				'respondents'         => __( 'Respondents', 'supportpress' ),
 				'status'              => __( 'Status', 'supportpress' ),
 				'author'              => __( 'Agent', 'supportpress' ),
 				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
@@ -506,6 +507,20 @@ class SupportPress_Admin extends SupportPress {
 			case 'updated':
 				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
 				echo sprintf( __( '%s ago', 'supportpress' ), human_time_diff( $modified_gmt ) );
+				break;
+			case 'respondents':
+				$respondents = SupportPress()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
+				if ( empty( $respondents ) )
+					break;
+				foreach( $respondents as $key => $respondent_email ) {
+					$args = array(
+							SupportPress()->respondents_tax     => SupportPress()->get_email_hash( $respondent_email ),
+							'post_type'                         => SupportPress()->post_type,
+						);
+					$respondent_link = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
+					$respondents[$key] = get_avatar( $respondent_email, 16 ) . '&nbsp;&nbsp;' . $respondent_link;
+				}
+				echo implode( '<br />', $respondents );
 				break;
 			case 'status':
 				$post_status = get_post_status( $thread_id );
