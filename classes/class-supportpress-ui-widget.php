@@ -52,12 +52,12 @@ class SupportPress_UI_Widget extends SupportPress {
 	public function render_single_comment_html( $comment ) {
 		$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
 
-		$output = '<div class="thread-comment-meta">'
+		$output = '<div class="thread-comment-body">'
+				. wpautop( stripslashes( $comment->comment_content ) )
+				. '</div>'
+				. '<div class="thread-comment-meta">'
 				. '<span class="thread-comment-author">' . esc_html( $comment->comment_author ) . '</span>'
 				. '<span class="thread-comment-timestamp">' . esc_html( $comment_timestamp ) . '</span>'
-				. '</div>'
-				. '<div class="thread-comment-body">'
-				. wpautop( stripslashes( $comment->comment_content ) )
 				. '</div>';
 		return $output;
 	}
