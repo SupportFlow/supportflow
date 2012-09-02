@@ -124,8 +124,7 @@ body {
 #supportpress-single-thread ul li,
 #supportpress-all-threads ul li {
 	border-bottom: 1px solid #ECECEC;
-	margin-bottom: 5px;
-	padding: 5px;
+	padding: 5px 5px 10px 5px;
 }
 #supportpress-all-threads ul li:first-child {
 	border-top: 1px solid #ECECEC;
@@ -136,8 +135,11 @@ body {
 	cursor: pointer;
 }
 #supportpress-all-threads ul li h4 {
-	font-weight: normal;
-	font-family: "Helvetica Neue", sans-serif;
+	font: bold 14px/18px "Helvetica Neue", sans-serif;
+	margin: 10px 0 0 0;
+}
+.thread-comments .thread-comment-body p {
+	font: 13px/18px "Helvetica Neue", sans-serif;
 	margin: 5px 0;
 }
 .thread-comments .thread-comment-meta {
