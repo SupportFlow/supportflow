@@ -130,12 +130,12 @@ var supportpress = {};
 		// If there was an error in the process, re-enable the form and show the error message
 		if ( 'error' == response.status ) {
 			// @todo display the error message
-			supportpress.enable_thread_form( supportpress.single_thread_form, false, SupportPressUserWidgetVars.start_thread_text );
+			supportpress.enable_thread_form( supportpress.single_thread_form, false, SupportPressUserWidgetVars.send_reply_text );
 			return;
 		}
 
 		// Renable the form and append the response
-		supportpress.enable_thread_form( supportpress.single_thread_form, true, SupportPressUserWidgetVars.start_thread_text );
+		supportpress.enable_thread_form( supportpress.single_thread_form, true, SupportPressUserWidgetVars.send_reply_text );
 		supportpress.single_thread_body.find( 'ul' ).append( response.html );
 
 	}
