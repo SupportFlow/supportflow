@@ -37,7 +37,8 @@ class SupportPress_Emails extends SupportPress {
 
 		$agent_emails = array();
 		foreach( $agent_ids as $user_id ) {
-			$agent_emails[] = get_user_by( 'id', $user_id )->user_email;
+			if ( $user = get_user_by( 'id', $user_id ) )
+				$agent_emails[] = $user->user_email;
 		}
 
 		// Don't email the person creating the comment, unless that's desired behavior
