@@ -197,6 +197,7 @@ class SupportPress {
 
 		require_once( $this->plugin_dir . 'classes/class-supportpress-json-api.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportpress-attachments.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportpress-emails.php' );
 
 		/** Extensions ********************************************************/
 
@@ -398,6 +399,7 @@ class SupportPress {
 	 */
 	public function get_thread( $thread_id ) {
 
+		return get_post( $thread_id );
 	}
 
 	/**
@@ -597,6 +599,8 @@ class SupportPress {
 		// Adding a thread comment updates the post modified time for the thread
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql') ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
+
+		do_action( 'supportpress_thread_comment_added', $comment_id );
 
 		return $comment_id;
 	}
