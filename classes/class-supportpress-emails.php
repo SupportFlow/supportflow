@@ -14,8 +14,50 @@ class SupportPress_Emails extends SupportPress {
 	 */
 	public function setup_actions() {
 		
-		// When a new comment is added to a thread, notify all of the respondents on the thread
+		// When a new comment is added to a thread, notify the respondents and the agents
+		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
 		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );
+	}
+
+	/**
+	 * When a new comment is added to the thread, notify the agent on the thread if there is one
+	 */
+	public function notify_agents_thread_comment( $comment_id ) {
+
+		$comment = get_comment( $comment_id );
+		if ( ! $comment )
+			return;
+
+		$thread = SupportPress()->get_thread( $comment->comment_post_ID );
+		// One agent by default, but easily allow notifications to a triage team
+		$agent_ids = apply_filters( 'supportpress_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'comment' );
+
+		if ( empty( $agent_ids ) )
+			return;
+
+		$agent_emails = array();
+		foreach( $agent_ids as $user_id ) {
+			$agent_emails[] = get_user_by( 'id', $user_id )->user_email;
+		}
+
+		// Don't email the person creating the comment, unless that's desired behavior
+		if ( !apply_filters( 'supportpress_emails_notify_creator', false, 'comment' ) ) {
+			$key = array_search( $comment->comment_author_email, $agent_emails );
+			if ( false !== $key )
+				unset( $agent_emails[$key] );
+		}
+
+		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
+		$message = stripslashes( $comment->comment_content );
+		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
+			$message .= "\n";
+			foreach( $attachment_ids as $attachment_id ) {
+				$message .= "\n" . wp_get_attachment_url( $attachment_id );
+			}
+		}
+		foreach( $agent_emails as $agent_email ) {
+			wp_mail( $agent_email, $subject, $message );
+		}
 	}
 
 	/**
