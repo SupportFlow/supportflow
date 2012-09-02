@@ -5,6 +5,9 @@
 class SupportPress_Attachments extends SupportPress {
 
 	var $file_hash = '';
+	var $secret_key = '';
+
+	const secret_key_option = 'supportpress_attachments_secret';
 
 	function __construct() {
 		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
@@ -16,6 +19,13 @@ class SupportPress_Attachments extends SupportPress {
 
 		// Handle delivery of the secure file
 		add_action( 'template_redirect', array( $this, 'handle_file_delivery' ) );
+
+		// Generate a secret key for our hashes the first time this is loaded in the admin
+		$this->secret_key = get_option( self::secret_key_option );
+		if ( is_admin() && !$this->secret_key ) {
+			$this->secret_key = wp_generate_password();
+			update_option( self::secret_key_option, $this->secret_key );
+		}
 
 		// Only apply to files that are uploaded to a thread
 		if ( isset( $_REQUEST['post_id'] ) && SupportPress()->is_thread( (int)$_REQUEST['post_id'] ) ) {
@@ -123,15 +133,14 @@ class SupportPress_Attachments extends SupportPress {
 
 	public function wp_handle_upload_prefilter( $file ) {
 
-		// @todo use a secret key stored in options here too
-		$this->private_hash = md5( date( 'Y-m-d' ) . $file['name'] );
+		$this->private_hash = md5( $this->secret_key . date( 'Y-m-d' ) . $file['name'] );
 		$file['name'] = $this->private_hash . '.' . basename( $file['name'] );
 		return $file;
 	}
 
 	public function wp_handle_upload( $file ) {
 
-		$secondary_hash = md5( date( 'Y-m-d' ) );
+		$secondary_hash = md5( $this->secret_key . date( 'Y-m-d' ) );
 		$file['url'] = site_url( '/secure-files/' ) . str_replace( $this->private_hash . '.', $secondary_hash . '/', basename( $file['file'] ) );
 		return $file;
 	}
