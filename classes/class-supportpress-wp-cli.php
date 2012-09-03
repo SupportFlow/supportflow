@@ -89,7 +89,7 @@ EOB
 			$thread_args = array(
 					'subject'                => $old_thread->subject,
 					'date'                   => $old_thread->dt,
-					'post_status'            => 'sp_' . $old_thread->state,
+					'status'            => 'sp_' . $old_thread->state,
 				);
 			$thread_id = SupportPress()->create_thread( $thread_args );
 			if ( is_wp_error( $thread_id ) )
