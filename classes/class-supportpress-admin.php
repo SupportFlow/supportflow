@@ -56,7 +56,7 @@ class SupportPress_Admin extends SupportPress {
 	}
 
 	/**
-	 * Sets up some default Plupload settings so we can upload media 
+	 * Sets up some default Plupload settings so we can upload media
 	 */
 	private static function add_default_plupload_settings() {
 		global $wp_scripts;
@@ -344,7 +344,7 @@ class SupportPress_Admin extends SupportPress {
 	}
 
 	/**
-	 * A box that appears at the top 
+	 * A box that appears at the top
 	 */
 	public function meta_box_subject() {
 

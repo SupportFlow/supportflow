@@ -47,7 +47,7 @@ class SupportPress_Attachments extends SupportPress {
 
 	public function handle_file_delivery( $template ) {
 
-		// First check to see 
+		// First check to see
 		if ( false === stripos( $_SERVER['REQUEST_URI' ], "secure-files/" ) )
 			return;
 
@@ -55,7 +55,7 @@ class SupportPress_Attachments extends SupportPress {
 		preg_match( '#^\/secure\-files\/(.+)$#', $_SERVER['REQUEST_URI'], $matches );
 		if ( empty( $matches ) )
 			return;
-		
+
 		global $wpdb;
 		$file = $matches[1];
 		$query = $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE guid LIKE %s", '%' . $file );

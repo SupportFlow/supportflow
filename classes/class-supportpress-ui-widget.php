@@ -15,7 +15,7 @@ class SupportPress_UI_Widget extends SupportPress {
 	}
 
 	/**
-	 * Hook into the response for the JSON API to add 
+	 * Hook into the response for the JSON API to add
 	 * our HTML to render the widget areas
 	 */
 	public function filter_json_api_response( $response ) {

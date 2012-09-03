@@ -13,7 +13,7 @@ class SupportPress_Emails extends SupportPress {
 	 * Register the notifications to happen on which actions
 	 */
 	public function setup_actions() {
-		
+
 		// When a new comment is added to a thread, notify the respondents and the agents
 		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
 		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );

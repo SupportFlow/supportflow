@@ -635,5 +635,3 @@ function SupportPress() {
 }
 
 add_action( 'plugins_loaded', 'SupportPress' );
-
-?>

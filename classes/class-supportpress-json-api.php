@@ -13,7 +13,7 @@ class SupportPress_JSON_API extends SupportPress {
 	}
 
 	public function action_wp_ajax_supportpress_json() {
-		
+
 		$current_user = wp_get_current_user();
 
 		$response = array(
@@ -50,7 +50,7 @@ class SupportPress_JSON_API extends SupportPress {
 				break;
 
 			case 'get-respondent-threads':
-				
+
 				break;
 
 			case 'get-thread':
