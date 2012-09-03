@@ -45,6 +45,9 @@ EOB
 		// Our WP connection
 		global $wpdb;
 
+		// Don't do stuff like send email notifications when importing
+		define( 'WP_IMPORTING', true );
+
 		// Make the connection
 		$spdb = new wpdb( $this->args['db_user'], $this->args['db_pass'], $this->args['db_name'], $this->args['db_host'] );
 

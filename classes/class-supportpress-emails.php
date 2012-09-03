@@ -14,6 +14,10 @@ class SupportPress_Emails extends SupportPress {
 	 */
 	public function setup_actions() {
 
+		// Don't send out any notifications when importing
+		if ( defined('WP_IMPORTING') && true == WP_IMPORTING )
+			return;
+
 		// When a new comment is added to a thread, notify the respondents and the agents
 		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
 		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );
