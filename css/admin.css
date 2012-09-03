@@ -16,6 +16,10 @@
 	padding-top: 0;
 }
 
+#side-sortables {
+	margin-top: 34px;
+}
+
 #supportpress-subject.postbox,
 #supportpress-respondents.postbox {
 	border:none;
@@ -62,7 +66,10 @@
 #supportpress-subject.postbox input {
 	width: 100%;
 	font-size: 1.7em;
-	padding: 8px 10px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 12px;
+	padding-bottom: 10px;
 }
 
 #supportpress-respondents.postbox input {
