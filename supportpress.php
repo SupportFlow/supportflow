@@ -254,7 +254,7 @@ class SupportPress {
 				'name'               => __( 'Threads',                   'supportpress' ),
 				'singular_name'      => __( 'Thread',                    'supportpress' ),
 				'all_items'          => __( 'All Threads',               'supportpress' ),
-				'add_new'            => __( 'Start New',                 'sp_thread' ),
+				'add_new'            => __( 'New Thread',                 'sp_thread' ),
 				'add_new_item'       => __( 'Start New Thread',          'supportpress' ),
 				'edit_item'          => __( 'Discussion',                'supportpress' ),
 				'new_item'           => __( 'New Thread',                'supportpress' ),
