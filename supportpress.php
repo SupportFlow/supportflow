@@ -216,6 +216,10 @@ class SupportPress {
 		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-widget.php' );
 
+		/** Tools *************************************************************/
+		if ( defined('WP_CLI') && WP_CLI )
+			require_once( $this->plugin_dir . '/classes/class-supportpress-wp-cli.php' );
+
 		# TODO: Akismet plugin?
 
 		/** Admin *************************************************************/
@@ -363,6 +367,7 @@ class SupportPress {
 		$defaults = array(
 			'subject'                  => '',
 			'message'                  => '',
+			'date'                     => '',
 			'respondent_id'            => 0,  // If the requester has a WordPress account (ID or username)
 			'respondent_name'          => '', // Otherwise supply a name
 			'respondent_email'         => '', // And an e-mail address
@@ -376,6 +381,7 @@ class SupportPress {
 			'post_type'                => $this->post_type,
 			'post_title'               => $args['subject'],
 			'post_author'              => $args['assignee'],
+			'post_date'                => $args['date'],
 		);
 
 		// Validate the thread status
@@ -595,6 +601,7 @@ class SupportPress {
 		$comment = array(
 				'comment_content'        => esc_sql( $comment_text ),
 				'comment_post_ID'        => (int)$thread_id,
+				'comment_date'           => esc_sql( $details['time'] ),
 				'comment_approved'       => esc_sql( $details['comment_approved'] ),
 				'comment_type'           => esc_sql( $this->comment_type ),
 				'comment_author'         => esc_sql( $details['comment_author'] ),
