@@ -79,42 +79,54 @@ class SupportPress {
 	 * @see SupportPress::instance()
 	 * @see SupportPress();
 	 */
-	private function __construct() { /* Do nothing here */ }
+	private function __construct() {
+		/* Do nothing here */
+	}
 
 	/**
 	 * A dummy magic method to prevent SupportPress from being cloned
 	 *
 	 * @since SupportPress 0.1
 	 */
-	public function __clone() { wp_die( __( 'Cheatin’ uh?' ) ); }
+	public function __clone() {
+		wp_die( __( 'Cheatin’ uh?' ) );
+	}
 
 	/**
 	 * A dummy magic method to prevent SupportPress from being unserialized
 	 *
 	 * @since SupportPress 0.1
 	 */
-	public function __wakeup() { wp_die( __( 'Cheatin’ uh?' ) ); }
+	public function __wakeup() {
+		wp_die( __( 'Cheatin’ uh?' ) );
+	}
 
 	/**
 	 * Magic method for checking the existence of a certain custom field
 	 *
 	 * @since SupportPress 0.1
 	 */
-	public function __isset( $key ) { return isset( $this->data[$key] ); }
+	public function __isset( $key ) {
+		return isset( $this->data[$key] );
+	}
 
 	/**
 	 * Magic method for getting SupportPress varibles
 	 *
 	 * @since SupportPress 0.1
 	 */
-	public function __get( $key ) { return isset( $this->data[$key] ) ? $this->data[$key] : null; }
+	public function __get( $key ) {
+		return isset( $this->data[$key] ) ? $this->data[$key] : null;
+	}
 
 	/**
 	 * Magic method for setting SupportPress varibles
 	 *
 	 * @since SupportPress 0.1
 	 */
-	public function __set( $key, $value ) { $this->data[$key] = $value; }
+	public function __set( $key, $value ) {
+		$this->data[$key] = $value;
+	}
 
 	/** Private Methods *******************************************************/
 
@@ -268,7 +280,7 @@ class SupportPress {
 			'label'                  => __( 'Respondents',                'supportpress' ),
 			'labels' => array(
 				'search_items'       => __( 'Search Respondents',         'supportpress' ),
-				'edit_item'          => __( 'Edit Respondent',            'supportpress' ), 
+				'edit_item'          => __( 'Edit Respondent',            'supportpress' ),
 				'update_item'        => __( 'Update Respondent',          'supportpress' ),
 				'add_new_item'       => __( 'Add New Respondent',         'supportpress' ),
 				),
@@ -562,7 +574,7 @@ class SupportPress {
 				'comment_approved'       => 'public',
 			);
 
-		// @todo This actually probably shouldn't default to current user, so 
+		// @todo This actually probably shouldn't default to current user, so
 		// we don't have to mandate the arguments be assigned each time
 		if ( $user = wp_get_current_user() ) {
 			$default_details['comment_author'] = $user->display_name;
