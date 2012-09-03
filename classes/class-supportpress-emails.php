@@ -14,8 +14,8 @@ class SupportPress_Emails extends SupportPress {
 	 */
 	public function setup_actions() {
 
-		// Don't send out any notifications when importing
-		if ( defined('WP_IMPORTING') && true == WP_IMPORTING )
+		// Don't send out any notifications when importing or using WP-CLI
+		if ( ( defined('WP_IMPORTING') && WP_IMPORTING ) || ( defined('WP_CLI') && WP_CLI ) )
 			return;
 
 		// When a new comment is added to a thread, notify the respondents and the agents
