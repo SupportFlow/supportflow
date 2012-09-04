@@ -52,7 +52,7 @@ class SupportPress_Attachments extends SupportPress {
 			return;
 
 		// Get the file
-		preg_match( '#^\/secure\-files\/(.+)$#', $_SERVER['REQUEST_URI'], $matches );
+		preg_match( '#\/secure\-files\/(.+)$#', $_SERVER['REQUEST_URI'], $matches );
 		if ( empty( $matches ) )
 			return;
 
