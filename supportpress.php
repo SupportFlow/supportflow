@@ -4,7 +4,7 @@
  * Plugin Name: SupportPress
  * Plugin URI:  http://supportpress.com/
  * Description: Reinventing how you support your customers.
- * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle, Automattic
+ * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
  * Author URI:  http://automattic.com/
  * Version:     0.1
  *
