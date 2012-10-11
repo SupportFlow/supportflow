@@ -1,29 +1,29 @@
 <?php
 
 /**
- * Plugin Name: SupportPress
- * Plugin URI:  http://supportpress.com/
+ * Plugin Name: Support Flow
+ * Plugin URI:  
  * Description: Reinventing how you support your customers.
  * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
- * Author URI:  http://automattic.com/
+ * Author URI:  
  * Version:     0.1
  *
- * Text Domain: supportpress
+ * Text Domain: support-flow
  * Domain Path: /languages/
  */
 
-class SupportPress {
+class SupportFlow {
 
 	/** Magic *****************************************************************/
 
 	/**
-	 * SupportPress uses many variables, most of which can be filtered to customize
+	 * Support Flow uses many variables, most of which can be filtered to customize
 	 * the way that it works. To prevent unauthorized access, these variables
 	 * are stored in a private array that is magically updated using PHP 5.2+
 	 * methods. This is to prevent third party plugins from tampering with
 	 * essential information indirectly, which would cause issues later.
 	 *
-	 * @see SupportPress::setup_globals()
+	 * @see SupportFlow::setup_globals()
 	 * @var array
 	 */
 	private $data;
@@ -38,31 +38,31 @@ class SupportPress {
 	/** Singleton *************************************************************/
 
 	/**
-	 * @var SupportPress The one true SupportPress
+	 * @var SupportFlow The one true SupportFlow
 	 */
 	private static $instance;
 
 	/**
-	 * Main SupportPress Instance
+	 * Main SupportFlow Instance
 	 *
-	 * SupportPress is fun
+	 * Support Flow is fun
 	 * Please load it only one time
 	 * For this, we thank you
 	 *
-	 * Insures that only one instance of SupportPress exists in memory at any one
+	 * Insures that only one instance of SupportFlow exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @staticvar array $instance
-	 * @uses SupportPress::setup_globals() Setup the globals needed
-	 * @uses SupportPress::includes() Include the required files
-	 * @uses SupportPress::setup_actions() Setup the hooks and actions
-	 * @see SupportPress()
-	 * @return The one true SupportPress
+	 * @uses SupportFlow::setup_globals() Setup the globals needed
+	 * @uses SupportFlow::includes() Include the required files
+	 * @uses SupportFlow::setup_actions() Setup the hooks and actions
+	 * @see SupportFlow()
+	 * @return The one true SupportFlow
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) ) {
-			self::$instance = new SupportPress;
+			self::$instance = new SupportFlow;
 			self::$instance->setup_globals();
 			self::$instance->includes();
 			self::$instance->setup_actions();
@@ -73,29 +73,29 @@ class SupportPress {
 	/** Magic Methods *********************************************************/
 
 	/**
-	 * A dummy constructor to prevent SupportPress from being loaded more than once.
+	 * A dummy constructor to prevent SupportFlow from being loaded more than once.
 	 *
-	 * @since SupportPress 0.1
-	 * @see SupportPress::instance()
-	 * @see SupportPress();
+	 * @since Support Flow 0.1
+	 * @see SupportFlow::instance()
+	 * @see SupportFlow();
 	 */
 	private function __construct() {
 		/* Do nothing here */
 	}
 
 	/**
-	 * A dummy magic method to prevent SupportPress from being cloned
+	 * A dummy magic method to prevent SupportFlow from being cloned
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 */
 	public function __clone() {
 		wp_die( __( 'Cheatin’ uh?' ) );
 	}
 
 	/**
-	 * A dummy magic method to prevent SupportPress from being unserialized
+	 * A dummy magic method to prevent SupportFlow from being unserialized
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 */
 	public function __wakeup() {
 		wp_die( __( 'Cheatin’ uh?' ) );
@@ -104,25 +104,25 @@ class SupportPress {
 	/**
 	 * Magic method for checking the existence of a certain custom field
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 */
 	public function __isset( $key ) {
 		return isset( $this->data[$key] );
 	}
 
 	/**
-	 * Magic method for getting SupportPress varibles
+	 * Magic method for getting SupportFlow varibles
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 */
 	public function __get( $key ) {
 		return isset( $this->data[$key] ) ? $this->data[$key] : null;
 	}
 
 	/**
-	 * Magic method for setting SupportPress varibles
+	 * Magic method for setting SupportFlow varibles
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 */
 	public function __set( $key, $value ) {
 		$this->data[$key] = $value;
@@ -134,59 +134,59 @@ class SupportPress {
 	 * Set some smart defaults to class variables. Allow some of them to be
 	 * filtered to allow for early overriding.
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @access private
-	 * @uses plugin_dir_path() To generate SupportPress plugin path
-	 * @uses plugin_dir_url() To generate SupportPress plugin url
+	 * @uses plugin_dir_path() To generate SupportFlow plugin path
+	 * @uses plugin_dir_url() To generate SupportFlow plugin url
 	 * @uses apply_filters() Calls various filters
 	 */
 	private function setup_globals() {
 
 		/** Version ***********************************************************/
 
-		$this->version        = '0.1-alpha'; // SupportPress version
+		$this->version        = '0.1-alpha'; // SupportFlow version
 
 		/** Paths *************************************************************/
 
 		// Setup some base path and URL information
 		$this->file           = __FILE__;
-		$this->basename       = apply_filters( 'supportpress_plugin_basenname', plugin_basename( $this->file ) );
-		$this->plugin_dir     = apply_filters( 'supportpress_plugin_dir_path',  plugin_dir_path( $this->file ) );
-		$this->plugin_url     = apply_filters( 'supportpress_plugin_dir_url',   plugin_dir_url ( $this->file ) );
+		$this->basename       = apply_filters( 'supportflow_plugin_basenname', plugin_basename( $this->file ) );
+		$this->plugin_dir     = apply_filters( 'supportflow_plugin_dir_path',  plugin_dir_path( $this->file ) );
+		$this->plugin_url     = apply_filters( 'supportflow_plugin_dir_url',   plugin_dir_url ( $this->file ) );
 
 		// Languages
-		$this->lang_dir       = apply_filters( 'supportpress_lang_dir',         trailingslashit( $this->plugin_dir . 'languages' ) );
+		$this->lang_dir       = apply_filters( 'supportflow_lang_dir',         trailingslashit( $this->plugin_dir . 'languages' ) );
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type        = apply_filters( 'supportpress_thread_post_type', 'sp_thread' );
-		$this->respondents_tax  = apply_filters( 'supportpresss_respondents_taxonomy', 'sp_respondent' );
-		$this->comment_type     = apply_filters( 'supportpress_thread_comment_type', 'sp_comment' );
+		$this->post_type        = apply_filters( 'supportflow_thread_post_type', 'sp_thread' );         // Todo: change prefix
+		$this->respondents_tax  = apply_filters( 'supportflow_respondents_taxonomy', 'sp_respondent' ); // Todo: change prefix
+		$this->comment_type     = apply_filters( 'supportflow_thread_comment_type', 'sp_comment' );     // Todo: change prefix
 
 		$this->email_term_prefix = 'sp-';
 
-		$this->post_statuses  = apply_filters( 'supportpress_thread_post_statuses', array(
+		$this->post_statuses  = apply_filters( 'supportflow_thread_post_statuses', array(
 			'sp_new'     => array(
-				'label'       => __( 'New', 'supportpress' ),
-				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportpress' ),
+				'label'       => __( 'New', 'support-flow' ),
+				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'support-flow' ),
 			),
 			'sp_open'    => array(
-				'label'       => __( 'Open', 'supportpress' ),
-				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportpress' ),
+				'label'       => __( 'Open', 'support-flow' ),
+				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'support-flow' ),
 			),
 			'sp_pending' => array(
-				'label'       => __( 'Pending', 'supportpress' ),
-				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportpress' ),
+				'label'       => __( 'Pending', 'support-flow' ),
+				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'support-flow' ),
 			),
 			'sp_closed'  => array(
-				'label'       => __( 'Closed', 'supportpress' ),
-				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportpress' ),
+				'label'       => __( 'Closed', 'support-flow' ),
+				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'support-flow' ),
 			),
 		) );
 
-		$this->post_meta_requester_id    = apply_filters( 'supportpress_post_meta_requester_id',    'supportpress_requester_id'    );
-		$this->post_meta_requester_name  = apply_filters( 'supportpress_post_meta_requester_name',  'supportpress_requester_name'  );
-		$this->post_meta_requester_email = apply_filters( 'supportpress_post_meta_requester_email', 'supportpress_requester_email' );
+		$this->post_meta_requester_id    = apply_filters( 'supportflow_post_meta_requester_id',    'supportflow_requester_id'    );
+		$this->post_meta_requester_name  = apply_filters( 'supportflow_post_meta_requester_name',  'supportflow_requester_name'  );
+		$this->post_meta_requester_email = apply_filters( 'supportflow_post_meta_requester_email', 'supportflow_requester_email' );
 
 		/** Misc **************************************************************/
 
@@ -198,7 +198,7 @@ class SupportPress {
 	/**
 	 * Include required files
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @access private
 	 * @todo Be smarter about conditionally loading code
 	 * @uses is_admin() If in WordPress admin, load additional file
@@ -207,18 +207,18 @@ class SupportPress {
 
 		/** Core **************************************************************/
 
-		require_once( $this->plugin_dir . 'classes/class-supportpress-json-api.php' );
-		require_once( $this->plugin_dir . 'classes/class-supportpress-attachments.php' );
-		require_once( $this->plugin_dir . 'classes/class-supportpress-emails.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-json-api.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-attachments.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-emails.php' );
 
 		/** Extensions ********************************************************/
 
-		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-submissionform.php' );
-		require_once( $this->plugin_dir . 'classes/class-supportpress-ui-widget.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-ui-submissionform.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-ui-widget.php' );
 
 		/** Tools *************************************************************/
 		if ( defined('WP_CLI') && WP_CLI )
-			require_once( $this->plugin_dir . '/classes/class-supportpress-wp-cli.php' );
+			require_once( $this->plugin_dir . '/classes/class-supportflow-wp-cli.php' );
 
 		# TODO: Akismet plugin?
 
@@ -226,14 +226,14 @@ class SupportPress {
 
 		// Quick admin check and load if needed
 		if ( is_admin() ) {
-			require_once( $this->plugin_dir . 'classes/class-supportpress-admin.php' );
+			require_once( $this->plugin_dir . 'classes/class-supportflow-admin.php' );
 		}
 	}
 
 	/**
 	 * Setup the default hooks and actions
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @access private
 	 * @uses add_action() To add various actions
 	 */
@@ -242,30 +242,30 @@ class SupportPress {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 
-		do_action_ref_array( 'supportpress_after_setup_actions', array( &$this ) );
+		do_action_ref_array( 'supportflow_after_setup_actions', array( &$this ) );
 	}
 
 	/**
 	 * Register the custom post type
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @uses register_post_type() To register the post type
 	 */
 	public function action_init_register_post_type() {
 		register_post_type( $this->post_type, array(
 			'labels' => array(
-				'menu_name'          => __( 'SupportPress',              'supportpress' ),
-				'name'               => __( 'Threads',                   'supportpress' ),
-				'singular_name'      => __( 'Thread',                    'supportpress' ),
-				'all_items'          => __( 'All Threads',               'supportpress' ),
-				'add_new'            => __( 'New Thread',                 'sp_thread' ),
-				'add_new_item'       => __( 'Start New Thread',          'supportpress' ),
-				'edit_item'          => __( 'Discussion',                'supportpress' ),
-				'new_item'           => __( 'New Thread',                'supportpress' ),
-				'view_item'          => __( 'View Thread',               'supportpress' ),
-				'search_items'       => __( 'Search Threads',            'supportpress' ),
-				'not_found'          => __( 'No threads found',          'supportpress' ),
-				'not_found_in_trash' => __( 'No threads found in trash', 'supportpress' ),
+				'menu_name'          => __( 'SupportFlow',               'support-flow' ),
+				'name'               => __( 'Threads',                   'support-flow' ),
+				'singular_name'      => __( 'Thread',                    'support-flow' ),
+				'all_items'          => __( 'All Threads',               'support-flow' ),
+				'add_new'            => __( 'New Thread',                'support-flow' ),
+				'add_new_item'       => __( 'Start New Thread',          'support-flow' ),
+				'edit_item'          => __( 'Discussion',                'support-flow' ),
+				'new_item'           => __( 'New Thread',                'support-flow' ),
+				'view_item'          => __( 'View Thread',               'support-flow' ),
+				'search_items'       => __( 'Search Threads',            'support-flow' ),
+				'not_found'          => __( 'No threads found',          'support-flow' ),
+				'not_found_in_trash' => __( 'No threads found in trash', 'support-flow' ),
 				),
 			'public'        => true,
 			'menu_position' => 3,
@@ -281,12 +281,12 @@ class SupportPress {
 	public function action_init_register_taxonomies() {
 
 		$args = array(
-			'label'                  => __( 'Respondents',                'supportpress' ),
+			'label'                  => __( 'Respondents',                'support-flow' ),
 			'labels' => array(
-				'search_items'       => __( 'Search Respondents',         'supportpress' ),
-				'edit_item'          => __( 'Edit Respondent',            'supportpress' ),
-				'update_item'        => __( 'Update Respondent',          'supportpress' ),
-				'add_new_item'       => __( 'Add New Respondent',         'supportpress' ),
+				'search_items'       => __( 'Search Respondents',         'support-flow' ),
+				'edit_item'          => __( 'Edit Respondent',            'support-flow' ),
+				'update_item'        => __( 'Update Respondent',          'support-flow' ),
+				'add_new_item'       => __( 'Add New Respondent',         'support-flow' ),
 				),
 			'public'                 => true,
 			'show_in_nav_menus'      => true,
@@ -298,7 +298,7 @@ class SupportPress {
 	/**
 	 * Register the custom post (thread) statuses
 	 *
-	 * @since SupportPress 0.1
+	 * @since Support Flow 0.1
 	 * @uses register_post_status() To register the post statuses
 	 * @uses apply_filters() To control what statuses are registered
 	 */
@@ -511,7 +511,7 @@ class SupportPress {
 	public function get_thread_comments( $thread_id, $args = array() ) {
 
 		$args['post_id'] = $thread_id;
-		$thread_comments = SupportPress()->get_comments( $args );
+		$thread_comments = SupportFlow()->get_comments( $args );
 		return $thread_comments;
 	}
 
@@ -608,7 +608,7 @@ class SupportPress {
 				'comment_author_email'   => esc_sql( $details['comment_author_email'] ),
 				'user_id'                => (int)$details['user_id'],
 			);
-		$comment = apply_filters( 'supportpress_pre_insert_thread_comment', $comment );
+		$comment = apply_filters( 'supportflow_pre_insert_thread_comment', $comment );
 		$comment_id = wp_insert_comment( $comment );
 
 		// If there are attachment IDs store them as meta
@@ -619,7 +619,7 @@ class SupportPress {
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql') ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
 
-		do_action( 'supportpress_thread_comment_added', $comment_id );
+		do_action( 'supportflow_thread_comment_added', $comment_id );
 
 		return $comment_id;
 	}
@@ -627,18 +627,18 @@ class SupportPress {
 }
 
 /**
- * The main function responsible for returning the one true SupportPress instance
+ * The main function responsible for returning the one true SupportFlow instance
  * to functions everywhere.
  *
  * Use this function like you would a global variable, except without needing
  * to declare the global.
  *
- * Example: <?php $supportpress = SupportPress(); ?>
+ * Example: <?php $supportflow = SupportFlow(); ?>
  *
- * @return The one true SupportPress Instance
+ * @return The one true SupportFlow Instance
  */
-function SupportPress() {
-	return SupportPress::instance();
+function SupportFlow() {
+	return SupportFlow::instance();
 }
 
-add_action( 'plugins_loaded', 'SupportPress' );
+add_action( 'plugins_loaded', 'SupportFlow' );

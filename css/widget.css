@@ -11,10 +11,10 @@ body {
 	margin: 0;
 	padding: 0 15px 4px 9px;
 }
-#supportpress-newthread-box {
+#supportflow-newthread-box {
 	padding: 10px 0;
 }
-#supportpress-newthread,
+#supportflow-newthread,
 #new-thread-submit {
 	background-color: #fff;
 	border: 1px solid #bbb;
@@ -30,12 +30,12 @@ body {
 	margin-top: 10px;
 }
 
-#supportpress-existing-thread-form input[type='text'] {
+#supportflow-existing-thread-form input[type='text'] {
 	width: 100%;
 }
 
-#supportpress-newthread-form textarea,
-#supportpress-existing-thread-form textarea {
+#supportflow-newthread-form textarea,
+#supportflow-existing-thread-form textarea {
 	width: 100%;
 	font-size: 16px;
 	font-weight:200;
@@ -47,8 +47,8 @@ body {
 	padding: 3px 8px;
 }
 
-#supportpress-newthread-form input[type='submit'],
-#supportpress-existing-thread-form input[type='submit'] {
+#supportflow-newthread-form input[type='submit'],
+#supportflow-existing-thread-form input[type='submit'] {
 	width: 100%;
 	font-size: 16px;
 	padding-top: 5px;
@@ -64,23 +64,23 @@ body {
 	border: 1px solid #BBB;
 }
 
-#supportpress-newthread-form input[type='submit']:hover,
-#supportpress-existing-thread-form input[type='submit']:hover {
+#supportflow-newthread-form input[type='submit']:hover,
+#supportflow-existing-thread-form input[type='submit']:hover {
 	cursor:pointer;
 	border-color: #888;
 	color: #111;
 }
 
-#supportpress-newthread:hover,
-#supportpress-newthread:active,
+#supportflow-newthread:hover,
+#supportflow-newthread:active,
 #new-thread-submit:hover,
 #new-thread-submit:active {
 	border-color: #666;
 }
-#supportpress-all-threads .thread .time {
+#supportflow-all-threads .thread .time {
 	color: gray;
 }
-#supportpress-all-threads .nothreads {
+#supportflow-all-threads .nothreads {
 	border-bottom: 1px solid #989898;
 	border-top: 1px solid #989898;
 	color: #333;
@@ -88,18 +88,18 @@ body {
 	padding: 20px 0;
 	text-align: center;
 }
-#supportpress-newthread-form {
+#supportflow-newthread-form {
 	display: none;
 	margin: 0;
 }
-#supportpress-newthread-form input[name="subject"] {
+#supportflow-newthread-form input[name="subject"] {
 	margin-bottom: 6px;
 }
-#supportpress-newthread-form input[type="text"] {
+#supportflow-newthread-form input[type="text"] {
 	font-size: 14px;
 	line-height: 150%;
 }
-#supportpress-newthread-form input[type="text"] {
+#supportflow-newthread-form input[type="text"] {
 	border: 1px solid #ccc;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
@@ -107,34 +107,34 @@ body {
 	padding: 3px 8px;
 	width: 100%;
 }
-#supportpress-help:hover,
-#supportpress-help:active {
+#supportflow-help:hover,
+#supportflow-help:active {
 	background-color: #13455b;
 }
 
-#supportpress-single-thread {
+#supportflow-single-thread {
 	display:none;
 }
-#supportpress-single-thread ul,
-#supportpress-all-threads ul {
+#supportflow-single-thread ul,
+#supportflow-all-threads ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
-#supportpress-single-thread ul li,
-#supportpress-all-threads ul li {
+#supportflow-single-thread ul li,
+#supportflow-all-threads ul li {
 	border-bottom: 1px solid #ECECEC;
 	padding: 5px 5px 10px 5px;
 }
-#supportpress-all-threads ul li:first-child {
+#supportflow-all-threads ul li:first-child {
 	border-top: 1px solid #ECECEC;
 	padding-top: 0;
 }
-#supportpress-all-threads ul li:hover {
+#supportflow-all-threads ul li:hover {
 	background-color: #fff;
 	cursor: pointer;
 }
-#supportpress-all-threads ul li h4 {
+#supportflow-all-threads ul li h4 {
 	font: bold 14px/18px "Helvetica Neue", sans-serif;
 	margin: 10px 0 0 0;
 }

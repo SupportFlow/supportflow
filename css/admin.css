@@ -20,40 +20,40 @@
 	margin-top: 34px;
 }
 
-#supportpress-subject.postbox,
-#supportpress-respondents.postbox {
+#supportflow-subject.postbox,
+#supportflow-respondents.postbox {
 	border:none;
 	background:none;
 }
 
-#supportpress-subject.postbox .inside,
-#supportpress-respondents.postbox .inside {
+#supportflow-subject.postbox .inside,
+#supportflow-respondents.postbox .inside {
 	padding: 0;
 }
 
-#supportpress-details .handlediv,
-#supportpress-details h3.hndle,
-#supportpress-subject .handlediv,
-#supportpress-subject h3.hndle,
-#supportpress-respondents .handlediv,
-#supportpress-respondents h3.hndle,
-#supportpress-comments .handlediv,
-#supportpress-comments h3.hndle {
+#supportflow-details .handlediv,
+#supportflow-details h3.hndle,
+#supportflow-subject .handlediv,
+#supportflow-subject h3.hndle,
+#supportflow-respondents .handlediv,
+#supportflow-respondents h3.hndle,
+#supportflow-comments .handlediv,
+#supportflow-comments h3.hndle {
 	display:none;
 }
 
-#supportpress-details #misc-publishing-actions label {
+#supportflow-details #misc-publishing-actions label {
 	width: 50px;
 	display: inline-block;
 }
 
-#supportpress-details #misc-publishing-actions select#post_status {
+#supportflow-details #misc-publishing-actions select#post_status {
 	width: 100px;
 }
 
-#supportpress-subject h4,
-#supportpress-respondents h4,
-#supportpress-comments h4 {
+#supportflow-subject h4,
+#supportflow-respondents h4,
+#supportflow-comments h4 {
 	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 	font-size: 13px;
 	font-weight: normal;
@@ -63,7 +63,7 @@
 	margin-bottom: 6px;
 }
 
-#supportpress-subject.postbox input {
+#supportflow-subject.postbox input {
 	width: 100%;
 	font-size: 1.7em;
 	padding-left: 8px;
@@ -72,95 +72,95 @@
 	padding-bottom: 10px;
 }
 
-#supportpress-respondents.postbox input {
+#supportflow-respondents.postbox input {
 	width: 100%;
 	padding: 8px;
 	font-size: 1.2em;
 }
-#supportpress-comments.postbox #comment-reply {
+#supportflow-comments.postbox #comment-reply {
 	width: 100%;
 }
 
-#supportpress-comments.postbox textarea {
+#supportflow-comments.postbox textarea {
 	width: 100%;
 	padding: 8px;
 	font-size: 1.1em;
 	font-size: 1.2em;
 }
 
-#supportpress-comments.postbox .inside #message-tools #submit-action {
+#supportflow-comments.postbox .inside #message-tools #submit-action {
 	padding:0;
 	margin-top: 5px;
 	float: right;
 }
 
-#supportpress-comments.postbox .inside #message-tools #comment-attachments-wrap {
+#supportflow-comments.postbox .inside #message-tools #comment-attachments-wrap {
 	float: left;
 }
 
-#supportpress-comments #upload-messages,
-#supportpress-comments #comment-attachments-list {
+#supportflow-comments #upload-messages,
+#supportflow-comments #comment-attachments-list {
 	margin-top: 9px;
 	margin-left: 2px;
 	color: #666666;
 }
 
-#supportpress-comments.postbox .inside #message-tools #submit-action input[type="checkbox"] {
+#supportflow-comments.postbox .inside #message-tools #submit-action input[type="checkbox"] {
 	margin-top: -1px;
 }
 
-#supportpress-comments.postbox .inside #message-tools #submit-action label {
+#supportflow-comments.postbox .inside #message-tools #submit-action label {
 	padding-top: 2px;
 	padding-left: 5px;
 	padding-right: 25px;
 }
 
-#supportpress-comments.postbox ul.private-comments {
+#supportflow-comments.postbox ul.private-comments {
 	background-color: #FFFFE0;
 	border: 1px solid #E6DB55;
 	padding: 5px 10px;
 }
 
-#supportpress-comments.postbox ul.private-comments li {
+#supportflow-comments.postbox ul.private-comments li {
 	border-top: 1px solid #DFDFDF;
 	margin-top: 10px;
 }
 
-#supportpress-comments.postbox ul.private-comments li:first-child {
+#supportflow-comments.postbox ul.private-comments li:first-child {
 	border-top: none;
 	margin-top: 0;
 }
 
-#supportpress-comments.postbox ul.private-comments li .thread-meta {
+#supportflow-comments.postbox ul.private-comments li .thread-meta {
 	color: #BBB;
 	font-size: 0.9em;
 	text-align: right;
 }
 
-#supportpress-comments.postbox ul.thread-comments li {
+#supportflow-comments.postbox ul.thread-comments li {
 	clear:left;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-#supportpress-comments.postbox ul.thread-comments li .thread-comment-attachments li,
-#supportpress-comments.postbox ul.private-comments li .thread-comment-attachments li {
+#supportflow-comments.postbox ul.thread-comments li .thread-comment-attachments li,
+#supportflow-comments.postbox ul.private-comments li .thread-comment-attachments li {
 	margin-top: 3px;
 	margin-bottom: 3px;
 	font-size: 0.9em;
 }
 
-#supportpress-comments.postbox ul.thread-comments li .comment-avatar {
+#supportflow-comments.postbox ul.thread-comments li .comment-avatar {
 	float: left;
 }
 
-#supportpress-comments.postbox ul.thread-comments li .comment-author {
+#supportflow-comments.postbox ul.thread-comments li .comment-author {
 	margin: 0;
 	font-size: 0.9em;
 	color: #666666;
 }
 
-#supportpress-comments.postbox ul.thread-comments li .thread-comment {
+#supportflow-comments.postbox ul.thread-comments li .thread-comment {
 	background-color: #FFFFFF;
 	margin-left: 105px;
 	min-height: 80px;
@@ -172,7 +172,7 @@
 	border-radius: 3px;
 }
 
-#supportpress-comments.postbox ul.thread-comments li .thread-meta {
+#supportflow-comments.postbox ul.thread-comments li .thread-meta {
 	margin-left: 105px;
 	font-size: 0.9em;
 	color: #666666;
