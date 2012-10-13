@@ -1,18 +1,18 @@
 <?php
 
-class SupportPress_JSON_API extends SupportPress {
+class SupportFlow_JSON_API extends SupportFlow {
 
-	public $action = 'supportpress_json';
+	public $action = 'supportflow_json';
 
 	function __construct() {
-		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	public function setup_actions() {
-		add_action( 'wp_ajax_' . $this->action, array( $this, 'action_wp_ajax_supportpress_json' ) );
+		add_action( 'wp_ajax_' . $this->action, array( $this, 'action_wp_ajax_supportflow_json' ) );
 	}
 
-	public function action_wp_ajax_supportpress_json() {
+	public function action_wp_ajax_supportflow_json() {
 
 		$current_user = wp_get_current_user();
 
@@ -40,7 +40,7 @@ class SupportPress_JSON_API extends SupportPress {
 					$thread_args['respondent_id'] = $current_user->ID;
 				}
 
-				$thread_id = SupportPress()->create_thread( $thread_args );
+				$thread_id = SupportFlow()->create_thread( $thread_args );
 				if ( is_wp_error( $thread_id ) ) {
 					$response['message'] = $thread_id->get_error_message();
 				} else {
@@ -71,7 +71,7 @@ class SupportPress_JSON_API extends SupportPress {
 					$comment_args['comment_author'] = $current_user->display_name;
 					$comment_args['user_id'] = $current_user->ID;
 				}
-				$comment_id = SupportPress()->add_thread_comment( $thread_id, $message);
+				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $message);
 				if ( is_wp_error( $comment_id ) ) {
 					$response['message'] = $comment_id->get_error_message();
 				} else {
@@ -81,15 +81,15 @@ class SupportPress_JSON_API extends SupportPress {
 				}
 				break;
 			default:
-				$response['message'] = __( "There's no API method registered under that action.", 'supportpress' );
+				$response['message'] = __( "There's no API method registered under that action.", 'supportflow' );
 				break;
 		}
 
-		$response = apply_filters( 'supportpress_json_api_response', $response );
+		$response = apply_filters( 'supportflow_json_api_response', $response );
 		@header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
 		echo json_encode( $response );
 		die();
 	}
 }
 
-SupportPress()->extend->jsonapi = new SupportPress_JSON_API();
+SupportFlow()->extend->jsonapi = new SupportFlow_JSON_API();

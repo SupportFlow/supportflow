@@ -2,15 +2,15 @@
 /**
  * Allow attachments to be securely stored and served
  */
-class SupportPress_Attachments extends SupportPress {
+class SupportFlow_Attachments extends SupportFlow {
 
 	var $file_hash = '';
 	var $secret_key = '';
 
-	const secret_key_option = 'supportpress_attachments_secret';
+	const secret_key_option = 'supportflow_attachments_secret';
 
 	function __construct() {
-		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	public function setup_actions() {
@@ -28,7 +28,7 @@ class SupportPress_Attachments extends SupportPress {
 		}
 
 		// Only apply to files that are uploaded to a thread
-		if ( isset( $_REQUEST['post_id'] ) && SupportPress()->is_thread( (int)$_REQUEST['post_id'] ) ) {
+		if ( isset( $_REQUEST['post_id'] ) && SupportFlow()->is_thread( (int)$_REQUEST['post_id'] ) ) {
 			add_filter( 'wp_handle_upload_prefilter', array( $this, 'wp_handle_upload_prefilter' ) );
 			add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
 		}
@@ -38,7 +38,7 @@ class SupportPress_Attachments extends SupportPress {
 	public function filter_wp_get_attachment_url( $url, $attachment_id ) {
 
 		if ( $attachment = get_post( $attachment_id ) ) {
-			if ( SupportPress()->is_thread( $attachment->post_parent ) )
+			if ( SupportFlow()->is_thread( $attachment->post_parent ) )
 				return $attachment->guid;
 
 		}
@@ -147,4 +147,4 @@ class SupportPress_Attachments extends SupportPress {
 
 }
 
-SupportPress()->extend->attachments = new SupportPress_Attachments();
+SupportFlow()->extend->attachments = new SupportFlow_Attachments();

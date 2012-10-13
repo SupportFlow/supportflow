@@ -3,10 +3,10 @@
  *
  */
 
-class SupportPress_Admin extends SupportPress {
+class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
-		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	public function setup_actions() {
@@ -24,11 +24,11 @@ class SupportPress_Admin extends SupportPress {
 		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 
 		// Manage threads view
-		add_filter( 'manage_' . SupportPress()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
-		add_filter( 'manage_edit-' . SupportPress()->post_type . '_sortable_columns', array( $this, 'manage_sortable_columns' ) );
+		add_filter( 'manage_' . SupportFlow()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
+		add_filter( 'manage_edit-' . SupportFlow()->post_type . '_sortable_columns', array( $this, 'manage_sortable_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
-		add_filter( 'bulk_actions-edit-' . SupportPress()->post_type, array( $this, 'filter_bulk_actions' ) );
+		add_filter( 'bulk_actions-edit-' . SupportFlow()->post_type, array( $this, 'filter_bulk_actions' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
 
@@ -50,8 +50,8 @@ class SupportPress_Admin extends SupportPress {
 	 */
 	public function action_admin_enqueue_scripts() {
 
-		wp_enqueue_style( 'supportpress-admin', SupportPress()->plugin_url . 'css/admin.css', array(), SupportPress()->version );
-		wp_enqueue_script( 'supportpress-plupload', SupportPress()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
+		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
+		wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
 		self::add_default_plupload_settings();
 	}
 
@@ -100,19 +100,19 @@ class SupportPress_Admin extends SupportPress {
 	public function filter_post_updated_messages( $messages ) {
 		global $post;
 
-		$messages[SupportPress()->post_type] = array(
+		$messages[SupportFlow()->post_type] = array(
 			0 => '', // Unused. Messages start at index 1.
-			1 => __( 'Thread updated.', 'supportpress' ),
-			2 => __( 'Custom field updated.', 'supportpress' ),
-			3 => __( 'Custom field deleted.', 'supportpress' ),
-			4 => __( 'Thread updated.', 'supportpress' ),
+			1 => __( 'Thread updated.', 'supportflow' ),
+			2 => __( 'Custom field updated.', 'supportflow' ),
+			3 => __( 'Custom field deleted.', 'supportflow' ),
+			4 => __( 'Thread updated.', 'supportflow' ),
 			/* translators: %s: date and time of the revision */
-			5 => isset($_GET['revision']) ? sprintf( __( 'Thread restored to revision from %s', 'supportpress' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => __( 'Thread updated.', 'supportpress' ),
-			7 => __( 'Thread updated.', 'supportpress' ),
-			8 => __( 'Thread updated.', 'supportpress' ),
-			9 => __( 'Thread updated.', 'supportpress' ),
-			10 => __( 'Thread updated.', 'supportpress' ),
+			5 => isset($_GET['revision']) ? sprintf( __( 'Thread restored to revision from %s', 'supportflow' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6 => __( 'Thread updated.', 'supportflow' ),
+			7 => __( 'Thread updated.', 'supportflow' ),
+			8 => __( 'Thread updated.', 'supportflow' ),
+			9 => __( 'Thread updated.', 'supportflow' ),
+			10 => __( 'Thread updated.', 'supportflow' ),
 		);
 		return $messages;
 	}
@@ -124,7 +124,7 @@ class SupportPress_Admin extends SupportPress {
 
 		// Rename these actions
 		if ( isset( $row_actions['edit'] ) )
-			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discussion', 'supportpress' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportpress' ), $row_actions['edit'] ) );
+			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discussion', 'supportflow' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportflow' ), $row_actions['edit'] ) );
 
 		// Save the trash action for the end
 		if ( isset( $row_actions['trash'] ) ) {
@@ -135,7 +135,7 @@ class SupportPress_Admin extends SupportPress {
 		}
 
 		// Allow an agent to easily close a ticket
-		$statuses = SupportPress()->post_statuses;
+		$statuses = SupportFlow()->post_statuses;
 		$status_slugs = array_keys( $statuses );
 		$last_status = array_pop( $status_slugs );
 		if ( !in_array( get_query_var( 'post_status' ), array( 'trash' ) ) ) {
@@ -150,15 +150,15 @@ class SupportPress_Admin extends SupportPress {
 					'sp_nonce'        => wp_create_nonce( 'sp-change-status' ),
 					'post_status'     => $change_to,
 					'thread_id'       => $post->ID,
-					'post_type'       => SupportPress()->post_type,
+					'post_type'       => SupportFlow()->post_type,
 				);
 			$action_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 			if ( $last_status == $change_to ) {
-				$title_attr = esc_attr__( 'Close Thread', 'supportpress' );
-				$action_text = esc_html__( 'Close', 'supportpress' );
+				$title_attr = esc_attr__( 'Close Thread', 'supportflow' );
+				$action_text = esc_html__( 'Close', 'supportflow' );
 			} else {
-				$title_attr = esc_attr__( 'Reopen Thread', 'supportpress' );
-				$action_text = esc_html__( 'Reopen', 'supportpress' );
+				$title_attr = esc_attr__( 'Reopen Thread', 'supportflow' );
+				$action_text = esc_html__( 'Reopen', 'supportflow' );
 			}
 			$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
 		}
@@ -190,7 +190,7 @@ class SupportPress_Admin extends SupportPress {
 		if ( 'edit.php' != $pagenow || !$query->is_main_query() )
 			return;
 
-		$statuses = SupportPress()->post_statuses;
+		$statuses = SupportFlow()->post_statuses;
 		$status_slugs = array_keys( $statuses );
 		$last_status = array_pop( $status_slugs );
 
@@ -213,12 +213,12 @@ class SupportPress_Admin extends SupportPress {
 					'search'                   => $search,
 					'comment_approved'         => 'any',
 				);
-			$matching_comments = SupportPress()->get_comments( $args );
+			$matching_comments = SupportFlow()->get_comments( $args );
 			$post_ids = wp_list_pluck( $matching_comments, 'comment_post_ID' );
 
 			$args = array(
 					's'                        => $search,
-					'post_type'                => SupportPress()->post_type,
+					'post_type'                => SupportFlow()->post_type,
 					'no_found_rows'            => true,
 					'update_post_meta_cache'   => false,
 					'update_post_term_cache'   => false,
@@ -258,7 +258,7 @@ class SupportPress_Admin extends SupportPress {
 			return;
 
 		if ( ! wp_verify_nonce( $_GET['sp_nonce'], 'sp-change-status' ) )
-			wp_die( __( "Doin' something phishy, huh?", 'supportpress' ) );
+			wp_die( __( "Doin' something phishy, huh?", 'supportflow' ) );
 
 		$post_status = sanitize_key( $_GET['post_status'] );
 		$thread_id = (int)$_GET['thread_id'];
@@ -284,17 +284,17 @@ class SupportPress_Admin extends SupportPress {
 		if ( ! $this->is_edit_screen() )
 			return;
 
-		$respondents_box = 'tagsdiv-' . SupportPress()->respondents_tax;
-		remove_meta_box( 'submitdiv',               SupportPress()->post_type, 'side' );
-		remove_meta_box( $respondents_box,          SupportPress()->post_type, 'side' );
-		remove_meta_box( 'commentstatusdiv',        SupportPress()->post_type, 'normal' );
-		remove_meta_box( 'slugdiv',                 SupportPress()->post_type, 'normal' );
-		remove_meta_box( 'commentsdiv',             SupportPress()->post_type, 'normal' );
+		$respondents_box = 'tagsdiv-' . SupportFlow()->respondents_tax;
+		remove_meta_box( 'submitdiv',               SupportFlow()->post_type, 'side' );
+		remove_meta_box( $respondents_box,          SupportFlow()->post_type, 'side' );
+		remove_meta_box( 'commentstatusdiv',        SupportFlow()->post_type, 'normal' );
+		remove_meta_box( 'slugdiv',                 SupportFlow()->post_type, 'normal' );
+		remove_meta_box( 'commentsdiv',             SupportFlow()->post_type, 'normal' );
 
-		add_meta_box( 'supportpress-details', __( 'Details', 'supportpress' ), array( $this, 'meta_box_details' ), SupportPress()->post_type, 'side' );
-		add_meta_box( 'supportpress-subject', __( 'Subject', 'supportpress' ), array( $this, 'meta_box_subject' ), SupportPress()->post_type, 'normal' );
-		add_meta_box( 'supportpress-respondents', __( 'Respondents', 'supportpress' ), array( $this, 'meta_box_respondents' ), SupportPress()->post_type, 'normal' );
-		add_meta_box( 'supportpress-comments', __( 'Commentss', 'supportpress' ), array( $this, 'meta_box_comments' ), SupportPress()->post_type, 'normal' );
+		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
+		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-comments', __( 'Commentss', 'supportflow' ), array( $this, 'meta_box_comments' ), SupportFlow()->post_type, 'normal' );
 	}
 
 	/**
@@ -307,9 +307,9 @@ class SupportPress_Admin extends SupportPress {
 		// Post status dropdown
 		$current_status = get_post_status( get_the_ID() );
 		echo '<div class="misc-pub-section">';
-		echo '<label for="post_status">' . __( 'Status', 'supportpress' ) . ':</label>';
+		echo '<label for="post_status">' . __( 'Status', 'supportflow' ) . ':</label>';
 		echo '<select id="post_status" name="post_status">';
-		foreach( SupportPress()->post_statuses as $slug => $post_status ) {
+		foreach( SupportFlow()->post_statuses as $slug => $post_status ) {
 			echo '<option value="' . esc_attr( $slug ) . '" ' . selected( $current_status, $slug ) . '>' . esc_html( $post_status['label'] ) . '</option>';
 		}
 		echo '</select>';
@@ -317,9 +317,9 @@ class SupportPress_Admin extends SupportPress {
 		// Agent assignment dropdown
 		$post_author = get_post( get_the_ID() )->post_author;
 		echo '<div class="misc-pub-section">';
-		echo '<label for="post_author">' . __( 'Owner', 'supportpress' ) . ':</label>';
+		echo '<label for="post_author">' . __( 'Owner', 'supportflow' ) . ':</label>';
 		$args = array(
-				'show_option_none'    => __( '-- Unassigned --', 'supportpress' ),
+				'show_option_none'    => __( '-- Unassigned --', 'supportflow' ),
 				'selected'            => $post_author,
 				'id'                  => 'post_author',
 				'name'                => 'post_author',
@@ -331,9 +331,9 @@ class SupportPress_Admin extends SupportPress {
 		echo '</div>';
 
 		if ( 'post-new.php' == $pagenow )
-			$submit_text = __( 'Start Thread', 'supportpress' );
+			$submit_text = __( 'Start Thread', 'supportflow' );
 		else
-			$submit_text = __( 'Update Thread', 'supportpress' );
+			$submit_text = __( 'Update Thread', 'supportflow' );
 		echo '<div id="major-publishing-actions">';
 		echo '<div id="publishing-action">';
 		submit_button( $submit_text, 'primary', 'save', false );
@@ -348,10 +348,10 @@ class SupportPress_Admin extends SupportPress {
 	 */
 	public function meta_box_subject() {
 
-		$placeholder = __( 'What is your conversation about?', 'supportpress' );
-		echo '<h4>' . __( 'Subject', 'supportpress' ) . '</h4>';
+		$placeholder = __( 'What is your conversation about?', 'supportflow' );
+		echo '<h4>' . __( 'Subject', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
-		echo '<p class="description">' . __( 'Please describe what this thread is about in several words', 'supportpress' ) . '</p>';
+		echo '<p class="description">' . __( 'Please describe what this thread is about in several words', 'supportflow' ) . '</p>';
 
 	}
 
@@ -360,12 +360,12 @@ class SupportPress_Admin extends SupportPress {
 	 */
 	public function meta_box_respondents() {
 
-		$respondents = SupportPress()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
+		$respondents = SupportFlow()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
 		$respondents_string = implode( ', ', $respondents );
-		$placeholder = __( 'Who are you starting a conversation with?', 'supportpress' );
-		echo '<h4>' . __( 'Respondent(s)', 'supportpress' ) . '</h4>';
+		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
+		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
-		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportpress' ) . '</p>';
+		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
 	}
 
 	/**
@@ -376,12 +376,12 @@ class SupportPress_Admin extends SupportPress {
 		global $pagenow;
 
 		$placeholders = array(
-				__( "What's burning?",                              'supportpress' ),
-				__( 'What do you need to get off your chest?',      'supportpress' ),
+				__( "What's burning?",                              'supportflow' ),
+				__( 'What do you need to get off your chest?',      'supportflow' ),
 			);
 
 		$rand = array_rand( $placeholders );
-		echo '<h4>' . __( 'Conversation', 'supportpress' ) . '</h4>';
+		echo '<h4>' . __( 'Conversation', 'supportflow' ) . '</h4>';
 		echo '<div id="comment-reply">';
 
 		echo "<textarea id='comment' name='comment' class='thread-comment' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
@@ -396,11 +396,11 @@ class SupportPress_Admin extends SupportPress {
 		echo '</div>';
 		echo '<div id="submit-action">';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
-		echo '<label for="mark-private">' . __( 'Mark private', 'supportpress' ) . '</label>';
+		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
 		if ( 'post-new.php' == $pagenow )
-			$submit_text = __( 'Start Thread', 'supportpress' );
+			$submit_text = __( 'Start Thread', 'supportflow' );
 		else
-			$submit_text = __( 'Send Message', 'supportpress' );
+			$submit_text = __( 'Send Message', 'supportflow' );
 		submit_button( $submit_text, 'primary', 'save', false );
 		echo '</div>';
 		echo '</div>';
@@ -414,7 +414,7 @@ class SupportPress_Admin extends SupportPress {
 
 	public function display_thread_comments() {
 
-		$private_comments = SupportPress()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'private' ) );
+		$private_comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'private' ) );
 		if ( !empty( $private_comments ) ) {
 			echo '<ul class="private-comments">';
 			foreach( $private_comments as $comment ) {
@@ -432,14 +432,14 @@ class SupportPress_Admin extends SupportPress {
 				echo '</div>';
 				$comment_date = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
 				$comment_time = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
-				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportpress' ), $comment->comment_author, $comment_date, $comment_time );
+				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $comment->comment_author, $comment_date, $comment_time );
 				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
 		}
 
-		$comments = SupportPress()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'public' ) );
+		$comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'public' ) );
 		if ( !empty( $comments ) ) {
 			echo '<ul class="thread-comments">';
 			foreach( $comments as $comment ) {
@@ -458,7 +458,7 @@ class SupportPress_Admin extends SupportPress {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$comment_timestamp = sprintf( __( '%s at %s', 'supportpress' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
+				$comment_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
 				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
@@ -478,12 +478,12 @@ class SupportPress_Admin extends SupportPress {
 
 		$new_columns = array(
 				'cb'                  => $columns['cb'],
-				'updated'             => __( 'Updated', 'supportpress' ),
-				'title'               => __( 'Subject', 'supportpress' ),
-				'respondents'         => __( 'Respondents', 'supportpress' ),
-				'status'              => __( 'Status', 'supportpress' ),
-				'author'              => __( 'Agent', 'supportpress' ),
-				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportpress' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+				'updated'             => __( 'Updated', 'supportflow' ),
+				'title'               => __( 'Subject', 'supportflow' ),
+				'respondents'         => __( 'Respondents', 'supportflow' ),
+				'status'              => __( 'Status', 'supportflow' ),
+				'author'              => __( 'Agent', 'supportflow' ),
+				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
 				'created'             => __( 'Created', 'support' ),
 			);
 		return $new_columns;
@@ -506,16 +506,16 @@ class SupportPress_Admin extends SupportPress {
 		switch( $column_name ) {
 			case 'updated':
 				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
-				echo sprintf( __( '%s ago', 'supportpress' ), human_time_diff( $modified_gmt ) );
+				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
 			case 'respondents':
-				$respondents = SupportPress()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
+				$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
 				if ( empty( $respondents ) )
 					break;
 				foreach( $respondents as $key => $respondent_email ) {
 					$args = array(
-							SupportPress()->respondents_tax     => SupportPress()->get_email_hash( $respondent_email ),
-							'post_type'                         => SupportPress()->post_type,
+							SupportFlow()->respondents_tax     => SupportFlow()->get_email_hash( $respondent_email ),
+							'post_type'                         => SupportFlow()->post_type,
 						);
 					$respondent_link = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
 					$respondents[$key] = get_avatar( $respondent_email, 16 ) . '&nbsp;&nbsp;' . $respondent_link;
@@ -525,7 +525,7 @@ class SupportPress_Admin extends SupportPress {
 			case 'status':
 				$post_status = get_post_status( $thread_id );
 				$args = array(
-						'post_type'       => SupportPress()->post_type,
+						'post_type'       => SupportFlow()->post_type,
 						'post_status'     => $post_status,
 					);
 				$status_name = get_post_status_object( $post_status )->label;
@@ -533,7 +533,7 @@ class SupportPress_Admin extends SupportPress {
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
 				break;
 			case 'sp_comments':
-				$comments = SupportPress()->get_thread_comment_count( $thread_id );
+				$comments = SupportFlow()->get_thread_comment_count( $thread_id );
 				echo '<div class="post-com-count-wrapper">';
 				echo "<span class='comment-count'>{$comments}</span>";
 				echo '</div>';
@@ -541,7 +541,7 @@ class SupportPress_Admin extends SupportPress {
 			case 'created':
 				$created_time = get_the_time( get_option( 'time_format' ) . ' T', $thread_id );
 				$created_date = get_the_time( get_option( 'date_format' ), $thread_id );
-				echo sprintf( __( '%s<br />%s', 'supportpress' ), $created_time, $created_date );
+				echo sprintf( __( '%s<br />%s', 'supportflow' ), $created_time, $created_date );
 				break;
 		}
 	}
@@ -554,11 +554,11 @@ class SupportPress_Admin extends SupportPress {
 	public function is_edit_screen() {
 		global $pagenow;
 
-		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) ) && ! empty( $_GET['post_type'] ) && $_GET['post_type'] == SupportPress()->post_type ) {
+		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) ) && ! empty( $_GET['post_type'] ) && $_GET['post_type'] == SupportFlow()->post_type ) {
 			return $pagenow;
 		} elseif ( 'post.php' == $pagenow && ! empty( $_GET['action'] ) && 'edit' == $_GET['action'] && ! empty( $_GET['post'] ) ) {
 			$the_post = get_post( $_GET['post'] );
-			return ( $the_post->post_type == SupportPress()->post_type ) ? $pagenow : false;
+			return ( $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
 		} else {
 			return false;
 		}
@@ -573,12 +573,12 @@ class SupportPress_Admin extends SupportPress {
 	 */
 	public function action_save_post( $thread_id ) {
 
-		if( SupportPress()->post_type != get_post_type( $thread_id ) )
+		if( SupportFlow()->post_type != get_post_type( $thread_id ) )
 			return;
 
 		if ( isset( $_POST['respondents'] ) ) {
 			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
-			SupportPress()->update_thread_respondents( $thread_id, $respondents );
+			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
 		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
@@ -592,10 +592,10 @@ class SupportPress_Admin extends SupportPress {
 					'comment_approved'        => $visibility,
 					'attachment_ids'          => $attachment_ids,
 				);
-			SupportPress()->add_thread_comment( $thread_id, $comment, $comment_args );
+			SupportFlow()->add_thread_comment( $thread_id, $comment, $comment_args );
 		}
 
 	}
 }
 
-SupportPress()->extend->admin = new SupportPress_Admin();
+SupportFlow()->extend->admin = new SupportFlow_Admin();

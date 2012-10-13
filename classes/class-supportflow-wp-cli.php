@@ -1,11 +1,11 @@
 <?php
 /**
- * WP-CLI commands for SupportPress
+ * WP-CLI commands for SupportFlow
  */
 
-WP_CLI::add_command( 'supportpress', 'SupportPress_WPCLI' );
+WP_CLI::add_command( 'supportflow', 'SupportFlow_WPCLI' );
 
-class SupportPress_WPCLI extends WP_CLI_Command {
+class SupportFlow_WPCLI extends WP_CLI_Command {
 
 	/**
 	 * Help function for this command
@@ -13,20 +13,20 @@ class SupportPress_WPCLI extends WP_CLI_Command {
 	public static function help() {
 
 		WP_CLI::line( <<<EOB
-usage: wp supportpress <parameters>
+usage: wp supportflow <parameters>
 Possible subcommands:
-					import_remote               Import from a remote SupportPress
+					import_remote               Import from a remote SupportFlow
 					--db_host=                  Hostname for the remote database
 					--db_name=                  Name of the database to connect to
 					--db_user=                  Remote database user
 					--db_pass=                  Remote database password
-					--table_prefix=             Prefix for the SupportPress tables
+					--table_prefix=             Prefix for the SupportFlow tables
 EOB
 		);
 	}
 
 	/**
-	 * Import a remote SupportPress instance into this instance
+	 * Import a remote SupportFlow instance into this instance
 	 *
 	 * @todo support mapping messages from old instance users to new instance users
 	 */
@@ -91,12 +91,12 @@ EOB
 					'date'                   => $old_thread->dt,
 					'status'            => 'sp_' . $old_thread->state,
 				);
-			$thread_id = SupportPress()->create_thread( $thread_args );
+			$thread_id = SupportFlow()->create_thread( $thread_args );
 			if ( is_wp_error( $thread_id ) )
 				continue;
 
 			// Add the respondent to the thread
-			SupportPress()->update_thread_respondents( $thread_id, $old_thread->email );
+			SupportFlow()->update_thread_respondents( $thread_id, $old_thread->email );
 
 			// Get the thread's messages and import those too
 			$old_messages = (array)$spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
@@ -108,7 +108,7 @@ EOB
 						'time'                        => $old_message->dt,
 						'comment_approved'            => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
 					);
-				$comment_id = SupportPress()->add_thread_comment( $thread_id, $old_message->content, $message_args );
+				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $old_message->content, $message_args );
 				add_comment_meta( $comment_id, '_imported_id', $old_message->message_id );
 				$count_comments++;
 			}

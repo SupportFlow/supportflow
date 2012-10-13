@@ -3,10 +3,10 @@
  * Primary class for determining which emails are sent and what goes in the email
  */
 
-class SupportPress_Emails extends SupportPress {
+class SupportFlow_Emails extends SupportFlow {
 
 	function __construct() {
-		add_action( 'supportpress_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
 	/**
@@ -19,8 +19,8 @@ class SupportPress_Emails extends SupportPress {
 			return;
 
 		// When a new comment is added to a thread, notify the respondents and the agents
-		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
-		add_action( 'supportpress_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );
+		add_action( 'supportflow_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
+		add_action( 'supportflow_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );
 	}
 
 	/**
@@ -32,9 +32,9 @@ class SupportPress_Emails extends SupportPress {
 		if ( ! $comment )
 			return;
 
-		$thread = SupportPress()->get_thread( $comment->comment_post_ID );
+		$thread = SupportFlow()->get_thread( $comment->comment_post_ID );
 		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = apply_filters( 'supportpress_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'comment' );
+		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'comment' );
 
 		if ( empty( $agent_ids ) )
 			return;
@@ -46,7 +46,7 @@ class SupportPress_Emails extends SupportPress {
 		}
 
 		// Don't email the person creating the comment, unless that's desired behavior
-		if ( !apply_filters( 'supportpress_emails_notify_creator', false, 'comment' ) ) {
+		if ( !apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
 			$key = array_search( $comment->comment_author_email, $agent_emails );
 			if ( false !== $key )
 				unset( $agent_emails[$key] );
@@ -75,11 +75,11 @@ class SupportPress_Emails extends SupportPress {
 		if ( ! $comment || 'private' == $comment->comment_approved )
 			return;
 
-		$thread = SupportPress()->get_thread( $comment->comment_post_ID );
-		$respondents = SupportPress()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
+		$thread = SupportFlow()->get_thread( $comment->comment_post_ID );
+		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
 
 		// Don't email the person creating the comment, unless that's desired behavior
-		if ( !apply_filters( 'supportpress_emails_notify_creator', false, 'comment' ) ) {
+		if ( !apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
 			$key = array_search( $comment->comment_author_email, $respondents );
 			if ( false !== $key )
 				unset( $respondents[$key] );
@@ -99,4 +99,4 @@ class SupportPress_Emails extends SupportPress {
 	}
 }
 
-SupportPress()->extend->emails = new SupportPress_Emails();
+SupportFlow()->extend->emails = new SupportFlow_Emails();
