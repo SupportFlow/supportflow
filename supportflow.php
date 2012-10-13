@@ -159,9 +159,9 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type        = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );         // Todo: change prefix
-		$this->respondents_tax  = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' ); // Todo: change prefix
-		$this->comment_type     = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );     // Todo: change prefix
+		$this->post_type        = apply_filters( 'supportflow_thread_post_type',      'sf_thread' );
+		$this->respondents_tax  = apply_filters( 'supportflow_respondents_taxonomy',  'sf_respondent' );
+		$this->comment_type     = apply_filters( 'supportflow_thread_comment_type',   'sf_comment' );
 
 		$this->email_term_prefix = 'sf-';
 
@@ -183,10 +183,6 @@ class SupportFlow {
 				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'support-flow' ),
 			),
 		) );
-
-		$this->post_meta_requester_id    = apply_filters( 'supportflow_post_meta_requester_id',    'supportflow_requester_id'    );
-		$this->post_meta_requester_name  = apply_filters( 'supportflow_post_meta_requester_name',  'supportflow_requester_name'  );
-		$this->post_meta_requester_email = apply_filters( 'supportflow_post_meta_requester_email', 'supportflow_requester_email' );
 
 		/** Misc **************************************************************/
 
