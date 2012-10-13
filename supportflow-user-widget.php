@@ -12,15 +12,15 @@
  * Domain Path: /languages/
  */
 
-add_action( 'wp_enqueue_scripts',      'sp_user_widget_enqueue_scripts' );
-add_action( 'admin_enqueue_scripts',   'sp_user_widget_enqueue_scripts' );
-function sp_user_widget_enqueue_scripts() {
+add_action( 'wp_enqueue_scripts',      'sf_user_widget_enqueue_scripts' );
+add_action( 'admin_enqueue_scripts',   'sf_user_widget_enqueue_scripts' );
+function sf_user_widget_enqueue_scripts() {
 	wp_enqueue_script( 'jquery' );
 }
 
-add_action( 'wp_footer',        'sp_user_widget_load_footer' );
-add_action( 'admin_footer',     'sp_user_widget_load_footer' );
-function sp_user_widget_load_footer() {
+add_action( 'wp_footer',        'sf_user_widget_load_footer' );
+add_action( 'admin_footer',     'sf_user_widget_load_footer' );
+function sf_user_widget_load_footer() {
 	$query_arg = 'supportflow_widget';
 
 	// If being run on the same site as Support Flow, prevent infinite widgets

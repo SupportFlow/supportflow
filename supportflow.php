@@ -159,26 +159,26 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type        = apply_filters( 'supportflow_thread_post_type', 'sp_thread' );         // Todo: change prefix
-		$this->respondents_tax  = apply_filters( 'supportflow_respondents_taxonomy', 'sp_respondent' ); // Todo: change prefix
-		$this->comment_type     = apply_filters( 'supportflow_thread_comment_type', 'sp_comment' );     // Todo: change prefix
+		$this->post_type        = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );         // Todo: change prefix
+		$this->respondents_tax  = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' ); // Todo: change prefix
+		$this->comment_type     = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );     // Todo: change prefix
 
-		$this->email_term_prefix = 'sp-';
+		$this->email_term_prefix = 'sf-';
 
 		$this->post_statuses  = apply_filters( 'supportflow_thread_post_statuses', array(
-			'sp_new'     => array(
+			'sf_new'     => array(
 				'label'       => __( 'New', 'support-flow' ),
 				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'support-flow' ),
 			),
-			'sp_open'    => array(
+			'sf_open'    => array(
 				'label'       => __( 'Open', 'support-flow' ),
 				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'support-flow' ),
 			),
-			'sp_pending' => array(
+			'sf_pending' => array(
 				'label'       => __( 'Pending', 'support-flow' ),
 				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'support-flow' ),
 			),
-			'sp_closed'  => array(
+			'sf_closed'  => array(
 				'label'       => __( 'Closed', 'support-flow' ),
 				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'support-flow' ),
 			),

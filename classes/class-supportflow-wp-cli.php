@@ -89,7 +89,7 @@ EOB
 			$thread_args = array(
 					'subject'                => $old_thread->subject,
 					'date'                   => $old_thread->dt,
-					'status'            => 'sp_' . $old_thread->state,
+					'status'            => 'sf_' . $old_thread->state,
 				);
 			$thread_id = SupportFlow()->create_thread( $thread_args );
 			if ( is_wp_error( $thread_id ) )

@@ -147,7 +147,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$args = array(
 					'action'          => 'change_status',
-					'sp_nonce'        => wp_create_nonce( 'sp-change-status' ),
+					'sf_nonce'        => wp_create_nonce( 'sf-change-status' ),
 					'post_status'     => $change_to,
 					'thread_id'       => $post->ID,
 					'post_type'       => SupportFlow()->post_type,
@@ -254,10 +254,10 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	function handle_action_change_status() {
 
-		if ( ! isset( $_GET['action'], $_GET['sp_nonce'], $_GET['post_status'], $_GET['thread_id'] ) )
+		if ( ! isset( $_GET['action'], $_GET['sf_nonce'], $_GET['post_status'], $_GET['thread_id'] ) )
 			return;
 
-		if ( ! wp_verify_nonce( $_GET['sp_nonce'], 'sp-change-status' ) )
+		if ( ! wp_verify_nonce( $_GET['sf_nonce'], 'sf-change-status' ) )
 			wp_die( __( "Doin' something phishy, huh?", 'supportflow' ) );
 
 		$post_status = sanitize_key( $_GET['post_status'] );
@@ -483,7 +483,7 @@ class SupportFlow_Admin extends SupportFlow {
 				'respondents'         => __( 'Respondents', 'supportflow' ),
 				'status'              => __( 'Status', 'supportflow' ),
 				'author'              => __( 'Agent', 'supportflow' ),
-				'sp_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+				'sf_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
 				'created'             => __( 'Created', 'support' ),
 			);
 		return $new_columns;
@@ -532,7 +532,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$filter_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
 				break;
-			case 'sp_comments':
+			case 'sf_comments':
 				$comments = SupportFlow()->get_thread_comment_count( $thread_id );
 				echo '<div class="post-com-count-wrapper">';
 				echo "<span class='comment-count'>{$comments}</span>";
