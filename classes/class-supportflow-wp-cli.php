@@ -15,6 +15,7 @@ class SupportFlow_WPCLI extends WP_CLI_Command {
 		WP_CLI::line( <<<EOB
 usage: wp supportflow <parameters>
 Possible subcommands:
+					download_and_process_email_replies
 					import_remote               Import from a remote SupportFlow
 					--db_host=                  Hostname for the remote database
 					--db_name=                  Name of the database to connect to
@@ -23,6 +24,14 @@ Possible subcommands:
 					--table_prefix=             Prefix for the SupportFlow tables
 EOB
 		);
+	}
+
+	/**
+	 * Download and process email replies from a remote IMAP inbox
+	 */
+	public function download_and_process_email_replies( $args, $assoc_args ) {
+
+		SupportFlow()->extend->email_replies->download_and_process_email_replies();
 	}
 
 	/**
