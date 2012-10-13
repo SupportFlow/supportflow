@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Plugin Name: Support Flow: User Widget
+ * Plugin Name: SupportFlow: User Widget
  * Plugin URI:  
- * Description: Displays a widget on the front end of any blog allowing interaction with a local or remote Support Flow install.
+ * Description: Displays a widget on the front end of any blog allowing interaction with a local or remote SupportFlow install.
  * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
  * Author URI:  
  * Version:     0.1
@@ -23,14 +23,14 @@ add_action( 'admin_footer',     'sf_user_widget_load_footer' );
 function sf_user_widget_load_footer() {
 	$query_arg = 'supportflow_widget';
 
-	// If being run on the same site as Support Flow, prevent infinite widgets
+	// If being run on the same site as SupportFlow, prevent infinite widgets
 	if ( ! empty( $_GET[$query_arg] ) )
 		return;
 
 	/**
 	 * This variable will need to be replaced with a UI or whatnot
 	 * so that this plugin here can run on a different blog than
-	 * the blog that Support Flow is running on.
+	 * the blog that SupportFlow is running on.
 	 */
 	$supportflow_install_url = home_url();
 

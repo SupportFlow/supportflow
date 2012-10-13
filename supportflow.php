@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Support Flow
+ * Plugin Name: SupportFlow
  * Plugin URI:  
  * Description: Reinventing how you support your customers.
  * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
@@ -17,7 +17,7 @@ class SupportFlow {
 	/** Magic *****************************************************************/
 
 	/**
-	 * Support Flow uses many variables, most of which can be filtered to customize
+	 * SupportFlow uses many variables, most of which can be filtered to customize
 	 * the way that it works. To prevent unauthorized access, these variables
 	 * are stored in a private array that is magically updated using PHP 5.2+
 	 * methods. This is to prevent third party plugins from tampering with
@@ -45,14 +45,14 @@ class SupportFlow {
 	/**
 	 * Main SupportFlow Instance
 	 *
-	 * Support Flow is fun
+	 * SupportFlow is fun
 	 * Please load it only one time
 	 * For this, we thank you
 	 *
 	 * Insures that only one instance of SupportFlow exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @staticvar array $instance
 	 * @uses SupportFlow::setup_globals() Setup the globals needed
 	 * @uses SupportFlow::includes() Include the required files
@@ -75,7 +75,7 @@ class SupportFlow {
 	/**
 	 * A dummy constructor to prevent SupportFlow from being loaded more than once.
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @see SupportFlow::instance()
 	 * @see SupportFlow();
 	 */
@@ -86,7 +86,7 @@ class SupportFlow {
 	/**
 	 * A dummy magic method to prevent SupportFlow from being cloned
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 */
 	public function __clone() {
 		wp_die( __( 'Cheatin’ uh?' ) );
@@ -95,7 +95,7 @@ class SupportFlow {
 	/**
 	 * A dummy magic method to prevent SupportFlow from being unserialized
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 */
 	public function __wakeup() {
 		wp_die( __( 'Cheatin’ uh?' ) );
@@ -104,7 +104,7 @@ class SupportFlow {
 	/**
 	 * Magic method for checking the existence of a certain custom field
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 */
 	public function __isset( $key ) {
 		return isset( $this->data[$key] );
@@ -113,7 +113,7 @@ class SupportFlow {
 	/**
 	 * Magic method for getting SupportFlow varibles
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 */
 	public function __get( $key ) {
 		return isset( $this->data[$key] ) ? $this->data[$key] : null;
@@ -122,7 +122,7 @@ class SupportFlow {
 	/**
 	 * Magic method for setting SupportFlow varibles
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 */
 	public function __set( $key, $value ) {
 		$this->data[$key] = $value;
@@ -134,7 +134,7 @@ class SupportFlow {
 	 * Set some smart defaults to class variables. Allow some of them to be
 	 * filtered to allow for early overriding.
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @access private
 	 * @uses plugin_dir_path() To generate SupportFlow plugin path
 	 * @uses plugin_dir_url() To generate SupportFlow plugin url
@@ -198,7 +198,7 @@ class SupportFlow {
 	/**
 	 * Include required files
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @access private
 	 * @todo Be smarter about conditionally loading code
 	 * @uses is_admin() If in WordPress admin, load additional file
@@ -233,7 +233,7 @@ class SupportFlow {
 	/**
 	 * Setup the default hooks and actions
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @access private
 	 * @uses add_action() To add various actions
 	 */
@@ -248,7 +248,7 @@ class SupportFlow {
 	/**
 	 * Register the custom post type
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @uses register_post_type() To register the post type
 	 */
 	public function action_init_register_post_type() {
@@ -298,7 +298,7 @@ class SupportFlow {
 	/**
 	 * Register the custom post (thread) statuses
 	 *
-	 * @since Support Flow 0.1
+	 * @since SupportFlow 0.1
 	 * @uses register_post_status() To register the post statuses
 	 * @uses apply_filters() To control what statuses are registered
 	 */
