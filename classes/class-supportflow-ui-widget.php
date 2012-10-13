@@ -39,7 +39,7 @@ class SupportFlow_UI_Widget extends SupportFlow {
 
 	public function render_single_thread_comments_html( $thread_id ) {
 
-		$comments = SupportFlow()->get_thread_comments( $thread_id, array( 'comment_approved' => 'public', 'order' => 'ASC' ) );
+		$comments = SupportFlow()->get_thread_comments( $thread_id, array( 'status' => 'public', 'order' => 'ASC' ) );
 
 		$output = '<ul class="thread-comments">';
 		foreach( $comments as $comment ) {
@@ -75,7 +75,7 @@ class SupportFlow_UI_Widget extends SupportFlow {
 				$output .= '<li id="thread-' . $thread->ID . '">';
 				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
 				$output .= '<div class="thread-comments">';
-				$comments = SupportFlow()->get_thread_comments( $thread->ID, array( 'comment_approved' => 'public' ) );
+				$comments = SupportFlow()->get_thread_comments( $thread->ID, array( 'status' => 'public' ) );
 				$last_comment = array_shift( $comments );
 				$output .= $this->render_single_comment_html( $last_comment );
 				$output .= '</div>';

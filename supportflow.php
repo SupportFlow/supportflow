@@ -521,7 +521,7 @@ class SupportFlow {
 	public function get_comments( $args ) {
 
 		$default_args = array(
-				'comment_approved'       => 'public', // 'public', 'private', 'all'
+				'status'                 => 'public', // 'public', 'private', 'all'
 				'post_id'                => '',
 				'search'                 => '',
 				'order'                  => 'DESC',   // 'DESC', 'ASC',
@@ -531,14 +531,14 @@ class SupportFlow {
 		$comment_args = array(
 				'search'                 => $args['search'],
 				'post_id'                => $args['post_id'],
-				'comment_approved'       => $args['comment_approved'],
+				'status'                 => $args['status'],
 				'comment_type'           => $this->comment_type,
 				'order'                  => $args['order'],
 			);
-		if ( 'any' == $args['comment_approved'] )
+		if ( 'any' == $args['status'] )
 			add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
 		$thread_comments = get_comments( $comment_args );
-		if ( 'any' == $args['comment_approved'] )
+		if ( 'any' == $args['status'] )
 			remove_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
 		return $thread_comments;
 	}
@@ -548,7 +548,7 @@ class SupportFlow {
 	 */
 	public function filter_comment_clauses( $clauses ) {
 		global $wpdb;
-		$old_comment_approved = 'comment_approved = \'any\'';
+		$old_comment_approved = "( comment_approved = '0' OR comment_approved = '1' )";
 		$new_comment_approved = "comment_approved IN ( 'private', 'public' )";
 		$clauses['where'] = str_replace( $old_comment_approved, $new_comment_approved, $clauses['where'] );
 		return $clauses;

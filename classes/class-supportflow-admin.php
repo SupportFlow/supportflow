@@ -211,7 +211,7 @@ class SupportFlow_Admin extends SupportFlow {
 			// Get any comments that match our results
 			$args = array(
 					'search'                   => $search,
-					'comment_approved'         => 'any',
+					'status'                   => 'any',
 				);
 			$matching_comments = SupportFlow()->get_comments( $args );
 			$post_ids = wp_list_pluck( $matching_comments, 'comment_post_ID' );
@@ -414,7 +414,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 	public function display_thread_comments() {
 
-		$private_comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'private' ) );
+		$private_comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'private' ) );
 		if ( !empty( $private_comments ) ) {
 			echo '<ul class="private-comments">';
 			foreach( $private_comments as $comment ) {
@@ -439,7 +439,7 @@ class SupportFlow_Admin extends SupportFlow {
 			echo '</ul>';
 		}
 
-		$comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'comment_approved' => 'public' ) );
+		$comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'public' ) );
 		if ( !empty( $comments ) ) {
 			echo '<ul class="thread-comments">';
 			foreach( $comments as $comment ) {
