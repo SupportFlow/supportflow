@@ -31,7 +31,22 @@ EOB
 	 */
 	public function download_and_process_email_replies( $args, $assoc_args ) {
 
-		SupportFlow()->extend->email_replies->download_and_process_email_replies();
+		$defaults = array(
+				'host'           => '', // '{imap.gmail.com:993/imap/ssl/novalidate-cert}' for Gmail
+				'username'       => '', // Full email address for Gmail
+				'password'       => '', // Whatever the password is
+				'inbox'          => 'INBOX', // Where the new emails will go
+				'archive'        => 'SF_ARCHIVE', // Where you'd like emails put after they've been processed
+			);
+		$connection_details = wp_parse_args( $assoc_args, $defaults );
+
+		// Allow the connection details to be stored in a secret config file or similar
+		$connection_details = apply_filters( 'sf_imap_connection_details', $connection_details );
+		$retval = SupportFlow()->extend->email_replies->download_and_process_email_replies( $connection_details );
+		if ( is_wp_error( $retval ) )
+			WP_CLI::error( $retval->get_error_message() );
+		else
+			WP_CLI::success( $retval );
 	}
 
 	/**
