@@ -165,6 +165,8 @@ class SupportFlow {
 
 		$this->email_term_prefix = 'sf-';
 
+		$this->thread_secret_key = 'thread_secret';
+
 		$this->post_statuses  = apply_filters( 'supportflow_thread_post_statuses', array(
 			'sf_new'     => array(
 				'label'       => __( 'New', 'support-flow' ),
@@ -620,6 +622,31 @@ class SupportFlow {
 		do_action( 'supportflow_thread_comment_added', $comment_id );
 
 		return $comment_id;
+	}
+
+	/**
+	 * Generate the secure key for replying to this thread
+	 *
+	 * @todo Rather than storing this in the database, it should be generated on the fly
+	 * with an encryption algorithim
+	 */
+	public function get_secret_for_thread( $thread_id ) {
+
+		if ( $secret = get_post_meta( $thread_id, $this->thread_secret_key, true ) )
+			return $secret;
+
+		$secret = wp_generate_password( 8, false );
+		update_post_meta( $thread_id, $this->thread_secret_key, $secret );
+		return $secret;
+	}
+
+	/**
+	 * Get the thread ID from a secret
+	 */
+	public function get_thread_from_secret( $secret ) {
+		global $wpdb;
+		$thread_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->thread_secret_key, $secret ) );
+		return ( $thread_id ) ? $thread_id : false;
 	}
 
 }

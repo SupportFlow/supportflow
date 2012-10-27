@@ -8,6 +8,21 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 	const email_id_key = 'orig_email_id';
 
+	function __construct() {
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+	}
+
+	public function setup_actions() {
+
+		add_filter( 'supportflow_emails_comment_notify_subject', array( $this, 'filter_comment_notify_subject' ), 10, 3 );
+	}
+
+	public function filter_comment_notify_subject( $subject, $comment_id, $thread_id ) {
+
+		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_thread( $thread_id ) . ']';
+		return $subject;
+	}
+
 	/**
 	 * Primary method for downloading and processing email replies
 	 */
