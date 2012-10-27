@@ -49,10 +49,12 @@ class SupportFlow_Admin extends SupportFlow {
 	 * Add any CSS or JS we need for the admin
 	 */
 	public function action_admin_enqueue_scripts() {
+		global $pagenow;
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
 		wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
-		self::add_default_plupload_settings();
+		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow )
+			self::add_default_plupload_settings();
 	}
 
 	/**
