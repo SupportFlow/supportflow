@@ -532,21 +532,22 @@ class SupportFlow {
 				'comment_type'           => $this->comment_type,
 				'order'                  => $args['order'],
 			);
-		if ( 'any' == $args['status'] )
-			add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
+
+		add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ), 10, 2 );
 		$thread_comments = get_comments( $comment_args );
-		if ( 'any' == $args['status'] )
-			remove_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
+		remove_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
 		return $thread_comments;
 	}
 
 	/**
 	 * Convert 'any' comment_approved requests to the proper SQL
 	 */
-	public function filter_comment_clauses( $clauses ) {
-		global $wpdb;
+	public function filter_comment_clauses( $clauses, $query ) {
 		$old_comment_approved = "( comment_approved = '0' OR comment_approved = '1' )";
-		$new_comment_approved = "comment_approved IN ( 'private', 'public' )";
+		if ( in_array( $query->query_vars['status'], array( 'public', 'private' ) ) )
+			$new_comment_approved = "comment_approved = '{$query->query_vars['status']}' ";
+		else
+			$new_comment_approved = "comment_approved IN ( 'private', 'public' )";
 		$clauses['where'] = str_replace( $old_comment_approved, $new_comment_approved, $clauses['where'] );
 		return $clauses;
 	}
