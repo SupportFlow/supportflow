@@ -134,6 +134,7 @@ class SupportFlow_UI_Widget extends SupportFlow {
 <body>
 
 <div id="supportflow-widget">
+	<button id="supportflow-back"><?php _e( 'All Threads', 'supportflow' ); ?></button>
 	<h1 id="widget-title"><?php echo $widget_title; ?></h1>
 
 	<div id="supportflow-newthread-box">

@@ -8,6 +8,9 @@ var supportflow = {};
 
 	supportflow.init = function() {
 		supportflow.widget_title = $('h1#widget-title');
+		supportflow.original_widget_title = supportflow.widget_title.html();
+		supportflow.back_button = $('#supportflow-back');
+		supportflow.back_button.click( supportflow.hide_single_thread_view );
 
 		// Creating a new thread
 		supportflow.new_thread_button = $('#supportflow-newthread');
@@ -48,11 +51,22 @@ var supportflow = {};
 
 	}
 
+	supportflow.hide_single_thread_view = function() {
+		supportflow.single_thread_view.hide();
+		supportflow.widget_title.html(supportflow.original_widget_title);
+		supportflow.all_threads_view.attr('opacity', '1').show();
+		supportflow.new_thread_button.show();
+		supportflow.back_button.hide();
+	}
+
 	supportflow.show_single_thread_view = function( e ) {
 		e.preventDefault();
 
+		supportflow.back_button.show();
+
 		supportflow.new_thread_button.hide();
 		supportflow.all_threads_view.attr('opacity', '0.5');
+		supportflow.widget_title.html($(this).find('.thread-title').html());
 		var thread_id = $(this).attr('id').replace('thread-','');
 		var data = {
 			thread_id:               thread_id,
