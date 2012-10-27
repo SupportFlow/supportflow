@@ -49,7 +49,7 @@ class SupportFlow {
 	 * Please load it only one time
 	 * For this, we thank you
 	 *
-	 * Insures that only one instance of SupportFlow exists in memory at any one
+	 * Ensures that only one instance of SupportFlow exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
 	 * @since SupportFlow 0.1
