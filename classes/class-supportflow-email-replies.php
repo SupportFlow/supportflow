@@ -77,7 +77,25 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		$respondent_name = $email->headers->from[0]->personal;
 		$respondent_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
-		$message = $this->get_message_from_body( $email->body );
+
+		// Parse out the reply body
+		if ( function_exists( 'What_The_Email' ) )
+			$message = What_The_Email()->get_message( $email->body );
+		else
+			$message = $email->body;
+
+		// Check if this email should be blocked
+		if ( function_exists( 'What_The_Email' ) ) {
+			$check_strings = array(
+					'subject'       => $subject,
+					'sender'        => $respondent_email,
+					'message'       => $message,
+				);
+			foreach( $check_strings as $key => $value ) {
+				if ( What_The_Email()->is_robot( $key, $value ) )
+					return true;
+			}
+		}
 
 		// Check to see if this message was in response to an existing thread
 		$thread_id = false;
@@ -133,19 +151,6 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		if ( empty( $body ) )
 			$body = imap_fetchbody( $connection, $num, 1 );
 		return $body;
-	}
-
-
-	/**
-	 * Parse the actual user text from a given email body
-	 *
-	 * @todo Plug in Gimme The Message email parsing to strip out the crap
-	 */
-	public function get_message_from_body( $body ) {
-
-		$message = trim( $body );
-
-		return $message;
 	}
 
 }
