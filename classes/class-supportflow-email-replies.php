@@ -75,23 +75,32 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		else
 			$subject = sprintf( __( 'New thread from %s', 'supportflow' ), $email->headers->fromaddress );
 
+		$respondent_name = $email->headers->from[0]->personal;
 		$respondent_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
-
-		// @todo Check to see if this message was in response to an existing thread
-
 		$message = $this->get_message_from_body( $email->body );
 
-		// If this wasn't in reply to an existing message, create a new thread
-		$new_thread_args = array(
-				'subject'               => $subject,
-				'respondent_email'      => $respondent_email,
-				'message'               => $message,
-			);
-		if ( ! empty( $email->headers->from[0]->personal ) )
-			$new_thread_args['respondent_name'] = $email->headers->from[0]->personal;
+		// Check to see if this message was in response to an existing thread
+		$thread_id = false;
+		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) )
+			$thread_id = (int)SupportFlow()->get_thread_from_secret( $matches[1] );
 
-		$thread_id = SupportFlow()->create_thread( $new_thread_args );
-		$new_comment = array_shift( SupportFlow()->get_thread_comments( $thread_id ) );
+		if ( $thread_id ) {
+			$message_args = array(
+					'comment_author'        => $respondent_name,
+					'comment_author_email'  => $respondent_email,
+				);
+			SupportFlow()->add_thread_comment( $thread_id, $message, $message_args );
+		} else {
+			// If this wasn't in reply to an existing message, create a new thread
+			$new_thread_args = array(
+					'subject'               => $subject,
+					'respondent_name'       => $respondent_name,
+					'respondent_email'      => $respondent_email,
+					'message'               => $message,
+				);
+			$thread_id = SupportFlow()->create_thread( $new_thread_args );
+		}
+		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
 
 		// Store the original email ID so we don't accidentally dupe it
 		$email_id = trim( $email->headers->message_id, '<>' );
