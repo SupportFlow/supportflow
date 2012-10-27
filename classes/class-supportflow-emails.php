@@ -5,6 +5,9 @@
 
 class SupportFlow_Emails extends SupportFlow {
 
+	var $from_name;
+	var $from_address;
+
 	function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
@@ -13,6 +16,9 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Register the notifications to happen on which actions
 	 */
 	public function setup_actions() {
+
+		$this->from_name = apply_filters( 'supportflow_emails_from_name', $this->from_name );
+		$this->from_address = apply_filters( 'supportflow_emails_from_address', $this->from_address );
 
 		// Don't send out any notifications when importing or using WP-CLI
 		if ( ( defined('WP_IMPORTING') && WP_IMPORTING ) || ( defined('WP_CLI') && WP_CLI ) )
@@ -94,8 +100,18 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 		foreach( $respondents as $respondent_email ) {
-			wp_mail( $respondent_email, $subject, $message );
+			self::mail( $respondent_email, $subject, $message );
 		}
+	}
+
+	/**
+	 * Send an email from SupportFlow
+	 */
+	public function mail( $respondent_email, $subject, $message ) {
+		$headers = array();
+		if ( ! empty( $this->from_name ) && is_email( $this->from_address ) )
+			$headers[] = 'From: ' . $this->from_name  . ' <' . $this->from_address . '>';
+		wp_mail( $respondent_email, $subject, $message, $headers );
 	}
 }
 
