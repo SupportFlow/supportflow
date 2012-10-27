@@ -41,7 +41,7 @@ EOB
 		$connection_details = wp_parse_args( $assoc_args, $defaults );
 
 		// Allow the connection details to be stored in a secret config file or similar
-		$connection_details = apply_filters( 'sf_imap_connection_details', $connection_details );
+		$connection_details = apply_filters( 'supportflow_imap_connection_details', $connection_details );
 		$retval = SupportFlow()->extend->email_replies->download_and_process_email_replies( $connection_details );
 		if ( is_wp_error( $retval ) )
 			WP_CLI::error( $retval->get_error_message() );
