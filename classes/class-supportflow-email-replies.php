@@ -102,9 +102,24 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
 
+		// Add anyone else that was in the 'to' or 'cc' fields as respondents
+		$respondents = array();
+		$fields = array( 'to', 'cc' );
+		foreach( $fields as $field ) {
+			if ( ! empty( $email->headers->$field ) ) {
+				foreach( $email->headers->$field as $recipient ) {
+					$email_address = $recipient->mailbox . '@' . $recipient->host;
+					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address )
+						$respondents[] = $email_address;
+				}
+			}
+		}
+		SupportFlow()->update_thread_respondents( $thread_id, $respondents, true );
+
 		// Store the original email ID so we don't accidentally dupe it
 		$email_id = trim( $email->headers->message_id, '<>' );
-		update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
+		if ( is_object( $new_comment ) )
+			update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
 
 		return true;
 	}

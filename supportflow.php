@@ -481,8 +481,12 @@ class SupportFlow {
 
 	/**
 	 * Update a thread's respondents
+	 *
+	 * @param int $thread_id
+	 * @param array $respondents An array of email addresses
+	 * @param bool $append Whether or not to append these email addresses to any existing addresses
 	 */
-	public function update_thread_respondents( $thread_id, $respondents ) {
+	public function update_thread_respondents( $thread_id, $respondents, $append = false ) {
 
 		if ( is_string( $respondents ) ) {
 			$respondents = array( $respondents );
@@ -501,7 +505,7 @@ class SupportFlow {
 				$term_ids[] = $term['term_id'];
 			}
 		}
-		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax );
+		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax, $append );
 	}
 
 	/**
