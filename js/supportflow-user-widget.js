@@ -36,7 +36,7 @@ var supportflow = {};
 	};
 
 	supportflow.get_ajax_url = function( action ) {
-		return supportflowUserWidgetVars.ajaxurl + '&api-action=' + action;
+		return SupportFlowUserWidgetVars.ajaxurl + '&api-action=' + action;
 	};
 
 	supportflow.show_new_thread_form = function() {
@@ -65,7 +65,7 @@ var supportflow = {};
 	supportflow.submit_new_thread_form = function( e ) {
 		e.preventDefault();
 
-		supportflow.disable_thread_form( supportflow.new_thread_form, supportflowUserWidgetVars.starting_thread_text );
+		supportflow.disable_thread_form( supportflow.new_thread_form, SupportFlowUserWidgetVars.starting_thread_text );
 
 		var data = {
 			subject:                 supportflow.new_thread_subject.val(),
@@ -78,7 +78,7 @@ var supportflow = {};
 	supportflow.submit_new_message_form = function( e ) {
 		e.preventDefault();
 
-		supportflow.disable_thread_form( supportflow.single_thread_form, supportflowUserWidgetVars.sending_reply_text );
+		supportflow.disable_thread_form( supportflow.single_thread_form, SupportFlowUserWidgetVars.sending_reply_text );
 
 		var data = {
 			thread_id:               supportflow.single_thread_id.val(),
@@ -108,12 +108,12 @@ var supportflow = {};
 
 		// If there was an error in the process, re-enable the form and show the error message
 		if ( 'error' == response.status ) {
-			supportflow.enable_thread_form( supportflow.new_thread_form, false, supportflowUserWidgetVars.start_thread_text );
+			supportflow.enable_thread_form( supportflow.new_thread_form, false, SupportFlowUserWidgetVars.start_thread_text );
 			return;
 		}
 
 		// Restore and hide the form
-		supportflow.enable_thread_form( supportflow.new_thread_form, true, supportflowUserWidgetVars.start_thread_text );
+		supportflow.enable_thread_form( supportflow.new_thread_form, true, SupportFlowUserWidgetVars.start_thread_text );
 		supportflow.new_thread_form.hide();
 		supportflow.all_threads_view.hide();
 
@@ -130,12 +130,12 @@ var supportflow = {};
 		// If there was an error in the process, re-enable the form and show the error message
 		if ( 'error' == response.status ) {
 			// @todo display the error message
-			supportflow.enable_thread_form( supportflow.single_thread_form, false, supportflowUserWidgetVars.send_reply_text );
+			supportflow.enable_thread_form( supportflow.single_thread_form, false, SupportFlowUserWidgetVars.send_reply_text );
 			return;
 		}
 
 		// Renable the form and append the response
-		supportflow.enable_thread_form( supportflow.single_thread_form, true, supportflowUserWidgetVars.send_reply_text );
+		supportflow.enable_thread_form( supportflow.single_thread_form, true, SupportFlowUserWidgetVars.send_reply_text );
 		supportflow.single_thread_body.find( 'ul' ).append( response.html );
 
 	}
