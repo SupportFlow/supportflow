@@ -132,6 +132,8 @@ EOB
 						'time'                        => $old_message->dt,
 						'comment_approved'            => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
 					);
+				if ( function_exists( 'What_The_Email' ) )
+					$old_message->content = What_The_Email()->get_message( $old_message->content );
 				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $old_message->content, $message_args );
 				add_comment_meta( $comment_id, '_imported_id', $old_message->message_id );
 				$count_comments++;
