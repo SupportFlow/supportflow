@@ -329,7 +329,7 @@ class SupportFlow_Admin extends SupportFlow {
 		// Date Created and Last Activity for Existing Posts
 		if( 'post.php' == $pagenow ) {
 
-			$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
+			$modified_gmt = get_post_modified_time( 'U', true, get_the_ID() );
 			$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 
 			echo '<div class="misc-pub-section created-on">';
