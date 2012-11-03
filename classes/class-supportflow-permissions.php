@@ -7,127 +7,171 @@
 class SupportFlow_Permissions extends SupportFlow {
 
 	/**
-	 * Value of the "close thread" capability.
+	 * Holds all of the capabilities managed by SupportFlow.
 	 *
-	 * @since	0.1
-	 * @var		string
+	 * @access	private
+	 * @var		array
 	 */
-	private $_close_thread_capability = 'sf_close_thread';
+	private $_caps = array();
 
 	/**
-	 * Value of the "open thread" capability.
+	 * Array of user roles and associated capabilities.
 	 *
-	 * @since	0.1
-	 * @var		string
+	 * @access	private
+	 * @var 	array
 	 */
-	private $_open_thread_capability = 'sf_open_thread';
+	private $_role_cap_map = array();
 
 	/**
-	 * Value of the "reopen thread" capability.
+	 * Construct the object and initiate actions to setup permissions.
 	 *
+	 * @access	public
 	 * @since	0.1
-	 * @var		string
-	 */
-	private $_reopen_thread_capability = 'sf_reopen_thread';
-
-	/**
-	 * Value of the "comment on thread" capability.
-	 *
-	 * @since	0.1
-	 * @var		string
-	 */
-	private $_comment_on_thread_capability = 'sf_comment_on_thread';
-
-	/**
-	 * Initiates the actions for the permissions class.
-	 *
-	 * @since 	0.1
 	 * @uses	add_action
 	 *
 	 * @return	SupportFlow_Permissions
 	 */
 	public function __construct() {
-		// Adds SupportFlow specific capabilities
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+	}
+
+	/**
+	 * Initiates the actions for the permissions class.
+	 *
+	 * @access	public
+	 * @since 	0.1
+	 * @uses	add_action
+	 *
+	 * @return	void
+	 */
+	public function setup_actions() {
+		$this->_setup_caps();
 		add_action( 'init', array( $this, 'add_capabilities' ) );
+	}
+
+	/**
+	 * Setup the mapping of roles to capabilities.
+	 *
+	 * @access	public
+	 * @since	0.1
+	 * @uses	apply_filters
+	 *
+	 * @return	void
+	 */
+	private function _setup_caps() {
+		// Setup the default caps for SupportFlow
+		$this->_caps = apply_filters( 'sf_caps', array(
+			'close_others_threads' 		=> 'sf_close_others_threads',
+			'open_others_threads' 		=> 'sf_open_others_threads',
+			'reopen_others_threads' 	=> 'sf_reopen_others_threads',
+			'comment_on_others_threads' => 'sf_comment_on_others_threads',
+			'close_threads' 			=> 'sf_close_threads',
+			'open_threads'			 	=> 'sf_open_threads',
+			'reopen_threads' 			=> 'sf_reopen_threads',
+			'comment_on_threads' 		=> 'sf_comment_on_threads',
+		) );
+
+		// Map the default caps onto WordPress roles
+		$this->_role_cap_map = apply_filters( 'sf_role_cap_map', array(
+			'administrator' => $this->get_caps(), // Apply all caps
+			'editor' 		=> $this->get_caps(), // Apply all caps
+			'author' 		=> array(
+				'close_threads' 	 => $this->get_cap( 'close_threads' ),
+				'open_threads' 		 => $this->get_cap( 'open_threads' ),
+				'comment_on_threads' => $this->get_cap( 'comment_on_threads' ),
+			),
+			'contributor' 	=> array(
+				'comment_on_threads' => $this->get_cap( 'comment_on_threads' ),
+			),
+		) );
 	}
 
 	/**
 	 * Adds the standard SupportFlow capabilities to built-in WordPress roles.
 	 *
+	 * @access	public
 	 * @since	0.1
 	 * @uses	get_role, WP_Roles::add_cap
 	 *
 	 * @return	void
 	 */
 	public function add_capabilities() {
-		// Modify the Admin role to include close, open, reopen and comment on thread capabilities
-		$admin = get_role( 'administrator' );
-		$admin->add_cap( $this->get_close_thread_capability() );
-		$admin->add_cap( $this->get_open_thread_capability() );
-		$admin->add_cap( $this->get_reopen_thread_capability() );
-		$admin->add_cap( $this->get_comment_on_thread_capability() );
+		$role_cap_map = $this->get_role_cap_map();
 
-		// Modify the Editor role to include close, open, reopen and comment on thread capabilities
-		$editor = get_role( 'editor' );
-		$editor->add_cap( $this->get_close_thread_capability() );
-		$editor->add_cap( $this->get_open_thread_capability() );
-		$editor->add_cap( $this->get_reopen_thread_capability() );
-		$editor->add_cap( $this->get_comment_on_thread_capability() );
+		if ( empty( $role_cap_map ) )
+			return;
 
-		// Modify the Author role to include close, open, and comment on thread capabilities
-		$author = get_role( 'author' );
-		$author->add_cap( $this->get_close_thread_capability() );
-		$author->add_cap( $this->get_open_thread_capability() );
-		$author->add_cap( $this->get_comment_on_thread_capability() );
+		// Loop through roles, adding the associated caps to each role
+		foreach ( $role_cap_map as $role => $caps ) {
+			// Get the role object
+			$role_obj = get_role( $role );
 
-		// Modify the Contributor role to include the comment on thread capability
-		$contributor = get_role( 'contributor' );
-		$contributor->add_cap( $this->get_comment_on_thread_capability() );
+			// Verify that an appropriate object was returned
+			if ( null !== $role_obj ) {
+				// Add caps to the role
+				foreach ( $caps as $index => $cap ) {
+					if ( false === $role_obj->has_cap( $cap ) ) {
+						$role_obj->add_cap( $cap );
+					}
+				}
+			}
+		}
 	}
 
 	/**
-	 * Get the value of $_close_thread_capability.
+	 * Get all SF capabilities.
 	 *
+	 * @access	public
 	 * @since	0.1
 	 *
-	 * @return	string
+	 * @return	array	Array of SF capabilities.
 	 */
-	public function get_close_thread_capability() {
-		return $this->_close_thread_capability;
+	public function get_caps() {
+		return $this->_caps;
 	}
 
 	/**
-	 * Get the value of $_open_thread_capability.
+	 * Get the mapping of roles to capabilities.
 	 *
+	 * @access	public
 	 * @since	0.1
 	 *
-	 * @return	string
+	 * @return	array	Array roles and caps.
 	 */
-	public function get_open_thread_capability() {
-		return $this->_open_thread_capability;
+	public function get_role_cap_map() {
+		return $this->_role_cap_map;
 	}
 
 	/**
-	 * Get the value of $_reopen_thread_capability.
+	 * Get the name of an individual capability.
 	 *
+	 * @access	public
 	 * @since	0.1
 	 *
-	 * @return	string
+	 * @param 	string			$cap		Capability to get.
+	 * @return 	string|bool					Capability name on success; False on failure.
 	 */
-	public function get_reopen_thread_capability() {
-		return $this->_reopen_thread_capability;
-	}
+	public function get_cap( $cap ) {
+		$all_caps = $this->get_caps();
 
-	/**
-	 * Get the value of $_comment_on_thread_capability.
-	 *
-	 * @since	0.1
-	 *
-	 * @return	string
-	 */
-	public function get_comment_on_thread_capability() {
-		return $this->_comment_on_thread_capability;
+		if ( array_key_exists( $cap, $all_caps ) )
+			return $all_caps[ $cap ];
+		else
+			return false;
 	}
 }
 
 SupportFlow()->extend->permissions = new SupportFlow_Permissions();
+
+/**
+ * Get the name of an individual capability.
+ *
+ * @since	0.1
+ * @uses	SupportFlow, SupportFlow_Permissions::get_cap
+ *
+ * @param 	string			$cap		Capability to get.
+ * @return	bool|string					Internal name of the capability on success; false on failure;
+ */
+function sf_get_cap( $cap ) {
+	return SupportFlow()->extend->permissions->get_cap( $cap );
+}
