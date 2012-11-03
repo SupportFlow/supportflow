@@ -209,6 +209,7 @@ class SupportFlow {
 		require_once( $this->plugin_dir . 'classes/class-supportflow-attachments.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-emails.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-email-replies.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-permissions.php' );
 
 		/** Extensions ********************************************************/
 
