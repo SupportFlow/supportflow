@@ -144,7 +144,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Rename these actions
 		if ( isset( $row_actions['edit'] ) )
-			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'Discussion', 'supportflow' ), str_replace( __( 'Edit this item' ), __( 'Discuss Thread', 'supportflow' ), $row_actions['edit'] ) );
+			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'View', 'supportflow' ), str_replace( __( 'Edit this item' ), __( 'View Thread', 'supportflow' ), $row_actions['edit'] ) );
 
 		// Save the trash action for the end
 		if ( isset( $row_actions['trash'] ) ) {
