@@ -409,7 +409,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		echo '<div id="message-tools">';
 		echo '<div id="comment-attachments-wrap">';
-		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it' ) . '</div>';
+		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it', 'supportflow' ) . '</div>';
 		echo '<ul id="comment-attachments-list">';
 		echo '</ul>';
 		echo '<input type="hidden" id="comment-attachments" name="comment-attachments" />';
