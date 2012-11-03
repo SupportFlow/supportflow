@@ -27,6 +27,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_filter( 'manage_' . SupportFlow()->post_type . '_posts_columns', array( $this, 'filter_manage_post_columns' ) );
 		add_filter( 'manage_edit-' . SupportFlow()->post_type . '_sortable_columns', array( $this, 'manage_sortable_columns' ) );
 		add_action( 'manage_posts_custom_column', array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
+		add_filter( 'views_edit-' . SupportFlow()->post_type, array( $this, 'filter_views' ) );
 		add_filter( 'post_row_actions', array( $this, 'filter_post_row_actions' ), 10, 2 );
 		add_filter( 'bulk_actions-edit-' . SupportFlow()->post_type, array( $this, 'filter_bulk_actions' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
@@ -122,6 +123,24 @@ class SupportFlow_Admin extends SupportFlow {
 			10 => __( 'Thread updated.', 'supportflow' ),
 		);
 		return $messages;
+	}
+
+	/**
+	 *
+	 */
+	public function filter_views( $views ) {
+
+		// The 'all' count shouldn't include closed posts
+		$post_type = SupportFlow()->post_type;
+		$num_posts = wp_count_posts( $post_type, 'readable' );
+		$total_posts = array_sum( (array)$num_posts );
+		foreach ( get_post_stati( array('show_in_admin_all_list' => false) ) as $state )
+			$total_posts -= $num_posts->$state;
+		$total_posts -= $num_posts->sf_closed;
+		$class = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
+		$views['all'] = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
+
+		return $views;
 	}
 
 	/**
