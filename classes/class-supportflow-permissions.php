@@ -48,6 +48,18 @@ class SupportFlow_Permissions extends SupportFlow {
 	 */
 	public function __construct() {
 		// Adds SupportFlow specific capabilities
+		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+	}
+
+	/**
+	 * Initiates the actions for the permissions class.
+	 *
+	 * @since 	0.1
+	 * @uses	add_action
+	 *
+	 * @return	void
+	 */
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'add_capabilities' ) );
 	}
 
