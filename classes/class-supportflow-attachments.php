@@ -7,6 +7,8 @@ class SupportFlow_Attachments extends SupportFlow {
 	var $file_hash = '';
 	var $secret_key = '';
 
+	var $attachments_require_permission = false;
+
 	const secret_key_option = 'supportflow_attachments_secret';
 
 	function __construct() {
@@ -33,6 +35,8 @@ class SupportFlow_Attachments extends SupportFlow {
 			add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
 		}
 
+		$this->attachments_require_permission = apply_filters( 'supportflow_attachments_require_permission', $this->attachments_require_permission );
+
 	}
 
 	public function filter_wp_get_attachment_url( $url, $attachment_id ) {
@@ -56,6 +60,15 @@ class SupportFlow_Attachments extends SupportFlow {
 		if ( empty( $matches ) )
 			return;
 
+		// User must be logged in to see attachments that require permission
+		if ( ! is_user_logged_in() && $this->attachments_require_permission ) {
+			$args = array(
+					'redirect_to'       => urlencode( esc_url( home_url( $_SERVER['REQUEST_URI'] ) ) ),
+				);
+			wp_safe_redirect( add_query_arg( $args, site_url( '/wp-login.php' ) ) );
+			exit;
+		}
+
 		global $wpdb;
 		$file = $matches[1];
 		$query = $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE guid LIKE %s", '%' . $file );
@@ -63,9 +76,11 @@ class SupportFlow_Attachments extends SupportFlow {
 		if ( empty( $post ) )
 			return get_404_template();
 
-		$post_id = $post->ID;
+		// Check to see whether the user has permission to view the thread
+		if ( $this->attachments_require_permission && ! $this->can_view_attachment( $post->ID ) )
+			wp_die( __( 'Sorry, you do not have permission to view this attachment.', 'supportflow' ) );
 
-		// @todo do our logged in and permissions checks
+		$post_id = $post->ID;
 
 		$file = get_attached_file( $post_id );
 
@@ -129,6 +144,32 @@ class SupportFlow_Attachments extends SupportFlow {
 		readfile( $file );
 
 		exit;
+	}
+
+	/**
+	 * Whether or not a given email address can view the attachment
+	 */
+	public function can_view_attachment( $attachment_id, $email_or_login = false ) {
+
+		if ( ! $email_or_login && is_user_logged_in() )
+			$email_or_login = wp_get_current_user()->user_email;
+
+		if ( ! is_email( $email_or_login ) ) {
+			$user = get_user_by( 'login' );
+			if ( $user )
+				$email_or_login = $user->user_email;
+		}
+
+		$thread_id = get_post( $attachment_id )->post_parent;
+		$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
+
+		// If the email address is a respondent, they can view
+		if ( in_array( $email_or_login, $respondents ) )
+			return true;
+
+		// @todo permissions check on whether the user is logged in as some who can view threads
+
+		return false;
 	}
 
 	public function wp_handle_upload_prefilter( $file ) {
