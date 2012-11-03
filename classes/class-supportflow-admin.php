@@ -52,9 +52,10 @@ class SupportFlow_Admin extends SupportFlow {
 		global $pagenow;
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
-		wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
-		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow )
+		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
+		}
 	}
 
 	/**
