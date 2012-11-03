@@ -42,6 +42,11 @@
 	display:none;
 }
 
+#supportflow-details .handlediv,
+#supportflow-details h3.hndle {
+	display: block;
+}
+
 #supportflow-details #misc-publishing-actions label {
 	width: 50px;
 	display: inline-block;
@@ -49,6 +54,14 @@
 
 #supportflow-details #misc-publishing-actions select#post_status {
 	width: 100px;
+}
+
+#supportflow-details #misc-publishing-actions span.the-date {
+	font-weight: bold;
+}
+
+#supportflow-details #misc-publishing-actions div.last-activity {
+	font-size: 11px;
 }
 
 #supportflow-subject h4,

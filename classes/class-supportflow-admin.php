@@ -323,7 +323,22 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_details() {
 		global $pagenow;
 
+		// Display Meta Data for Post
 		echo '<div id="misc-publishing-actions">';
+
+		// Date Created and Last Activity for Existing Posts
+		if( 'post.php' == $pagenow ) {
+
+			$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
+			$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+
+			echo '<div class="misc-pub-section created-on">';
+			echo '<label for="created_on">' . __( 'Opened', 'supportflow' ) . ':</label>';
+			echo '<span class="the-date">' . get_the_date() . ' ' .get_the_time() . '</span>'; 
+			echo '<div clas="last-activity" title="' . get_the_modified_date('l, M j, Y ') . get_the_modified_time() . '">' . __( 'Last Activity', 'SupportFlow' ) . ': <strong>' . $last_activity . '</strong></div>';
+			echo '</div>';
+		}
+
 		// Post status dropdown
 		$current_status = get_post_status( get_the_ID() );
 		echo '<div class="misc-pub-section">';
@@ -334,6 +349,7 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 		echo '</select>';
 		echo '</div>';
+
 		// Agent assignment dropdown
 		$post_author = get_post( get_the_ID() )->post_author;
 		echo '<div class="misc-pub-section">';
@@ -348,8 +364,10 @@ class SupportFlow_Admin extends SupportFlow {
 		wp_dropdown_users( $args );
 		echo '</div>';
 
-		echo '</div>';
+		echo '</div>'; // end div#misc-publishing-actions
 
+
+		// Start/Update Thread (submit)
 		if ( 'post-new.php' == $pagenow )
 			$submit_text = __( 'Start Thread', 'supportflow' );
 		else
