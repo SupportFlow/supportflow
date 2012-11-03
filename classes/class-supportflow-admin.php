@@ -31,6 +31,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_filter( 'bulk_actions-edit-' . SupportFlow()->post_type, array( $this, 'filter_bulk_actions' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
+		add_action( 'restrict_manage_posts', array( $this, 'action_restrict_manage_posts' ) );
 
 	}
 
@@ -118,6 +119,22 @@ class SupportFlow_Admin extends SupportFlow {
 			10 => __( 'Thread updated.', 'supportflow' ),
 		);
 		return $messages;
+	}
+
+	/**
+	 * Add custom filters for the Manage Threads view
+	 */
+	public function action_restrict_manage_posts() {
+
+		// Filter to specific agents
+		$agent_dropdown_args = array(
+						'show_option_all'   => __( 'Show all agents', 'supportflow' ),
+						'name'              => 'author',
+						'selected'          => ( ! empty( $_REQUEST['author'] ) ) ? (int)$_REQUEST['author'] : false,
+						'who'               => 'authors',
+						);
+		$agent_dropdown_args = apply_filters( 'supportflow_admin_agent_dropdown_args', $agent_dropdown_args );
+		wp_dropdown_users( $agent_dropdown_args );
 	}
 
 	/**
