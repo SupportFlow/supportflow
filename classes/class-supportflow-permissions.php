@@ -162,16 +162,3 @@ class SupportFlow_Permissions extends SupportFlow {
 }
 
 SupportFlow()->extend->permissions = new SupportFlow_Permissions();
-
-/**
- * Get the name of an individual capability.
- *
- * @since	0.1
- * @uses	SupportFlow, SupportFlow_Permissions::get_cap
- *
- * @param 	string			$cap		Capability to get.
- * @return	bool|string					Internal name of the capability on success; false on failure;
- */
-function sf_get_cap( $cap ) {
-	return SupportFlow()->extend->permissions->get_cap( $cap );
-}
