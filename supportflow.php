@@ -8,7 +8,7 @@
  * Author URI:  
  * Version:     0.1
  *
- * Text Domain: support-flow
+ * Text Domain: supportflow
  * Domain Path: /languages/
  */
 
@@ -169,20 +169,20 @@ class SupportFlow {
 
 		$this->post_statuses  = apply_filters( 'supportflow_thread_post_statuses', array(
 			'sf_new'     => array(
-				'label'       => __( 'New', 'support-flow' ),
-				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'support-flow' ),
+				'label'       => __( 'New', 'supportflow' ),
+				'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportflow' ),
 			),
 			'sf_open'    => array(
-				'label'       => __( 'Open', 'support-flow' ),
-				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'support-flow' ),
+				'label'       => __( 'Open', 'supportflow' ),
+				'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportflow' ),
 			),
 			'sf_pending' => array(
-				'label'       => __( 'Pending', 'support-flow' ),
-				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'support-flow' ),
+				'label'       => __( 'Pending', 'supportflow' ),
+				'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
 			),
 			'sf_closed'  => array(
-				'label'       => __( 'Closed', 'support-flow' ),
-				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'support-flow' ),
+				'label'       => __( 'Closed', 'supportflow' ),
+				'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportflow' ),
 			),
 		) );
 
@@ -254,18 +254,18 @@ class SupportFlow {
 	public function action_init_register_post_type() {
 		register_post_type( $this->post_type, array(
 			'labels' => array(
-				'menu_name'          => __( 'SupportFlow',               'support-flow' ),
-				'name'               => __( 'Threads',                   'support-flow' ),
-				'singular_name'      => __( 'Thread',                    'support-flow' ),
-				'all_items'          => __( 'All Threads',               'support-flow' ),
-				'add_new'            => __( 'New Thread',                'support-flow' ),
-				'add_new_item'       => __( 'Start New Thread',          'support-flow' ),
-				'edit_item'          => __( 'Discussion',                'support-flow' ),
-				'new_item'           => __( 'New Thread',                'support-flow' ),
-				'view_item'          => __( 'View Thread',               'support-flow' ),
-				'search_items'       => __( 'Search Threads',            'support-flow' ),
-				'not_found'          => __( 'No threads found',          'support-flow' ),
-				'not_found_in_trash' => __( 'No threads found in trash', 'support-flow' ),
+				'menu_name'          => __( 'SupportFlow',               'supportflow' ),
+				'name'               => __( 'Threads',                   'supportflow' ),
+				'singular_name'      => __( 'Thread',                    'supportflow' ),
+				'all_items'          => __( 'All Threads',               'supportflow' ),
+				'add_new'            => __( 'New Thread',                'supportflow' ),
+				'add_new_item'       => __( 'Start New Thread',          'supportflow' ),
+				'edit_item'          => __( 'Discussion',                'supportflow' ),
+				'new_item'           => __( 'New Thread',                'supportflow' ),
+				'view_item'          => __( 'View Thread',               'supportflow' ),
+				'search_items'       => __( 'Search Threads',            'supportflow' ),
+				'not_found'          => __( 'No threads found',          'supportflow' ),
+				'not_found_in_trash' => __( 'No threads found in trash', 'supportflow' ),
 				),
 			'public'        => true,
 			'menu_position' => 3,
@@ -281,12 +281,12 @@ class SupportFlow {
 	public function action_init_register_taxonomies() {
 
 		$args = array(
-			'label'                  => __( 'Respondents',                'support-flow' ),
+			'label'                  => __( 'Respondents',                'supportflow' ),
 			'labels' => array(
-				'search_items'       => __( 'Search Respondents',         'support-flow' ),
-				'edit_item'          => __( 'Edit Respondent',            'support-flow' ),
-				'update_item'        => __( 'Update Respondent',          'support-flow' ),
-				'add_new_item'       => __( 'Add New Respondent',         'support-flow' ),
+				'search_items'       => __( 'Search Respondents',         'supportflow' ),
+				'edit_item'          => __( 'Edit Respondent',            'supportflow' ),
+				'update_item'        => __( 'Update Respondent',          'supportflow' ),
+				'add_new_item'       => __( 'Add New Respondent',         'supportflow' ),
 				),
 			'public'                 => true,
 			'show_in_nav_menus'      => true,
