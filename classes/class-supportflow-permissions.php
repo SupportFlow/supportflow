@@ -60,7 +60,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	 */
 	private function _setup_caps() {
 		// Setup the default caps for SupportFlow
-		$this->_caps = apply_filters( 'sf_caps', array(
+		$this->_caps = apply_filters( 'supportflow_caps', array(
 			'close_others_threads' 		=> 'sf_close_others_threads',
 			'open_others_threads' 		=> 'sf_open_others_threads',
 			'reopen_others_threads' 	=> 'sf_reopen_others_threads',
@@ -72,7 +72,7 @@ class SupportFlow_Permissions extends SupportFlow {
 		) );
 
 		// Map the default caps onto WordPress roles
-		$this->_role_cap_map = apply_filters( 'sf_role_cap_map', array(
+		$this->_role_cap_map = apply_filters( 'supportflow_role_cap_map', array(
 			'administrator' => $this->get_caps(), // Apply all caps
 			'editor' 		=> $this->get_caps(), // Apply all caps
 			'author' 		=> array(
