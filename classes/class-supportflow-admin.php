@@ -39,11 +39,14 @@ class SupportFlow_Admin extends SupportFlow {
 	 * Re-sort the custom statuses so trash appears last
 	 */
 	function action_admin_init() {
-		global $wp_post_statuses;
+		global $wp_post_statuses, $pagenow;
 
 		$trash_status = $wp_post_statuses['trash'];
 		unset( $wp_post_statuses['trash'] );
 		$wp_post_statuses['trash'] = $trash_status;
+
+		if ( 'edit.php' == $pagenow )
+			add_filter( 'get_the_excerpt', array( $this, 'filter_get_the_excerpt' ) );
 	}
 
 	/**
@@ -534,6 +537,17 @@ class SupportFlow_Admin extends SupportFlow {
 		$columns['updated'] = 'modified';
 		$columns['created'] = 'date';
 		return $columns;
+	}
+
+	/**
+	 * Use the most recent public comment as the post excerpt
+	 * on the Manage Threads view so mode=excerpt works well
+	 */
+	public function filter_get_the_excerpt( $orig ) {
+		if ( $comment = array_pop( SupportFlow()->get_thread_comments( get_the_ID() ) ) )
+			return $comment->comment_author .': "' . wp_trim_excerpt( $comment->comment_content ) . '"';
+		else
+			return $orig;
 	}
 
 	/**
