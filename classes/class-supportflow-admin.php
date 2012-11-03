@@ -334,7 +334,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			echo '<div class="misc-pub-section created-on">';
 			echo '<label for="created_on">' . __( 'Opened', 'supportflow' ) . ':</label>';
-			echo '<span class="the-date">' . get_the_date() . ' ' .get_the_time() . '</span>'; 
+			echo '<span class="the-date">' . get_the_date() . ' ' . get_the_time() . '</span>'; 
 			echo '<div clas="last-activity" title="' . get_the_modified_date('l, M j, Y ') . get_the_modified_time() . '">' . __( 'Last Activity', 'SupportFlow' ) . ': <strong>' . $last_activity . '</strong></div>';
 			echo '</div>';
 		}
