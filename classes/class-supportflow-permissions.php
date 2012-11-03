@@ -62,27 +62,39 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function add_capabilities() {
 		// Modify the Admin role to include close, open, reopen and comment on thread capabilities
 		$admin = get_role( 'administrator' );
-		$admin->add_cap( $this->get_close_thread_capability() );
-		$admin->add_cap( $this->get_open_thread_capability() );
-		$admin->add_cap( $this->get_reopen_thread_capability() );
-		$admin->add_cap( $this->get_comment_on_thread_capability() );
+
+		if ( null !== $admin ) {
+			$admin->add_cap( $this->get_close_thread_capability() );
+			$admin->add_cap( $this->get_open_thread_capability() );
+			$admin->add_cap( $this->get_reopen_thread_capability() );
+			$admin->add_cap( $this->get_comment_on_thread_capability() );
+		}
 
 		// Modify the Editor role to include close, open, reopen and comment on thread capabilities
 		$editor = get_role( 'editor' );
-		$editor->add_cap( $this->get_close_thread_capability() );
-		$editor->add_cap( $this->get_open_thread_capability() );
-		$editor->add_cap( $this->get_reopen_thread_capability() );
-		$editor->add_cap( $this->get_comment_on_thread_capability() );
+
+		if ( null !== $editor ) {
+			$editor->add_cap( $this->get_close_thread_capability() );
+			$editor->add_cap( $this->get_open_thread_capability() );
+			$editor->add_cap( $this->get_reopen_thread_capability() );
+			$editor->add_cap( $this->get_comment_on_thread_capability() );
+		}
 
 		// Modify the Author role to include close, open, and comment on thread capabilities
 		$author = get_role( 'author' );
-		$author->add_cap( $this->get_close_thread_capability() );
-		$author->add_cap( $this->get_open_thread_capability() );
-		$author->add_cap( $this->get_comment_on_thread_capability() );
+
+		if ( null !== $author ) {
+			$author->add_cap( $this->get_close_thread_capability() );
+			$author->add_cap( $this->get_open_thread_capability() );
+			$author->add_cap( $this->get_comment_on_thread_capability() );
+		}
 
 		// Modify the Contributor role to include the comment on thread capability
 		$contributor = get_role( 'contributor' );
-		$contributor->add_cap( $this->get_comment_on_thread_capability() );
+
+		if ( null !== $contributor ) {
+			$contributor->add_cap( $this->get_comment_on_thread_capability() );
+		}
 	}
 
 	/**
