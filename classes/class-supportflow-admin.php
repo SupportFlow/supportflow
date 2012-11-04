@@ -60,6 +60,7 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
 			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
+			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete', array('jquery', 'jquery-ui-autocomplete' ) );
 		}
 	}
 
