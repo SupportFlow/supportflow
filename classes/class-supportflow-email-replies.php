@@ -50,10 +50,11 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		for( $i = 1; $i <= $email_count; $i++ ) {
 			$email = new stdClass;
 			$email->headers = imap_headerinfo( $this->imap_connection, $i );
+			$email->structure = imap_fetchstructure( $this->imap_connection, $i );
 			$email->body = $this->get_body_from_connection( $this->imap_connection, $i );
 
 			// @todo Confirm this a message we want to process
-			$ret = $this->process_email( $email );
+			$ret = $this->process_email( $email, $i );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
 				imap_mail_move( $this->imap_connection, $i, $archive );
@@ -65,10 +66,28 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 	/**
 	 * Given an email object, maybe create a new ticket
-	 *
-	 * @todo upload the attachment if there is one
 	 */
-	public function process_email( $email ) {
+	public function process_email( $email, $i ) {
+
+		// Initial handling of one jpg attachment via hard coded part 2
+		$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, '2' );
+
+		// The raw data from imap is base64 encoded, but php-imap has us covered!
+		$attachment_data = imap_base64( $raw_attachment_data );
+
+
+		$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
+		touch( $temp_file );
+		$temp_handle = fopen( $temp_file, 'w+' );
+		fwrite( $temp_handle, $attachment_data );
+		fclose( $temp_handle );
+
+		$file_array = array(
+			'tmp_name' => $temp_file,
+			'name' => 'attached-email.jpg', // @todo this should be the real attachment name
+		);
+
+		$new_attachment_id = media_handle_sideload( $file_array, NULL );
 
 		if ( ! empty( $email->headers->subject ) )
 			$subject = $email->headers->subject;
@@ -118,6 +137,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				);
 			$thread_id = SupportFlow()->create_thread( $new_thread_args );
 		}
+
+		// Associate the thread ID as the parent to our new attachment
+		wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
+
 		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
 
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
