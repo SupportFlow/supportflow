@@ -69,25 +69,37 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	 */
 	public function process_email( $email, $i ) {
 
-		// Initial handling of one jpg attachment via hard coded part 2
-		$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, '2' );
+		$accepted_attachments = array( 'PDF', 'JPEG', 'PNG', 'GIF' );
+		$new_attachment_ids = array();
 
-		// The raw data from imap is base64 encoded, but php-imap has us covered!
-		$attachment_data = imap_base64( $raw_attachment_data );
+		$k = 0;
+		foreach( $email->structure->parts as $email_part ) {
+			if ( 'ATTACHMENT' == $email_part->disposition && in_array( $email_part->subtype, $accepted_attachments ) ) {
+				// We need to add 1 to our array key each time to get the correct email part
+				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+1 );
 
+				// The raw data from imap is base64 encoded, but php-imap has us covered!
+				$attachment_data = imap_base64( $raw_attachment_data );
 
-		$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
-		touch( $temp_file );
-		$temp_handle = fopen( $temp_file, 'w+' );
-		fwrite( $temp_handle, $attachment_data );
-		fclose( $temp_handle );
+				$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
+				touch( $temp_file );
+				$temp_handle = fopen( $temp_file, 'w+' );
+				fwrite( $temp_handle, $attachment_data );
+				fclose( $temp_handle );
 
-		$file_array = array(
-			'tmp_name' => $temp_file,
-			'name' => 'attached-email.jpg', // @todo this should be the real attachment name
-		);
+				$file_array = array(
+					'tmp_name' => $temp_file,
+					'name' => $email_part->dparameters[0]->value,
+				);
 
-		$new_attachment_id = media_handle_sideload( $file_array, NULL );
+				$upload_result = media_handle_sideload( $file_array, NULL );
+
+				if ( ! is_wp_error( $upload_result ) )
+					$new_attachment_ids[] = $upload_result;
+
+			}
+			$k++;
+		}
 
 		if ( ! empty( $email->headers->subject ) )
 			$subject = $email->headers->subject;
@@ -138,8 +150,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$thread_id = SupportFlow()->create_thread( $new_thread_args );
 		}
 
-		// Associate the thread ID as the parent to our new attachment
-		wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
+		foreach ( $new_attachment_ids as $new_attachment_id ) {
+			// Associate the thread ID as the parent to our new attachment
+			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
+		}
 
 		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
 
