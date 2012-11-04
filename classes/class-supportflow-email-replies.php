@@ -181,7 +181,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$email_id = trim( $email->headers->message_id, '<>' );
 		if ( is_object( $new_comment ) ) {
 			update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
-			update_comment_meta( $new_comment->comment_ID, '_sf_attachment_ids', $new_attachment_ids );
+			update_comment_meta( $new_comment->comment_ID, 'attachment_ids', $new_attachment_ids );
 		}
 		return true;
 	}
