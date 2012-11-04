@@ -81,8 +81,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				continue;
 
 			if ( 'ATTACHMENT' == $email_part->disposition && in_array( $email_part->subtype, $accepted_attachments ) ) {
-				// We need to add 1 to our array key each time to get the correct email part
-				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+1 );
+				// We need to add 2 to our array key each time to get the correct email part
+				//@todo this needs more testing with different emails, should be smarter about which parts
+				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+2 );
 
 				// The raw data from imap is base64 encoded, but php-imap has us covered!
 				$attachment_data = imap_base64( $raw_attachment_data );
