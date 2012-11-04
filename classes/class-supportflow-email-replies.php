@@ -50,10 +50,11 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		for( $i = 1; $i <= $email_count; $i++ ) {
 			$email = new stdClass;
 			$email->headers = imap_headerinfo( $this->imap_connection, $i );
+			$email->structure = imap_fetchstructure( $this->imap_connection, $i );
 			$email->body = $this->get_body_from_connection( $this->imap_connection, $i );
 
 			// @todo Confirm this a message we want to process
-			$ret = $this->process_email( $email );
+			$ret = $this->process_email( $email, $i );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
 				imap_mail_move( $this->imap_connection, $i, $archive );
@@ -65,10 +66,47 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 	/**
 	 * Given an email object, maybe create a new ticket
-	 *
-	 * @todo upload the attachment if there is one
 	 */
-	public function process_email( $email ) {
+	public function process_email( $email, $i ) {
+
+		// @todo can probably make this the same as accepted MIME types in WordPress
+		$accepted_attachments = array( 'PDF', 'JPEG', 'PNG', 'GIF' );
+		$new_attachment_ids = array();
+
+		$k = 0;
+		foreach( $email->structure->parts as $email_part ) {
+
+			// We should at least be dealing with something that resembles an email object at this point
+			if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) )
+				continue;
+
+			if ( 'ATTACHMENT' == $email_part->disposition && in_array( $email_part->subtype, $accepted_attachments ) ) {
+				// We need to add 2 to our array key each time to get the correct email part
+				//@todo this needs more testing with different emails, should be smarter about which parts
+				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+2 );
+
+				// The raw data from imap is base64 encoded, but php-imap has us covered!
+				$attachment_data = imap_base64( $raw_attachment_data );
+
+				$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
+				touch( $temp_file );
+				$temp_handle = fopen( $temp_file, 'w+' );
+				fwrite( $temp_handle, $attachment_data );
+				fclose( $temp_handle );
+
+				$file_array = array(
+					'tmp_name' => $temp_file,
+					'name' => $email_part->dparameters[0]->value,
+				);
+
+				$upload_result = media_handle_sideload( $file_array, NULL );
+
+				if ( ! is_wp_error( $upload_result ) )
+					$new_attachment_ids[] = $upload_result;
+
+			}
+			$k++;
+		}
 
 		if ( ! empty( $email->headers->subject ) )
 			$subject = $email->headers->subject;
@@ -118,6 +156,12 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				);
 			$thread_id = SupportFlow()->create_thread( $new_thread_args );
 		}
+
+		foreach ( $new_attachment_ids as $new_attachment_id ) {
+			// Associate the thread ID as the parent to our new attachment
+			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
+		}
+
 		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
 
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
@@ -136,9 +180,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		// Store the original email ID so we don't accidentally dupe it
 		$email_id = trim( $email->headers->message_id, '<>' );
-		if ( is_object( $new_comment ) )
+		if ( is_object( $new_comment ) ) {
 			update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
-
+			update_comment_meta( $new_comment->comment_ID, 'attachment_ids', $new_attachment_ids );
+		}
 		return true;
 	}
 
