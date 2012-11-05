@@ -138,7 +138,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		// Check to see if this message was in response to an existing thread
 		$thread_id = false;
 		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) )
-			$thread_id = (int)SupportFlow()->get_thread_from_secret( $matches[1] );
+			$thread_id = SupportFlow()->get_thread_from_secret( $matches[1] );
 
 		if ( $thread_id ) {
 			$message_args = array(

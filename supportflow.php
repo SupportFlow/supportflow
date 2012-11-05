@@ -667,7 +667,14 @@ class SupportFlow {
 	public function get_thread_from_secret( $secret ) {
 		global $wpdb;
 		$thread_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->thread_secret_key, $secret ) );
-		return ( $thread_id ) ? $thread_id : false;
+		return ( $thread_id ) ? (int)$thread_id : 0;
+	}
+
+	/**
+	 * Get the special capability given a string
+	 */
+	public function get_cap( $cap ) {
+		return SupportFlow()->extend->permissions->get_cap( $cap );
 	}
 
 }
