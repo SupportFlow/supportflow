@@ -68,6 +68,15 @@ class SupportFlow_Emails extends SupportFlow {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
 			}
 		}
+		// Ticket details that are relevant to the agent
+		$message .= "\n\n-------";
+		// Thread status
+		$post_status = SupportFlow()->post_statuses[$thread->post_status]['label'];
+		$message .= "\n" . sprintf( __( "Status: %s", 'supportflow' ), $post_status );
+		// Assigned agent
+		$assigned_agent = ( $thread->post_author ) ? get_user_by( 'id', $thread->post_author )->display_name : __( 'None assigned', 'supportflow' );
+		$message .= "\n" . sprintf( __( "Agent: %s", 'supportflow' ), $assigned_agent );
+
 		foreach( $agent_emails as $agent_email ) {
 			wp_mail( $agent_email, $subject, $message );
 		}
