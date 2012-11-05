@@ -1,17 +1,5 @@
 <?php
 
-/**
- * Plugin Name: SupportFlow: User Widget
- * Plugin URI:  
- * Description: Displays a widget on the front end of any blog allowing interaction with a local or remote SupportFlow install.
- * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
- * Author URI:  
- * Version:     0.1
- *
- * Text Domain: support-flow
- * Domain Path: /languages/
- */
-
 add_action( 'wp_enqueue_scripts',      'sf_user_widget_enqueue_scripts' );
 add_action( 'admin_enqueue_scripts',   'sf_user_widget_enqueue_scripts' );
 function sf_user_widget_enqueue_scripts() {
