@@ -77,6 +77,8 @@ class SupportFlow_Emails extends SupportFlow {
 		$assigned_agent = ( $thread->post_author ) ? get_user_by( 'id', $thread->post_author )->display_name : __( 'None assigned', 'supportflow' );
 		$message .= "\n" . sprintf( __( "Agent: %s", 'supportflow' ), $assigned_agent );
 
+		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'agent' );
+
 		foreach( $agent_emails as $agent_email ) {
 			wp_mail( $agent_email, $subject, $message );
 		}
@@ -112,6 +114,9 @@ class SupportFlow_Emails extends SupportFlow {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
 			}
 		}
+
+		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'respondent' );
+
 		foreach( $respondents as $respondent_email ) {
 			self::mail( $respondent_email, $subject, $message );
 		}
