@@ -5,8 +5,8 @@
 
 class SupportFlow_Emails extends SupportFlow {
 
-	var $from_name;
-	var $from_address;
+	private $from_name = false;
+	private $from_email = false;
 
 	function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
@@ -18,7 +18,7 @@ class SupportFlow_Emails extends SupportFlow {
 	public function setup_actions() {
 
 		$this->from_name = apply_filters( 'supportflow_emails_from_name', $this->from_name );
-		$this->from_address = apply_filters( 'supportflow_emails_from_address', $this->from_address );
+		$this->from_email = apply_filters( 'supportflow_emails_from_address', $this->from_email );
 
 		// Don't send out any notifications when importing or using WP-CLI
 		if ( ( defined('WP_IMPORTING') && WP_IMPORTING ) || ( defined('WP_CLI') && WP_CLI ) )
@@ -80,7 +80,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'agent' );
 
 		foreach( $agent_emails as $agent_email ) {
-			wp_mail( $agent_email, $subject, $message );
+			self::mail( $agent_email, $subject, $message );
 		}
 	}
 
@@ -126,10 +126,32 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Send an email from SupportFlow
 	 */
 	public function mail( $respondent_email, $subject, $message ) {
-		$headers = array();
-		if ( ! empty( $this->from_name ) && is_email( $this->from_address ) )
-			$headers[] = 'From: ' . $this->from_name  . ' <' . $this->from_address . '>';
-		wp_mail( $respondent_email, $subject, $message, $headers );
+		
+		add_filter( 'wp_mail_from', array( $this, 'filter_wp_mail_from' ) );
+		add_filter( 'wp_mail_from_name', array( $this, 'filter_wp_mail_from_name' ) );
+		wp_mail( $respondent_email, $subject, $message );
+		remove_filter( 'wp_mail_from', array( $this, 'filter_wp_mail_from' ) );
+		remove_filter( 'wp_mail_from_name', array( $this, 'filter_wp_mail_from_name' ) );
+	}
+
+	/**
+	 * Filter the 'from address' value used by wp_mail
+	 */
+	public function filter_wp_mail_from( $from_email ) {
+		if ( $this->from_email )
+			return $this->from_email;
+		else
+			$from_email;
+	}
+
+	/**
+	 * Filter the 'from name' value used by wp_mail
+	 */
+	public function filter_wp_mail_from_name( $from_name ) {
+		if ( $this->from_name )
+			return $this->from_name;
+		else
+			$from_name;
 	}
 }
 
