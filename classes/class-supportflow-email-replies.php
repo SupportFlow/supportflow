@@ -69,8 +69,6 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	 */
 	public function process_email( $email, $i ) {
 
-		// @todo can probably make this the same as accepted MIME types in WordPress
-		$accepted_attachments = array( 'PDF', 'JPEG', 'PNG', 'GIF' );
 		$new_attachment_ids = array();
 
 		$k = 0;
@@ -80,7 +78,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) )
 				continue;
 
-			if ( 'ATTACHMENT' == $email_part->disposition && in_array( $email_part->subtype, $accepted_attachments ) ) {
+			if ( 'ATTACHMENT' == $email_part->disposition ) {
 				// We need to add 2 to our array key each time to get the correct email part
 				//@todo this needs more testing with different emails, should be smarter about which parts
 				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+2 );
@@ -101,7 +99,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 				$upload_result = media_handle_sideload( $file_array, NULL );
 
-				if ( ! is_wp_error( $upload_result ) )
+				if ( is_wp_error( $upload_result ) )
+					WP_CLI::warning( $upload_result->get_error_message() );
+				else
 					$new_attachment_ids[] = $upload_result;
 
 			}
