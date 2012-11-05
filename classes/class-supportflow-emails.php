@@ -59,7 +59,7 @@ class SupportFlow_Emails extends SupportFlow {
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID );
+		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID, 'agent' );
 
 		$message = stripslashes( $comment->comment_content );
 		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
@@ -94,7 +94,7 @@ class SupportFlow_Emails extends SupportFlow {
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID );
+		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID, 'respondent' );
 
 		$message = stripslashes( $comment->comment_content );
 		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
