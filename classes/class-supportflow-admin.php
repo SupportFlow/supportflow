@@ -129,6 +129,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function filter_views( $views ) {
+		global $wpdb;
 
 		// The 'all' count shouldn't include closed posts
 		$post_type = SupportFlow()->post_type;
@@ -138,7 +139,25 @@ class SupportFlow_Admin extends SupportFlow {
 			$total_posts -= $num_posts->$state;
 		$total_posts -= $num_posts->sf_closed;
 		$class = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
-		$views['all'] = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
+		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
+
+		// @todo Only show "Mine" if the user is an agent
+		$mine_args = array(
+				'post_type'        => SupportFlow()->post_type,
+				'author'           => get_current_user_id(),
+			);
+		$post_statuses = SupportFlow()->post_statuses;
+		array_pop( $post_statuses );
+		$post_statuses = "'" . implode( "','", array_map( 'sanitize_key', array_keys( $post_statuses ) ) ) . "'";
+		$my_posts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type=%s AND post_author=%d AND post_status IN ({$post_statuses})", SupportFlow()->post_type, get_current_user_id() ) );
+		$view_mine = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
+
+		// Put 'All' and 'Mine' at the beginning of the array
+		array_shift( $views );
+		$views = array_reverse( $views );
+		$views['mine'] = $view_mine;
+		$views['all'] = $view_all;
+		$views = array_reverse( $views );
 
 		return $views;
 	}
