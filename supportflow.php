@@ -476,17 +476,22 @@ class SupportFlow {
 	 * 
 	 * @param string $query partial email address to search for
 	 */
-	public function get_respondents( $query ) {
+	public function get_respondents( $args = array() ) {
 
-		$args = array(
+		$defaults = array(
+				'search' => '',
+				'number' => 10
+			);
+		$args = array_merge( $defaults, $args );
+
+		$term_args = array(
 				'orderby' => 'name',
 				'hide_empty' => 0,
 				'fields' => 'all',
-				'name__like' => $query,
-				'number' => 10
+				'name__like' => $args['search'],
+				'number' => $args['number'],
 			);
-
-		$matches = get_terms( $this->respondents_tax, $args );
+		$matches = get_terms( $this->respondents_tax, $term_args );
 
 		if( !$matches ) 
 			return array();

@@ -55,7 +55,7 @@ class SupportFlow_JSON_API extends SupportFlow {
 
 			case 'get-respondents':
 				$search_for = sanitize_text_field( $_REQUEST['respondents'] );
-				$respondent_matches = SupportFlow()->get_respondents( $search_for );
+				$respondent_matches = SupportFlow()->get_respondents( array( 'search' => $search_for ) );
 				if( is_wp_error($respondent_matches) ) {
 					$response['message'] = $respondent_matches->get_error_message();
 				} else {
