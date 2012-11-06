@@ -472,6 +472,29 @@ class SupportFlow {
 	}
 
 	/**
+	 * Get respondents matching $query
+	 * 
+	 * @param string $query partial email address to search for
+	 */
+	public function get_respondents( $query ) {
+
+		$args = array(
+				'orderby' => 'name',
+				'hide_empty' => 0,
+				'fields' => 'all',
+				'name__like' => $query,
+				'number' => 10
+			);
+
+		$matches = get_terms( $this->respondents_tax, $args );
+
+		if( !$matches ) 
+			return array();
+
+		return $matches;
+	}
+
+	/**
 	 * Get a thread's respondents
 	 *
 	 * @todo support retrieving more fields

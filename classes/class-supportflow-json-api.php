@@ -53,6 +53,19 @@ class SupportFlow_JSON_API extends SupportFlow {
 
 				break;
 
+			case 'get-respondents':
+				$search_for = sanitize_text_field( $_REQUEST['respondents'] );
+				$respondent_matches = SupportFlow()->get_respondents( $search_for );
+				if( is_wp_error($respondent_matches) ) {
+					$response['message'] = $respondent_matches->get_error_message();
+				} else {
+					$response['query'] = $search_for;
+					$response['status'] = "ok";
+					$response['respondents'] = $respondent_matches;
+				}
+
+				break;
+
 			case 'get-thread':
 				$thread_id = (int)$_REQUEST['thread_id'];
 				$response['status'] = 'ok';
