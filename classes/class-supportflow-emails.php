@@ -17,12 +17,13 @@ class SupportFlow_Emails extends SupportFlow {
 	 */
 	public function setup_actions() {
 
-		$this->from_name = apply_filters( 'supportflow_emails_from_name', $this->from_name );
+		$this->from_name  = apply_filters( 'supportflow_emails_from_name', $this->from_name );
 		$this->from_email = apply_filters( 'supportflow_emails_from_address', $this->from_email );
 
 		// Don't send out any notifications when importing or using WP-CLI
-		if ( ( defined('WP_IMPORTING') && WP_IMPORTING ) || ( defined('WP_CLI') && WP_CLI ) )
+		if ( ( defined( 'WP_IMPORTING' ) && WP_IMPORTING ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
+		}
 
 		// When a new comment is added to a thread, notify the respondents and the agents
 		add_action( 'supportflow_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
@@ -35,27 +36,31 @@ class SupportFlow_Emails extends SupportFlow {
 	public function notify_agents_thread_comment( $comment_id ) {
 
 		$comment = get_comment( $comment_id );
-		if ( ! $comment )
+		if ( ! $comment ) {
 			return;
+		}
 
 		$thread = SupportFlow()->get_thread( $comment->comment_post_ID );
 		// One agent by default, but easily allow notifications to a triage team
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'comment' );
 
-		if ( empty( $agent_ids ) )
+		if ( empty( $agent_ids ) ) {
 			return;
+		}
 
 		$agent_emails = array();
-		foreach( $agent_ids as $user_id ) {
-			if ( $user = get_user_by( 'id', $user_id ) )
+		foreach ( $agent_ids as $user_id ) {
+			if ( $user = get_user_by( 'id', $user_id ) ) {
 				$agent_emails[] = $user->user_email;
+			}
 		}
 
 		// Don't email the person creating the comment, unless that's desired behavior
-		if ( !apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
+		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
 			$key = array_search( $comment->comment_author_email, $agent_emails );
-			if ( false !== $key )
+			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
+			}
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
@@ -64,7 +69,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = stripslashes( $comment->comment_content );
 		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
 			$message .= "\n";
-			foreach( $attachment_ids as $attachment_id ) {
+			foreach ( $attachment_ids as $attachment_id ) {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
 			}
 		}
@@ -79,7 +84,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'agent' );
 
-		foreach( $agent_emails as $agent_email ) {
+		foreach ( $agent_emails as $agent_email ) {
 			self::mail( $agent_email, $subject, $message );
 		}
 	}
@@ -91,17 +96,19 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// Respondents shouldn't receive private comments
 		$comment = get_comment( $comment_id );
-		if ( ! $comment || 'private' == $comment->comment_approved )
+		if ( ! $comment || 'private' == $comment->comment_approved ) {
 			return;
+		}
 
-		$thread = SupportFlow()->get_thread( $comment->comment_post_ID );
+		$thread      = SupportFlow()->get_thread( $comment->comment_post_ID );
 		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
 
 		// Don't email the person creating the comment, unless that's desired behavior
-		if ( !apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
+		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
 			$key = array_search( $comment->comment_author_email, $respondents );
-			if ( false !== $key )
+			if ( false !== $key ) {
 				unset( $respondents[$key] );
+			}
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
@@ -110,14 +117,14 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = stripslashes( $comment->comment_content );
 		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
 			$message .= "\n";
-			foreach( $attachment_ids as $attachment_id ) {
+			foreach ( $attachment_ids as $attachment_id ) {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
 			}
 		}
 
 		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'respondent' );
 
-		foreach( $respondents as $respondent_email ) {
+		foreach ( $respondents as $respondent_email ) {
 			self::mail( $respondent_email, $subject, $message );
 		}
 	}
@@ -126,7 +133,7 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Send an email from SupportFlow
 	 */
 	public function mail( $respondent_email, $subject, $message ) {
-		
+
 		add_filter( 'wp_mail_from', array( $this, 'filter_wp_mail_from' ) );
 		add_filter( 'wp_mail_from_name', array( $this, 'filter_wp_mail_from_name' ) );
 		wp_mail( $respondent_email, $subject, $message );
@@ -138,20 +145,22 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Filter the 'from address' value used by wp_mail
 	 */
 	public function filter_wp_mail_from( $from_email ) {
-		if ( $this->from_email )
+		if ( $this->from_email ) {
 			return $this->from_email;
-		else
+		} else {
 			$from_email;
+		}
 	}
 
 	/**
 	 * Filter the 'from name' value used by wp_mail
 	 */
 	public function filter_wp_mail_from_name( $from_name ) {
-		if ( $this->from_name )
+		if ( $this->from_name ) {
 			return $this->from_name;
-		else
+		} else {
 			$from_name;
+		}
 	}
 }
 

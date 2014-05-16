@@ -1,26 +1,26 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
 	new wp.Uploader({
 
 		/* Selectors */
-		browser:   '#upload-indicator',
-		dropzone:  '#comment-reply',
+		browser : '#upload-indicator',
+		dropzone: '#comment-reply',
 
 		/* Callbacks */
-		success  : function( attachment ) {
-			$( '#comment-attachments' ).val( $( '#comment-attachments' ).val() + ',' + attachment.id );
-			$( '#upload-messages' ).hide();
-			$( '<li>', {
+		success : function (attachment) {
+			$('#comment-attachments').val($('#comment-attachments').val() + ',' + attachment.id);
+			$('#upload-messages').hide();
+			$('<li>', {
 				html: '<a target="_blank" href="' + attachment.url + '">' + attachment.title + '</a>',
-			 } ).appendTo( $( 'ul#comment-attachments-list' ) );
-			$( '#upload-messages' ).removeClass( 'uploading' );
+			}).appendTo($('ul#comment-attachments-list'));
+			$('#upload-messages').removeClass('uploading');
 		},
 
-		error    : function ( reason ) {
-			$( '#upload-indicator' ).html( reason ).addClass('error');
+		error: function (reason) {
+			$('#upload-indicator').html(reason).addClass('error');
 		},
 
-		added    : function() {
-			$( '#upload-indicator' ).addClass( 'uploading' );
+		added: function () {
+			$('#upload-indicator').addClass('uploading');
 		},
 
 		// TypeError: file is undefined
@@ -28,8 +28,8 @@ jQuery(document).ready(function($) {
 		// 	$( '#upload-indicator' ).html( "Uploading: " + file.name + ' ' + file.percent + '%' );
 		// },
 
-		complete : function() {
-			$( '#upload-indicator' ).html( 'All done!' );
+		complete: function () {
+			$('#upload-indicator').html('All done!');
 		}
 	});
 });

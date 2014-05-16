@@ -15,8 +15,9 @@ class SupportFlow_Admin extends SupportFlow {
 		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 
-		if ( !$this->is_edit_screen() )
+		if ( ! $this->is_edit_screen() ) {
 			return;
+		}
 
 		// Everything
 		add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
@@ -46,8 +47,9 @@ class SupportFlow_Admin extends SupportFlow {
 		unset( $wp_post_statuses['trash'] );
 		$wp_post_statuses['trash'] = $trash_status;
 
-		if ( 'edit.php' == $pagenow )
+		if ( 'edit.php' == $pagenow ) {
 			add_filter( 'get_the_excerpt', array( $this, 'filter_get_the_excerpt' ) );
+		}
 	}
 
 	/**
@@ -58,12 +60,12 @@ class SupportFlow_Admin extends SupportFlow {
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js' , array( 'wp-plupload', 'jquery' ) );
+			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js', array( 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
-			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array('jquery', 'jquery-ui-autocomplete' ) );
+			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
-			wp_localize_script('supportflow-respondents-autocomplete', 'SFRespondentsAc', array('ajax_url' => $ajaxurl ) );
+			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 		}
 	}
 
@@ -80,12 +82,12 @@ class SupportFlow_Admin extends SupportFlow {
 			'url'                 => add_query_arg( 'post_id', get_the_id(), admin_url( 'admin-ajax.php', 'relative' ) ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
-			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*') ),
+			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*' ) ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
 			'multipart_params'    => array(
-				'action'          => 'upload-attachment',
-				'_wpnonce'        => wp_create_nonce( 'media-form' )
+				'action'   => 'upload-attachment',
+				'_wpnonce' => wp_create_nonce( 'media-form' )
 			)
 		);
 
@@ -100,8 +102,9 @@ class SupportFlow_Admin extends SupportFlow {
 		$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
 		$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
 
-		if ( ! empty( $data ) )
+		if ( ! empty( $data ) ) {
 			$script = "$data\n$script";
+		}
 
 		$wp_scripts->add_data( 'wp-plupload', 'data', $script );
 	}
@@ -113,19 +116,20 @@ class SupportFlow_Admin extends SupportFlow {
 		global $post;
 
 		$messages[SupportFlow()->post_type] = array(
-			0 => '', // Unused. Messages start at index 1.
-			1 => __( 'Thread updated.', 'supportflow' ),
-			2 => __( 'Custom field updated.', 'supportflow' ),
-			3 => __( 'Custom field deleted.', 'supportflow' ),
-			4 => __( 'Thread updated.', 'supportflow' ),
+			0  => '', // Unused. Messages start at index 1.
+			1  => __( 'Thread updated.', 'supportflow' ),
+			2  => __( 'Custom field updated.', 'supportflow' ),
+			3  => __( 'Custom field deleted.', 'supportflow' ),
+			4  => __( 'Thread updated.', 'supportflow' ),
 			/* translators: %s: date and time of the revision */
-			5 => isset($_GET['revision']) ? sprintf( __( 'Thread restored to revision from %s', 'supportflow' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => __( 'Thread updated.', 'supportflow' ),
-			7 => __( 'Thread updated.', 'supportflow' ),
-			8 => __( 'Thread updated.', 'supportflow' ),
-			9 => __( 'Thread updated.', 'supportflow' ),
+			5  => isset( $_GET['revision'] ) ? sprintf( __( 'Thread restored to revision from %s', 'supportflow' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6  => __( 'Thread updated.', 'supportflow' ),
+			7  => __( 'Thread updated.', 'supportflow' ),
+			8  => __( 'Thread updated.', 'supportflow' ),
+			9  => __( 'Thread updated.', 'supportflow' ),
 			10 => __( 'Thread updated.', 'supportflow' ),
 		);
+
 		return $messages;
 	}
 
@@ -136,32 +140,33 @@ class SupportFlow_Admin extends SupportFlow {
 		global $wpdb;
 
 		// The 'all' count shouldn't include closed posts
-		$post_type = SupportFlow()->post_type;
-		$num_posts = wp_count_posts( $post_type, 'readable' );
-		$total_posts = array_sum( (array)$num_posts );
-		foreach ( get_post_stati( array('show_in_admin_all_list' => false) ) as $state )
+		$post_type   = SupportFlow()->post_type;
+		$num_posts   = wp_count_posts( $post_type, 'readable' );
+		$total_posts = array_sum( (array) $num_posts );
+		foreach ( get_post_stati( array( 'show_in_admin_all_list' => false ) ) as $state ) {
 			$total_posts -= $num_posts->$state;
+		}
 		$total_posts -= $num_posts->sf_closed;
-		$class = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
+		$class    = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
 		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
 
 		// @todo Only show "Mine" if the user is an agent
-		$mine_args = array(
-				'post_type'        => SupportFlow()->post_type,
-				'author'           => get_current_user_id(),
-			);
+		$mine_args     = array(
+			'post_type' => SupportFlow()->post_type,
+			'author'    => get_current_user_id(),
+		);
 		$post_statuses = SupportFlow()->post_statuses;
 		array_pop( $post_statuses );
 		$post_statuses = "'" . implode( "','", array_map( 'sanitize_key', array_keys( $post_statuses ) ) ) . "'";
-		$my_posts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type=%s AND post_author=%d AND post_status IN ({$post_statuses})", SupportFlow()->post_type, get_current_user_id() ) );
-		$view_mine = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
+		$my_posts      = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type=%s AND post_author=%d AND post_status IN ({$post_statuses})", SupportFlow()->post_type, get_current_user_id() ) );
+		$view_mine     = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
 
 		// Put 'All' and 'Mine' at the beginning of the array
 		array_shift( $views );
-		$views = array_reverse( $views );
+		$views         = array_reverse( $views );
 		$views['mine'] = $view_mine;
-		$views['all'] = $view_all;
-		$views = array_reverse( $views );
+		$views['all']  = $view_all;
+		$views         = array_reverse( $views );
 
 		return $views;
 	}
@@ -173,11 +178,11 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Filter to specific agents
 		$agent_dropdown_args = array(
-						'show_option_all'   => __( 'Show all agents', 'supportflow' ),
-						'name'              => 'author',
-						'selected'          => ( ! empty( $_REQUEST['author'] ) ) ? (int)$_REQUEST['author'] : false,
-						'who'               => 'authors',
-						);
+			'show_option_all' => __( 'Show all agents', 'supportflow' ),
+			'name'            => 'author',
+			'selected'        => ( ! empty( $_REQUEST['author'] ) ) ? (int) $_REQUEST['author'] : false,
+			'who'             => 'authors',
+		);
 		$agent_dropdown_args = apply_filters( 'supportflow_admin_agent_dropdown_args', $agent_dropdown_args );
 		wp_dropdown_users( $agent_dropdown_args );
 	}
@@ -188,8 +193,9 @@ class SupportFlow_Admin extends SupportFlow {
 	function filter_post_row_actions( $row_actions, $post ) {
 
 		// Rename these actions
-		if ( isset( $row_actions['edit'] ) )
+		if ( isset( $row_actions['edit'] ) ) {
 			$row_actions['edit'] = str_replace( __( 'Edit' ), __( 'View', 'supportflow' ), str_replace( __( 'Edit this item' ), __( 'View Thread', 'supportflow' ), $row_actions['edit'] ) );
+		}
 
 		// Save the trash action for the end
 		if ( isset( $row_actions['trash'] ) ) {
@@ -200,29 +206,30 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		// Allow an agent to easily close a ticket
-		$statuses = SupportFlow()->post_statuses;
+		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array_keys( $statuses );
-		$last_status = array_pop( $status_slugs );
-		if ( !in_array( get_query_var( 'post_status' ), array( 'trash' ) ) ) {
+		$last_status  = array_pop( $status_slugs );
+		if ( ! in_array( get_query_var( 'post_status' ), array( 'trash' ) ) ) {
 
-			if ( $last_status == get_post_status( $post->ID ) )
+			if ( $last_status == get_post_status( $post->ID ) ) {
 				$change_to = $status_slugs[2];
-			else
+			} else {
 				$change_to = $last_status;
+			}
 
-			$args = array(
-					'action'          => 'change_status',
-					'sf_nonce'        => wp_create_nonce( 'sf-change-status' ),
-					'post_status'     => $change_to,
-					'thread_id'       => $post->ID,
-					'post_type'       => SupportFlow()->post_type,
-				);
+			$args        = array(
+				'action'      => 'change_status',
+				'sf_nonce'    => wp_create_nonce( 'sf-change-status' ),
+				'post_status' => $change_to,
+				'thread_id'   => $post->ID,
+				'post_type'   => SupportFlow()->post_type,
+			);
 			$action_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 			if ( $last_status == $change_to ) {
-				$title_attr = esc_attr__( 'Close Thread', 'supportflow' );
+				$title_attr  = esc_attr__( 'Close Thread', 'supportflow' );
 				$action_text = esc_html__( 'Close', 'supportflow' );
 			} else {
-				$title_attr = esc_attr__( 'Reopen Thread', 'supportflow' );
+				$title_attr  = esc_attr__( 'Reopen Thread', 'supportflow' );
 				$action_text = esc_html__( 'Reopen', 'supportflow' );
 			}
 			$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
@@ -232,8 +239,9 @@ class SupportFlow_Admin extends SupportFlow {
 		unset( $row_actions['inline hide-if-no-js'] );
 		unset( $row_actions['view'] );
 
-		if ( $trash_action )
+		if ( $trash_action ) {
 			$row_actions['trash'] = $trash_action;
+		}
 
 		return $row_actions;
 	}
@@ -243,6 +251,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function filter_bulk_actions( $actions ) {
 		unset( $actions['edit'] );
+
 		return $actions;
 	}
 
@@ -252,20 +261,21 @@ class SupportFlow_Admin extends SupportFlow {
 	function action_pre_get_posts( $query ) {
 		global $pagenow;
 
-		if ( 'edit.php' != $pagenow || !$query->is_main_query() )
+		if ( 'edit.php' != $pagenow || ! $query->is_main_query() ) {
 			return;
+		}
 
-		$statuses = SupportFlow()->post_statuses;
+		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array_keys( $statuses );
-		$last_status = array_pop( $status_slugs );
+		$last_status  = array_pop( $status_slugs );
 
 		// Order posts by post_modified if there's no orderby set
-		if ( !$query->get( 'orderby' ) ) {
-			$sort_order = array(
-					'orderby'       => 'modified',
-				);
+		if ( ! $query->get( 'orderby' ) ) {
+			$sort_order          = array(
+				'orderby' => 'modified',
+			);
 			$sort_order['order'] = ( in_array( $query->get( 'post_status' ), array( 'trash', $last_status ) ) ) ? 'desc' : 'asc';
-			foreach( $sort_order as $key => $value ) {
+			foreach ( $sort_order as $key => $value ) {
 				$query->set( $key, $value );
 				$_GET[$key] = $value;
 			}
@@ -274,24 +284,25 @@ class SupportFlow_Admin extends SupportFlow {
 		// Do our own custom search handling so we can search against comment text
 		if ( $search = $query->get( 's' ) ) {
 			// Get any comments that match our results
-			$args = array(
-					'search'                   => $search,
-					'status'                   => 'any',
-				);
+			$args              = array(
+				'search' => $search,
+				'status' => 'any',
+			);
 			$matching_comments = SupportFlow()->get_comments( $args );
-			$post_ids = wp_list_pluck( $matching_comments, 'comment_post_ID' );
+			$post_ids          = wp_list_pluck( $matching_comments, 'comment_post_ID' );
 
-			$args = array(
-					's'                        => $search,
-					'post_type'                => SupportFlow()->post_type,
-					'no_found_rows'            => true,
-					'update_post_meta_cache'   => false,
-					'update_post_term_cache'   => false,
-					'fields'                   => 'ids',
-				);
+			$args       = array(
+				's'                      => $search,
+				'post_type'              => SupportFlow()->post_type,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'fields'                 => 'ids',
+			);
 			$post_query = new WP_Query( $args );
-			if ( !is_wp_error( $post_query ) )
+			if ( ! is_wp_error( $post_query ) ) {
 				$post_ids = array_merge( $post_ids, $post_query->posts );
+			}
 
 			$query->set( 'post__in', $post_ids );
 			// Ignore the original search query
@@ -300,8 +311,9 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Only show threads with the last status if the last status is set
 		$post_status = $query->get( 'post_status' );
-		if ( !$query->get( 's' ) && empty( $post_status ) )
+		if ( ! $query->get( 's' ) && empty( $post_status ) ) {
 			$query->set( 'post_status', $status_slugs );
+		}
 
 	}
 
@@ -319,19 +331,21 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	function handle_action_change_status() {
 
-		if ( ! isset( $_GET['action'], $_GET['sf_nonce'], $_GET['post_status'], $_GET['thread_id'] ) )
+		if ( ! isset( $_GET['action'], $_GET['sf_nonce'], $_GET['post_status'], $_GET['thread_id'] ) ) {
 			return;
+		}
 
-		if ( ! wp_verify_nonce( $_GET['sf_nonce'], 'sf-change-status' ) )
+		if ( ! wp_verify_nonce( $_GET['sf_nonce'], 'sf-change-status' ) ) {
 			wp_die( __( "Doin' something phishy, huh?", 'supportflow' ) );
+		}
 
 		$post_status = sanitize_key( $_GET['post_status'] );
-		$thread_id = (int)$_GET['thread_id'];
+		$thread_id   = (int) $_GET['thread_id'];
 
 		$new_thread = array(
-				'ID'               => $thread_id,
-				'post_status'      => $post_status,
-			);
+			'ID'          => $thread_id,
+			'post_status' => $post_status,
+		);
 		wp_update_post( $new_thread );
 		wp_safe_redirect( wp_get_referer() );
 		exit;
@@ -346,15 +360,16 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function action_add_meta_boxes() {
-		if ( ! $this->is_edit_screen() )
+		if ( ! $this->is_edit_screen() ) {
 			return;
+		}
 
 		$respondents_box = 'tagsdiv-' . SupportFlow()->respondents_tax;
-		remove_meta_box( 'submitdiv',               SupportFlow()->post_type, 'side' );
-		remove_meta_box( $respondents_box,          SupportFlow()->post_type, 'side' );
-		remove_meta_box( 'commentstatusdiv',        SupportFlow()->post_type, 'normal' );
-		remove_meta_box( 'slugdiv',                 SupportFlow()->post_type, 'normal' );
-		remove_meta_box( 'commentsdiv',             SupportFlow()->post_type, 'normal' );
+		remove_meta_box( 'submitdiv', SupportFlow()->post_type, 'side' );
+		remove_meta_box( $respondents_box, SupportFlow()->post_type, 'side' );
+		remove_meta_box( 'commentstatusdiv', SupportFlow()->post_type, 'normal' );
+		remove_meta_box( 'slugdiv', SupportFlow()->post_type, 'normal' );
+		remove_meta_box( 'commentsdiv', SupportFlow()->post_type, 'normal' );
 
 		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
@@ -372,15 +387,15 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div id="misc-publishing-actions">';
 
 		// Date Created and Last Activity for Existing Posts
-		if( 'post.php' == $pagenow ) {
+		if ( 'post.php' == $pagenow ) {
 
-			$modified_gmt = get_post_modified_time( 'U', true, get_the_ID() );
+			$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
 			$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 
 			echo '<div class="misc-pub-section created-on">';
 			echo '<label for="created_on">' . __( 'Opened', 'supportflow' ) . ':</label>';
-			echo '<span class="the-date">' . get_the_date() . ' ' . get_the_time() . '</span>'; 
-			echo '<div clas="last-activity" title="' . get_the_modified_date('l, M j, Y ') . get_the_modified_time() . '">' . __( 'Last Activity', 'SupportFlow' ) . ': <strong>' . $last_activity . '</strong></div>';
+			echo '<span class="the-date">' . get_the_date() . ' ' . get_the_time() . '</span>';
+			echo '<div clas="last-activity" title="' . get_the_modified_date( 'l, M j, Y ' ) . get_the_modified_time() . '">' . __( 'Last Activity', 'SupportFlow' ) . ': <strong>' . $last_activity . '</strong></div>';
 			echo '</div>';
 		}
 
@@ -389,7 +404,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div class="misc-pub-section">';
 		echo '<label for="post_status">' . __( 'Status', 'supportflow' ) . ':</label>';
 		echo '<select id="post_status" name="post_status">';
-		foreach( SupportFlow()->post_statuses as $slug => $post_status ) {
+		foreach ( SupportFlow()->post_statuses as $slug => $post_status ) {
 			echo '<option value="' . esc_attr( $slug ) . '" ' . selected( $current_status, $slug ) . '>' . esc_html( $post_status['label'] ) . '</option>';
 		}
 		echo '</select>';
@@ -400,12 +415,12 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div class="misc-pub-section">';
 		echo '<label for="post_author">' . __( 'Owner', 'supportflow' ) . ':</label>';
 		$args = array(
-				'show_option_none'    => __( '-- Unassigned --', 'supportflow' ),
-				'selected'            => $post_author,
-				'id'                  => 'post_author',
-				'name'                => 'post_author',
-				'who'                 => 'author',
-			);
+			'show_option_none' => __( '-- Unassigned --', 'supportflow' ),
+			'selected'         => $post_author,
+			'id'               => 'post_author',
+			'name'             => 'post_author',
+			'who'              => 'author',
+		);
 		wp_dropdown_users( $args );
 		echo '</div>';
 
@@ -413,10 +428,11 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Start/Update Thread (submit)
-		if ( 'post-new.php' == $pagenow )
+		if ( 'post-new.php' == $pagenow ) {
 			$submit_text = __( 'Start Thread', 'supportflow' );
-		else
+		} else {
 			$submit_text = __( 'Update Thread', 'supportflow' );
+		}
 		echo '<div id="major-publishing-actions">';
 		echo '<div id="publishing-action">';
 		submit_button( $submit_text, 'primary', 'save', false );
@@ -443,9 +459,9 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function meta_box_respondents() {
 
-		$respondents = SupportFlow()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
+		$respondents        = SupportFlow()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
 		$respondents_string = implode( ', ', $respondents );
-		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
+		$placeholder        = __( 'Who are you starting a conversation with?', 'supportflow' );
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
@@ -459,9 +475,9 @@ class SupportFlow_Admin extends SupportFlow {
 		global $pagenow;
 
 		$placeholders = array(
-				__( "What's burning?",                              'supportflow' ),
-				__( 'What do you need to get off your chest?',      'supportflow' ),
-			);
+			__( "What's burning?", 'supportflow' ),
+			__( 'What do you need to get off your chest?', 'supportflow' ),
+		);
 
 		$rand = array_rand( $placeholders );
 		echo '<h4>' . __( 'Conversation', 'supportflow' ) . '</h4>';
@@ -480,10 +496,11 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div id="submit-action">';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
-		if ( 'post-new.php' == $pagenow )
+		if ( 'post-new.php' == $pagenow ) {
 			$submit_text = __( 'Start Thread', 'supportflow' );
-		else
+		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
+		}
 		submit_button( $submit_text, 'primary', 'save', false );
 		echo '</div>';
 		echo '</div>';
@@ -498,23 +515,23 @@ class SupportFlow_Admin extends SupportFlow {
 	public function display_thread_comments() {
 
 		$private_comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'private' ) );
-		if ( !empty( $private_comments ) ) {
+		if ( ! empty( $private_comments ) ) {
 			echo '<ul class="private-comments">';
-			foreach( $private_comments as $comment ) {
+			foreach ( $private_comments as $comment ) {
 				echo '<li>';
 				echo '<div class="thread-comment">';
 				echo wpautop( stripslashes( $comment->comment_content ) );
 				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
 					echo '<ul class="thread-comment-attachments">';
-					foreach( $attachment_ids as $attachment_id ) {
+					foreach ( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
 				echo '</div>';
-				$comment_date = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
-				$comment_time = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
+				$comment_date      = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
+				$comment_time      = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
 				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $comment->comment_author, $comment_date, $comment_time );
 				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
 				echo '</li>';
@@ -523,18 +540,18 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		$comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'public' ) );
-		if ( !empty( $comments ) ) {
+		if ( ! empty( $comments ) ) {
 			echo '<ul class="thread-comments">';
-			foreach( $comments as $comment ) {
+			foreach ( $comments as $comment ) {
 				echo '<li>';
 				echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
-				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) .'</p>';
+				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) . '</p>';
 				echo '</div>';
 				echo '<div class="thread-comment">';
 				echo wpautop( stripslashes( $comment->comment_content ) );
 				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
 					echo '<ul class="thread-comment-attachments">';
-					foreach( $attachment_ids as $attachment_id ) {
+					foreach ( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
@@ -560,15 +577,16 @@ class SupportFlow_Admin extends SupportFlow {
 	public function filter_manage_post_columns( $columns ) {
 
 		$new_columns = array(
-				'cb'                  => $columns['cb'],
-				'updated'             => __( 'Updated', 'supportflow' ),
-				'title'               => __( 'Subject', 'supportflow' ),
-				'respondents'         => __( 'Respondents', 'supportflow' ),
-				'status'              => __( 'Status', 'supportflow' ),
-				'author'              => __( 'Agent', 'supportflow' ),
-				'sf_comments'         => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
-				'created'             => __( 'Created', 'support' ),
-			);
+			'cb'          => $columns['cb'],
+			'updated'     => __( 'Updated', 'supportflow' ),
+			'title'       => __( 'Subject', 'supportflow' ),
+			'respondents' => __( 'Respondents', 'supportflow' ),
+			'status'      => __( 'Status', 'supportflow' ),
+			'author'      => __( 'Agent', 'supportflow' ),
+			'sf_comments' => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+			'created'     => __( 'Created', 'support' ),
+		);
+
 		return $new_columns;
 	}
 
@@ -578,6 +596,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function manage_sortable_columns( $columns ) {
 		$columns['updated'] = 'modified';
 		$columns['created'] = 'date';
+
 		return $columns;
 	}
 
@@ -586,10 +605,11 @@ class SupportFlow_Admin extends SupportFlow {
 	 * on the Manage Threads view so mode=excerpt works well
 	 */
 	public function filter_get_the_excerpt( $orig ) {
-		if ( $comment = array_pop( SupportFlow()->get_thread_comments( get_the_ID() ) ) )
-			return $comment->comment_author .': "' . wp_trim_excerpt( $comment->comment_content ) . '"';
-		else
+		if ( $comment = array_pop( SupportFlow()->get_thread_comments( get_the_ID() ) ) ) {
+			return $comment->comment_author . ': "' . wp_trim_excerpt( $comment->comment_content ) . '"';
+		} else {
 			return $orig;
+		}
 	}
 
 	/**
@@ -597,31 +617,32 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	function action_manage_posts_custom_column( $column_name, $thread_id ) {
 
-		switch( $column_name ) {
+		switch ( $column_name ) {
 			case 'updated':
 				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
 			case 'respondents':
 				$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
-				if ( empty( $respondents ) )
+				if ( empty( $respondents ) ) {
 					break;
-				foreach( $respondents as $key => $respondent_email ) {
-					$args = array(
-							SupportFlow()->respondents_tax     => SupportFlow()->get_email_hash( $respondent_email ),
-							'post_type'                         => SupportFlow()->post_type,
-						);
-					$respondent_link = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
+				}
+				foreach ( $respondents as $key => $respondent_email ) {
+					$args              = array(
+						SupportFlow()->respondents_tax => SupportFlow()->get_email_hash( $respondent_email ),
+						'post_type'                    => SupportFlow()->post_type,
+					);
+					$respondent_link   = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
 					$respondents[$key] = get_avatar( $respondent_email, 16 ) . '&nbsp;&nbsp;' . $respondent_link;
 				}
 				echo implode( '<br />', $respondents );
 				break;
 			case 'status':
 				$post_status = get_post_status( $thread_id );
-				$args = array(
-						'post_type'       => SupportFlow()->post_type,
-						'post_status'     => $post_status,
-					);
+				$args        = array(
+					'post_type'   => SupportFlow()->post_type,
+					'post_status' => $post_status,
+				);
 				$status_name = get_post_status_object( $post_status )->label;
 				$filter_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
@@ -652,6 +673,7 @@ class SupportFlow_Admin extends SupportFlow {
 			return $pagenow;
 		} elseif ( 'post.php' == $pagenow && ! empty( $_GET['action'] ) && 'edit' == $_GET['action'] && ! empty( $_GET['post'] ) ) {
 			$the_post = get_post( $_GET['post'] );
+
 			return ( $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
 		} else {
 			return false;
@@ -667,25 +689,27 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function action_save_post( $thread_id ) {
 
-		if( SupportFlow()->post_type != get_post_type( $thread_id ) )
+		if ( SupportFlow()->post_type != get_post_type( $thread_id ) ) {
 			return;
+		}
 
 		if ( isset( $_POST['respondents'] ) ) {
 			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['comment'] ) && !empty( $_POST['comment' ] ) ) {
-			$comment = wp_filter_nohtml_kses( $_POST['comment'] );
-			$visibility = ( !empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
-			if ( !empty( $_POST['comment-attachments'] ) )
+		if ( isset( $_POST['comment'] ) && ! empty( $_POST['comment'] ) ) {
+			$comment    = wp_filter_nohtml_kses( $_POST['comment'] );
+			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
+			if ( ! empty( $_POST['comment-attachments'] ) ) {
 				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['comment-attachments'], ',' ) ) );
-			else
+			} else {
 				$attachment_ids = '';
+			}
 			$comment_args = array(
-					'comment_approved'        => $visibility,
-					'attachment_ids'          => $attachment_ids,
-				);
+				'comment_approved' => $visibility,
+				'attachment_ids'   => $attachment_ids,
+			);
 			SupportFlow()->add_thread_comment( $thread_id, $comment, $comment_args );
 		}
 

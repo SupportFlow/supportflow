@@ -5,8 +5,9 @@ class SupportFlow_UI_Widget extends SupportFlow {
 	public $script_slug = 'supportflow-user-widget';
 
 	function __construct() {
-		if ( ! empty( $_REQUEST['supportflow_widget'] ) )
+		if ( ! empty( $_REQUEST['supportflow_widget'] ) ) {
 			add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+		}
 	}
 
 	public function setup_actions() {
@@ -20,20 +21,22 @@ class SupportFlow_UI_Widget extends SupportFlow {
 	 */
 	public function filter_json_api_response( $response ) {
 
-		if ( 'error' == $response['status'] )
+		if ( 'error' == $response['status'] ) {
 			return $response;
+		}
 
-		switch( $response['api-action'] ) {
+		switch ( $response['api-action'] ) {
 			case 'create-thread':
 			case 'get-thread':
-				$response['widget_title'] = get_the_title( (int)$response['thread_id'] );
-				$response['html'] = $this->render_single_thread_comments_html( (int)$response['thread_id'] );
+				$response['widget_title'] = get_the_title( (int) $response['thread_id'] );
+				$response['html']         = $this->render_single_thread_comments_html( (int) $response['thread_id'] );
 				break;
 			case 'add-thread-comment':
-				$comment = get_comment( $response['comment_id'] );
+				$comment          = get_comment( $response['comment_id'] );
 				$response['html'] = '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
 				break;
 		}
+
 		return $response;
 	}
 
@@ -42,10 +45,11 @@ class SupportFlow_UI_Widget extends SupportFlow {
 		$comments = SupportFlow()->get_thread_comments( $thread_id, array( 'status' => 'public', 'order' => 'ASC' ) );
 
 		$output = '<ul class="thread-comments">';
-		foreach( $comments as $comment ) {
+		foreach ( $comments as $comment ) {
 			$output .= '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
 		}
 		$output .= '</ul>';
+
 		return $output;
 	}
 
@@ -53,12 +57,13 @@ class SupportFlow_UI_Widget extends SupportFlow {
 		$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
 
 		$output = '<div class="thread-comment-body">'
-				. wpautop( stripslashes( $comment->comment_content ) )
-				. '</div>'
-				. '<div class="thread-comment-meta">'
-				. '<span class="thread-comment-author">' . esc_html( $comment->comment_author ) . '</span>'
-				. '<span class="thread-comment-timestamp">' . esc_html( $comment_timestamp ) . '</span>'
-				. '</div>';
+			. wpautop( stripslashes( $comment->comment_content ) )
+			. '</div>'
+			. '<div class="thread-comment-meta">'
+			. '<span class="thread-comment-author">' . esc_html( $comment->comment_author ) . '</span>'
+			. '<span class="thread-comment-timestamp">' . esc_html( $comment_timestamp ) . '</span>'
+			. '</div>';
+
 		return $output;
 	}
 
@@ -71,11 +76,11 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			$output = '<div class="thread nothreads">' . __( 'No open threads.', 'supportflow' ) . '</div>';
 		} else {
 			$output = '<ul id="respondent-threads">';
-			foreach( $threads as $thread ) {
+			foreach ( $threads as $thread ) {
 				$output .= '<li id="thread-' . $thread->ID . '">';
 				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
 				$output .= '<div class="thread-comments">';
-				$comments = SupportFlow()->get_thread_comments( $thread->ID, array( 'status' => 'public' ) );
+				$comments     = SupportFlow()->get_thread_comments( $thread->ID, array( 'status' => 'public' ) );
 				$last_comment = array_shift( $comments );
 				$output .= $this->render_single_comment_html( $last_comment );
 				$output .= '</div>';
@@ -83,6 +88,7 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			}
 			$output .= '</ul>';
 		}
+
 		return $output;
 
 	}
@@ -102,20 +108,20 @@ class SupportFlow_UI_Widget extends SupportFlow {
 
 		$widget_title = __( 'Support', 'supportflow' );
 
-		$start_thread_text = __( 'Start thread', 'supportflow' );
+		$start_thread_text    = __( 'Start thread', 'supportflow' );
 		$starting_thread_text = __( 'Starting thread...', 'supportflow' );
-		$send_reply_text = __( 'Send reply', 'supportflow' );
-		$sending_reply_text = __( 'Sending reply...', 'supportflow' );
+		$send_reply_text      = __( 'Send reply', 'supportflow' );
+		$sending_reply_text   = __( 'Sending reply...', 'supportflow' );
 		wp_localize_script(
 			$this->script_slug,
 			'SupportFlowUserWidgetVars',
 			array(
-				'ajaxurl'                       => $ajaxurl,
-				'widget_title'                  => $widget_title,
-				'start_thread_text'             => $start_thread_text,
-				'starting_thread_text'          => $starting_thread_text,
-				'send_reply_text'               => $send_reply_text,
-				'sending_reply_text'            => $sending_reply_text,
+				'ajaxurl'              => $ajaxurl,
+				'widget_title'         => $widget_title,
+				'start_thread_text'    => $start_thread_text,
+				'starting_thread_text' => $starting_thread_text,
+				'send_reply_text'      => $send_reply_text,
+				'sending_reply_text'   => $sending_reply_text,
 			)
 		);
 
@@ -147,7 +153,7 @@ class SupportFlow_UI_Widget extends SupportFlow {
 	</div>
 
 	<div id="supportflow-all-threads">
-<?php echo $this->render_all_threads_html(); ?>
+		<?php echo $this->render_all_threads_html(); ?>
 	</div>
 
 	<div id="supportflow-single-thread">

@@ -14,7 +14,7 @@ body {
 }
 
 #supportflow-back {
-	display:none;
+	display: none;
 	position: relative;
 	background-color: #fff;
 	border: 1px solid #bbb;
@@ -37,6 +37,7 @@ body {
 #supportflow-newthread-box {
 	padding: 10px 0;
 }
+
 #supportflow-newthread,
 #new-thread-submit {
 	background-color: #fff;
@@ -49,6 +50,7 @@ body {
 	white-space: nowrap;
 	-webkit-border-radius: 15px;
 }
+
 #new-thread-submit {
 	margin-top: 10px;
 }
@@ -61,7 +63,7 @@ body {
 #supportflow-existing-thread-form textarea {
 	width: 100%;
 	font-size: 16px;
-	font-weight:200;
+	font-weight: 200;
 	border: 1px solid #BBB;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -89,7 +91,7 @@ body {
 
 #supportflow-newthread-form input[type='submit']:hover,
 #supportflow-existing-thread-form input[type='submit']:hover {
-	cursor:pointer;
+	cursor: pointer;
 	border-color: #888;
 	color: #111;
 }
@@ -102,9 +104,11 @@ body {
 #supportflow-back:active {
 	border-color: #666;
 }
+
 #supportflow-all-threads .thread .time {
 	color: gray;
 }
+
 #supportflow-all-threads .nothreads {
 	border-bottom: 1px solid #989898;
 	border-top: 1px solid #989898;
@@ -113,17 +117,21 @@ body {
 	padding: 20px 0;
 	text-align: center;
 }
+
 #supportflow-newthread-form {
 	display: none;
 	margin: 0;
 }
+
 #supportflow-newthread-form input[name="subject"] {
 	margin-bottom: 6px;
 }
+
 #supportflow-newthread-form input[type="text"] {
 	font-size: 14px;
 	line-height: 150%;
 }
+
 #supportflow-newthread-form input[type="text"] {
 	border: 1px solid #ccc;
 	-webkit-border-radius: 3px;
@@ -132,48 +140,58 @@ body {
 	padding: 3px 8px;
 	width: 100%;
 }
+
 #supportflow-help:hover,
 #supportflow-help:active {
 	background-color: #13455b;
 }
 
 #supportflow-single-thread {
-	display:none;
+	display: none;
 }
+
 #supportflow-single-thread ul,
 #supportflow-all-threads ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
+
 #supportflow-single-thread ul li,
 #supportflow-all-threads ul li {
 	border-bottom: 1px solid #ECECEC;
 	padding: 5px 5px 10px 5px;
 }
+
 #supportflow-all-threads ul li:first-child {
 	border-top: 1px solid #ECECEC;
 	padding-top: 0;
 }
+
 #supportflow-all-threads ul li:hover {
 	background-color: #fff;
 	cursor: pointer;
 }
+
 #supportflow-all-threads ul li h4 {
 	font: bold 14px/18px "Helvetica Neue", sans-serif;
 	margin: 10px 0 0 0;
 }
+
 .thread-comments .thread-comment-body p {
 	font: 13px/18px "Helvetica Neue", sans-serif;
 	margin: 5px 0;
 }
+
 .thread-comments .thread-comment-meta {
 	font-size: 12px;
 	color: #888;
 }
+
 .thread-comments .thread-comment-meta .thread-comment-author {
 	font-weight: bold;
 }
+
 .thread-comments .thread-comment-meta .thread-comment-timestamp {
 	float: right;
 }

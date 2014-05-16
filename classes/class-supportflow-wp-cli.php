@@ -12,8 +12,9 @@ class SupportFlow_WPCLI extends WP_CLI_Command {
 	 */
 	public static function help() {
 
-		WP_CLI::line( <<<EOB
-usage: wp supportflow <parameters>
+		WP_CLI::line(
+			<<<EOB
+			usage: wp supportflow <parameters>
 Possible subcommands:
 					download_and_process_email_replies
 					import_remote               Import from a remote SupportFlow
@@ -31,22 +32,23 @@ EOB
 	 */
 	public function download_and_process_email_replies( $args, $assoc_args ) {
 
-		$defaults = array(
-				'host'           => '', // '{imap.gmail.com:993/imap/ssl/novalidate-cert}' for Gmail
-				'username'       => '', // Full email address for Gmail
-				'password'       => '', // Whatever the password is
-				'inbox'          => 'INBOX', // Where the new emails will go
-				'archive'        => 'SF_ARCHIVE', // Where you'd like emails put after they've been processed
-			);
+		$defaults           = array(
+			'host'     => '', // '{imap.gmail.com:993/imap/ssl/novalidate-cert}' for Gmail
+			'username' => '', // Full email address for Gmail
+			'password' => '', // Whatever the password is
+			'inbox'    => 'INBOX', // Where the new emails will go
+			'archive'  => 'SF_ARCHIVE', // Where you'd like emails put after they've been processed
+		);
 		$connection_details = wp_parse_args( $assoc_args, $defaults );
 
 		// Allow the connection details to be stored in a secret config file or similar
 		$connection_details = apply_filters( 'supportflow_imap_connection_details', $connection_details );
-		$retval = SupportFlow()->extend->email_replies->download_and_process_email_replies( $connection_details );
-		if ( is_wp_error( $retval ) )
+		$retval             = SupportFlow()->extend->email_replies->download_and_process_email_replies( $connection_details );
+		if ( is_wp_error( $retval ) ) {
 			WP_CLI::error( $retval->get_error_message() );
-		else
+		} else {
 			WP_CLI::success( $retval );
+		}
 	}
 
 	/**
@@ -57,12 +59,12 @@ EOB
 	public function import_remote( $args, $assoc_args ) {
 
 		$defaults = array(
-				'db_host'                   => '',
-				'db_name'                   => '',
-				'db_user'                   => '',
-				'db_pass'                   => '',
-				'table_prefix'              => 'support_',
-			);
+			'db_host'      => '',
+			'db_name'      => '',
+			'db_user'      => '',
+			'db_pass'      => '',
+			'table_prefix' => 'support_',
+		);
 
 		$this->args = wp_parse_args( $assoc_args, $defaults );
 
@@ -77,31 +79,31 @@ EOB
 
 		// Register our tables
 		$sp_tables = array(
-				'messagemeta',
-				'messages',
-				'predefined_messages',
-				'tags',
-				'threadmeta',
-				'threads',
-				'usermeta',
-				'users',
-			);
-		foreach( $sp_tables as $sp_table ) {
+			'messagemeta',
+			'messages',
+			'predefined_messages',
+			'tags',
+			'threadmeta',
+			'threads',
+			'usermeta',
+			'users',
+		);
+		foreach ( $sp_tables as $sp_table ) {
 			$table_name = $this->args['table_prefix'] . $sp_table;
-			if ( !in_array( $table_name, $spdb->tables ) ) {
+			if ( ! in_array( $table_name, $spdb->tables ) ) {
 				$spdb->tables[$sp_table] = $table_name;
-				$spdb->$sp_table = $table_name;
+				$spdb->$sp_table         = $table_name;
 			}
 		}
-		
+
 		/**
 		 * Import threads and their messages
 		 *
 		 * @todo Support for importing priorities. This seems to exist in the schema for old SP, but not in the interface
 		 */
-		$old_threads = $spdb->get_results( "SELECT * FROM $spdb->threads" );
+		$old_threads           = $spdb->get_results( "SELECT * FROM $spdb->threads" );
 		$count_threads_created = 0;
-		foreach( $old_threads as $old_thread ) {
+		foreach ( $old_threads as $old_thread ) {
 
 			// Don't import a thread that's already been imported
 			if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE '_imported_id'=%d", $old_thread->thread_id ) ) ) {
@@ -111,39 +113,41 @@ EOB
 
 			// Create the new thread
 			$thread_args = array(
-					'subject'                => $old_thread->subject,
-					'date'                   => $old_thread->dt,
-					'status'            => 'sf_' . $old_thread->state,
-				);
-			$thread_id = SupportFlow()->create_thread( $thread_args );
-			if ( is_wp_error( $thread_id ) )
+				'subject' => $old_thread->subject,
+				'date'    => $old_thread->dt,
+				'status'  => 'sf_' . $old_thread->state,
+			);
+			$thread_id   = SupportFlow()->create_thread( $thread_args );
+			if ( is_wp_error( $thread_id ) ) {
 				continue;
+			}
 
 			// Add the respondent to the thread
 			SupportFlow()->update_thread_respondents( $thread_id, $old_thread->email );
 
 			// Get the thread's messages and import those too
-			$old_messages = (array)$spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
+			$old_messages   = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
 			$count_comments = 0;
-			foreach( $old_messages as $old_message ) {
+			foreach ( $old_messages as $old_message ) {
 				$message_args = array(
-						'comment_author'              => $old_message->email,
-						'comment_author_email'        => $old_message->email,
-						'time'                        => $old_message->dt,
-						'comment_approved'            => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
-					);
-				if ( function_exists( 'What_The_Email' ) )
+					'comment_author'       => $old_message->email,
+					'comment_author_email' => $old_message->email,
+					'time'                 => $old_message->dt,
+					'comment_approved'     => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
+				);
+				if ( function_exists( 'What_The_Email' ) ) {
 					$old_message->content = What_The_Email()->get_message( $old_message->content );
+				}
 				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $old_message->content, $message_args );
 				add_comment_meta( $comment_id, '_imported_id', $old_message->message_id );
-				$count_comments++;
+				$count_comments ++;
 			}
 
 			// One the thread is created, log the old thread ID
 			update_post_meta( $thread_id, '_imported_id', $old_thread->thread_id );
 
 			WP_CLI::line( "Created: #{$old_thread->thread_id} '{$old_thread->subject}' with {$count_comments} comments" );
-			$count_threads_created++;
+			$count_threads_created ++;
 		}
 
 		/**
