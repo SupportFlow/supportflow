@@ -20,6 +20,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	public function filter_comment_notify_subject( $subject, $comment_id, $thread_id ) {
 
 		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_thread( $thread_id ) . ']';
+
 		return $subject;
 	}
 
@@ -28,39 +29,43 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	 */
 	public function download_and_process_email_replies( $connection_details ) {
 
-		$inbox = $connection_details['inbox'];
+		$inbox   = $connection_details['inbox'];
 		$archive = $connection_details['archive'];
 
 		$this->imap_connection = imap_open( $connection_details['host'], $connection_details['username'], $connection_details['password'] );
-		if ( ! $this->imap_connection )
+		if ( ! $this->imap_connection ) {
 			return new WP_Error( 'connection-error', __( 'Error connecting to mailbox', 'supportflow' ) );
+		}
 
 		// Check to see if the archive mailbox exists, and create it if it doesn't
 		$mailboxes = imap_getmailboxes( $this->imap_connection, $connection_details['host'], '*' );
-		if ( ! wp_filter_object_list( $mailboxes, array( 'name' => $connection_details['host'] . $archive ) ) )
+		if ( ! wp_filter_object_list( $mailboxes, array( 'name' => $connection_details['host'] . $archive ) ) ) {
 			imap_createmailbox( $this->imap_connection, $connection_details['host'] . $archive );
+		}
 
 		// Make sure here are new emails to process
 		$email_count = imap_num_msg( $this->imap_connection );
-		if ( $email_count < 1 )
+		if ( $email_count < 1 ) {
 			return false;
+		}
 
 		// Process each new email and put it in the archive mailbox when done
 		$success = 0;
-		for( $i = 1; $i <= $email_count; $i++ ) {
-			$email = new stdClass;
-			$email->headers = imap_headerinfo( $this->imap_connection, $i );
+		for ( $i = 1; $i <= $email_count; $i ++ ) {
+			$email            = new stdClass;
+			$email->headers   = imap_headerinfo( $this->imap_connection, $i );
 			$email->structure = imap_fetchstructure( $this->imap_connection, $i );
-			$email->body = $this->get_body_from_connection( $this->imap_connection, $i );
+			$email->body      = $this->get_body_from_connection( $this->imap_connection, $i );
 
 			// @todo Confirm this a message we want to process
 			$ret = $this->process_email( $email, $i );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
 				imap_mail_move( $this->imap_connection, $i, $archive );
-				$success++;
+				$success ++;
 			}
 		}
+
 		return sprintf( __( 'Processed %d emails', 'supportflow' ), $success );
 	}
 
@@ -72,16 +77,17 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$new_attachment_ids = array();
 
 		$k = 0;
-		foreach( $email->structure->parts as $email_part ) {
+		foreach ( $email->structure->parts as $email_part ) {
 
 			// We should at least be dealing with something that resembles an email object at this point
-			if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) )
+			if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) ) {
 				continue;
+			}
 
 			if ( 'ATTACHMENT' == $email_part->disposition ) {
 				// We need to add 2 to our array key each time to get the correct email part
 				//@todo this needs more testing with different emails, should be smarter about which parts
-				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k+2 );
+				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k + 2 );
 
 				// The raw data from imap is base64 encoded, but php-imap has us covered!
 				$attachment_data = imap_base64( $raw_attachment_data );
@@ -94,67 +100,72 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 				$file_array = array(
 					'tmp_name' => $temp_file,
-					'name' => $email_part->dparameters[0]->value,
+					'name'     => $email_part->dparameters[0]->value,
 				);
 
-				$upload_result = media_handle_sideload( $file_array, NULL );
+				$upload_result = media_handle_sideload( $file_array, null );
 
-				if ( is_wp_error( $upload_result ) )
+				if ( is_wp_error( $upload_result ) ) {
 					WP_CLI::warning( $upload_result->get_error_message() );
-				else
+				} else {
 					$new_attachment_ids[] = $upload_result;
+				}
 
 			}
-			$k++;
+			$k ++;
 		}
 
-		if ( ! empty( $email->headers->subject ) )
+		if ( ! empty( $email->headers->subject ) ) {
 			$subject = $email->headers->subject;
-		else
+		} else {
 			$subject = sprintf( __( 'New thread from %s', 'supportflow' ), $email->headers->fromaddress );
+		}
 
-		$respondent_name = $email->headers->from[0]->personal;
+		$respondent_name  = $email->headers->from[0]->personal;
 		$respondent_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
 
 		// Parse out the reply body
-		if ( function_exists( 'What_The_Email' ) )
+		if ( function_exists( 'What_The_Email' ) ) {
 			$message = What_The_Email()->get_message( $email->body );
-		else
+		} else {
 			$message = $email->body;
+		}
 
 		// Check if this email should be blocked
 		if ( function_exists( 'What_The_Email' ) ) {
 			$check_strings = array(
-					'subject'       => $subject,
-					'sender'        => $respondent_email,
-					'message'       => $message,
-				);
-			foreach( $check_strings as $key => $value ) {
-				if ( What_The_Email()->is_robot( $key, $value ) )
+				'subject' => $subject,
+				'sender'  => $respondent_email,
+				'message' => $message,
+			);
+			foreach ( $check_strings as $key => $value ) {
+				if ( What_The_Email()->is_robot( $key, $value ) ) {
 					return true;
+				}
 			}
 		}
 
 		// Check to see if this message was in response to an existing thread
 		$thread_id = false;
-		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) )
+		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) ) {
 			$thread_id = SupportFlow()->get_thread_from_secret( $matches[1] );
+		}
 
 		if ( $thread_id ) {
 			$message_args = array(
-					'comment_author'        => $respondent_name,
-					'comment_author_email'  => $respondent_email,
-				);
+				'comment_author'       => $respondent_name,
+				'comment_author_email' => $respondent_email,
+			);
 			SupportFlow()->add_thread_comment( $thread_id, $message, $message_args );
 		} else {
 			// If this wasn't in reply to an existing message, create a new thread
 			$new_thread_args = array(
-					'subject'               => $subject,
-					'respondent_name'       => $respondent_name,
-					'respondent_email'      => $respondent_email,
-					'message'               => $message,
-				);
-			$thread_id = SupportFlow()->create_thread( $new_thread_args );
+				'subject'          => $subject,
+				'respondent_name'  => $respondent_name,
+				'respondent_email' => $respondent_email,
+				'message'          => $message,
+			);
+			$thread_id       = SupportFlow()->create_thread( $new_thread_args );
 		}
 
 		foreach ( $new_attachment_ids as $new_attachment_id ) {
@@ -166,13 +177,14 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
 		$respondents = array();
-		$fields = array( 'to', 'cc' );
-		foreach( $fields as $field ) {
+		$fields      = array( 'to', 'cc' );
+		foreach ( $fields as $field ) {
 			if ( ! empty( $email->headers->$field ) ) {
-				foreach( $email->headers->$field as $recipient ) {
+				foreach ( $email->headers->$field as $recipient ) {
 					$email_address = $recipient->mailbox . '@' . $recipient->host;
-					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address )
+					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address ) {
 						$respondents[] = $email_address;
+					}
 				}
 			}
 		}
@@ -184,6 +196,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
 			update_comment_meta( $new_comment->comment_ID, 'attachment_ids', $new_attachment_ids );
 		}
+
 		return true;
 	}
 
@@ -193,8 +206,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	public function get_body_from_connection( $connection, $num, $type = 'text/plain' ) {
 		// Hacky way to get the email body. We should support more MIME types in the future
 		$body = imap_fetchbody( $connection, $num, 1.1 );
-		if ( empty( $body ) )
+		if ( empty( $body ) ) {
 			$body = imap_fetchbody( $connection, $num, 1 );
+		}
+
 		return $body;
 	}
 

@@ -22,8 +22,8 @@
 
 #supportflow-subject.postbox,
 #supportflow-respondents.postbox {
-	border:none;
-	background:none;
+	border: none;
+	background: none;
 }
 
 #supportflow-subject.postbox .inside,
@@ -39,7 +39,7 @@
 #supportflow-respondents h3.hndle,
 #supportflow-comments .handlediv,
 #supportflow-comments h3.hndle {
-	display:none;
+	display: none;
 }
 
 #supportflow-details .handlediv,
@@ -67,7 +67,7 @@
 #supportflow-subject h4,
 #supportflow-respondents h4,
 #supportflow-comments h4 {
-	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+	font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
 	font-size: 13px;
 	font-weight: normal;
 	margin-left: 0;
@@ -90,6 +90,7 @@
 	padding: 8px;
 	font-size: 1.2em;
 }
+
 #supportflow-comments.postbox #comment-reply {
 	width: 100%;
 }
@@ -102,7 +103,7 @@
 }
 
 #supportflow-comments.postbox .inside #message-tools #submit-action {
-	padding:0;
+	padding: 0;
 	margin-top: 5px;
 	float: right;
 }
@@ -151,7 +152,7 @@
 }
 
 #supportflow-comments.postbox ul.thread-comments li {
-	clear:left;
+	clear: left;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
@@ -197,15 +198,17 @@
 }
 
 input::-webkit-input-placeholder {
-	color:#BBB;
+	color: #BBB;
 }
+
 input:-moz-placeholder {
-	color:#BBB;
+	color: #BBB;
 }
 
 textarea::-webkit-input-placeholder {
-	color:#BBB;
+	color: #BBB;
 }
+
 textarea:-moz-placeholder {
-	color:#BBB;
+	color: #BBB;
 }

@@ -24,13 +24,13 @@ class SupportFlow_Attachments extends SupportFlow {
 
 		// Generate a secret key for our hashes the first time this is loaded in the admin
 		$this->secret_key = get_option( self::secret_key_option );
-		if ( is_admin() && !$this->secret_key ) {
+		if ( is_admin() && ! $this->secret_key ) {
 			$this->secret_key = wp_generate_password();
 			update_option( self::secret_key_option, $this->secret_key );
 		}
 
 		// Only apply to files that are uploaded to a thread
-		if ( isset( $_REQUEST['post_id'] ) && SupportFlow()->is_thread( (int)$_REQUEST['post_id'] ) ) {
+		if ( isset( $_REQUEST['post_id'] ) && SupportFlow()->is_thread( (int) $_REQUEST['post_id'] ) ) {
 			add_filter( 'wp_handle_upload_prefilter', array( $this, 'wp_handle_upload_prefilter' ) );
 			add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
 		}
@@ -42,63 +42,72 @@ class SupportFlow_Attachments extends SupportFlow {
 	public function filter_wp_get_attachment_url( $url, $attachment_id ) {
 
 		if ( $attachment = get_post( $attachment_id ) ) {
-			if ( SupportFlow()->is_thread( $attachment->post_parent ) )
+			if ( SupportFlow()->is_thread( $attachment->post_parent ) ) {
 				return $attachment->guid;
+			}
 
 		}
+
 		return $url;
 	}
 
 	public function handle_file_delivery( $template ) {
 
 		// First check to see
-		if ( false === stripos( $_SERVER['REQUEST_URI' ], "secure-files/" ) )
+		if ( false === stripos( $_SERVER['REQUEST_URI'], "secure-files/" ) ) {
 			return;
+		}
 
 		// Get the file
 		preg_match( '#\/secure\-files\/(.+)$#', $_SERVER['REQUEST_URI'], $matches );
-		if ( empty( $matches ) )
+		if ( empty( $matches ) ) {
 			return;
+		}
 
 		// User must be logged in to see attachments that require permission
 		if ( ! is_user_logged_in() && $this->attachments_require_permission ) {
 			$args = array(
-					'redirect_to'       => urlencode( esc_url( home_url( $_SERVER['REQUEST_URI'] ) ) ),
-				);
+				'redirect_to' => urlencode( esc_url( home_url( $_SERVER['REQUEST_URI'] ) ) ),
+			);
 			wp_safe_redirect( add_query_arg( $args, site_url( '/wp-login.php' ) ) );
 			exit;
 		}
 
 		global $wpdb;
-		$file = $matches[1];
+		$file  = $matches[1];
 		$query = $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE guid LIKE %s", '%' . $file );
-		$post = $wpdb->get_row( $query );
-		if ( empty( $post ) )
+		$post  = $wpdb->get_row( $query );
+		if ( empty( $post ) ) {
 			return get_404_template();
+		}
 
 		// Check to see whether the user has permission to view the thread
-		if ( $this->attachments_require_permission && ! $this->can_view_attachment( $post->ID ) )
+		if ( $this->attachments_require_permission && ! $this->can_view_attachment( $post->ID ) ) {
 			wp_die( __( 'Sorry, you do not have permission to view this attachment.', 'supportflow' ) );
+		}
 
 		$post_id = $post->ID;
 
 		$file = get_attached_file( $post_id );
 
-		if ( !is_file( $file ) )
+		if ( ! is_file( $file ) ) {
 			return get_404_template();
+		}
 
 		// We may override this later.
 		status_header( 200 );
 
 		//rest inspired by wp-includes/ms-files.php.
 		$mime = wp_check_filetype( $file );
-		if ( false === $mime[ 'type' ] && function_exists( 'mime_content_type' ) )
-			$mime[ 'type' ] = mime_content_type( $file );
+		if ( false === $mime['type'] && function_exists( 'mime_content_type' ) ) {
+			$mime['type'] = mime_content_type( $file );
+		}
 
-		if ( $mime[ 'type' ] )
-			$mimetype = $mime[ 'type' ];
-		else
+		if ( $mime['type'] ) {
+			$mimetype = $mime['type'];
+		} else {
 			$mimetype = 'image/' . substr( $file, strrpos( $file, '.' ) + 1 );
+		}
 
 		//fake the filename
 		$filename = $post->post_name;
@@ -110,7 +119,7 @@ class SupportFlow_Attachments extends SupportFlow {
 		header( 'Content-Type: ' . $mimetype ); // always send this
 		header( 'Content-Length: ' . filesize( $file ) );
 		$last_modified = gmdate( 'D, d M Y H:i:s', filemtime( $file ) );
-		$etag = '"' . md5( $last_modified ) . '"';
+		$etag          = '"' . md5( $last_modified ) . '"';
 		header( "Last-Modified: $last_modified GMT" );
 		header( 'ETag: ' . $etag );
 		header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + 100000000 ) . ' GMT' );
@@ -118,8 +127,9 @@ class SupportFlow_Attachments extends SupportFlow {
 		// Support for Conditional GET
 		$client_etag = isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) ? stripslashes( $_SERVER['HTTP_IF_NONE_MATCH'] ) : false;
 
-		if ( ! isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) )
+		if ( ! isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) ) {
 			$_SERVER['HTTP_IF_MODIFIED_SINCE'] = false;
+		}
 
 		$client_last_modified = trim( $_SERVER['HTTP_IF_MODIFIED_SINCE'] );
 
@@ -127,13 +137,14 @@ class SupportFlow_Attachments extends SupportFlow {
 		$client_modified_timestamp = $client_last_modified ? strtotime( $client_last_modified ) : 0;
 
 		// Make a timestamp for our most recent modification...
-		$modified_timestamp = strtotime($last_modified);
+		$modified_timestamp = strtotime( $last_modified );
 
 		if ( ( $client_last_modified && $client_etag )
-			? ( ( $client_modified_timestamp >= $modified_timestamp) && ( $client_etag == $etag ) )
-			: ( ( $client_modified_timestamp >= $modified_timestamp) || ( $client_etag == $etag ) )
+			? ( ( $client_modified_timestamp >= $modified_timestamp ) && ( $client_etag == $etag ) )
+			: ( ( $client_modified_timestamp >= $modified_timestamp ) || ( $client_etag == $etag ) )
 		) {
 			status_header( 304 );
+
 			return;
 		}
 
@@ -151,21 +162,24 @@ class SupportFlow_Attachments extends SupportFlow {
 	 */
 	public function can_view_attachment( $attachment_id, $email_or_login = false ) {
 
-		if ( ! $email_or_login && is_user_logged_in() )
+		if ( ! $email_or_login && is_user_logged_in() ) {
 			$email_or_login = wp_get_current_user()->user_email;
+		}
 
 		if ( ! is_email( $email_or_login ) ) {
 			$user = get_user_by( 'login' );
-			if ( $user )
+			if ( $user ) {
 				$email_or_login = $user->user_email;
+			}
 		}
 
-		$thread_id = get_post( $attachment_id )->post_parent;
+		$thread_id   = get_post( $attachment_id )->post_parent;
 		$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
 
 		// If the email address is a respondent, they can view
-		if ( in_array( $email_or_login, $respondents ) )
+		if ( in_array( $email_or_login, $respondents ) ) {
 			return true;
+		}
 
 		// @todo permissions check on whether the user is logged in as some who can view threads
 
@@ -175,14 +189,16 @@ class SupportFlow_Attachments extends SupportFlow {
 	public function wp_handle_upload_prefilter( $file ) {
 
 		$this->private_hash = md5( $this->secret_key . date( 'Y-m-d' ) . $file['name'] );
-		$file['name'] = $this->private_hash . '.' . basename( $file['name'] );
+		$file['name']       = $this->private_hash . '.' . basename( $file['name'] );
+
 		return $file;
 	}
 
 	public function wp_handle_upload( $file ) {
 
 		$secondary_hash = md5( $this->secret_key . date( 'Y-m-d' ) );
-		$file['url'] = site_url( '/secure-files/' ) . str_replace( $this->private_hash . '.', $secondary_hash . '/', basename( $file['file'] ) );
+		$file['url']    = site_url( '/secure-files/' ) . str_replace( $this->private_hash . '.', $secondary_hash . '/', basename( $file['file'] ) );
+
 		return $file;
 	}
 
