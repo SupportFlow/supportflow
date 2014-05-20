@@ -162,6 +162,7 @@ class SupportFlow {
 
 		$this->post_type       = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
 		$this->respondents_tax = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
+		$this->tags_tax        = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
 		$this->comment_type    = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
 
 		$this->email_term_prefix = 'sf-';
@@ -288,7 +289,7 @@ class SupportFlow {
 	 */
 	public function action_init_register_taxonomies() {
 
-		$args = array(
+		$args_respondents_tax = array(
 			'label'             => __( 'Respondents', 'supportflow' ),
 			'labels'            => array(
 				'search_items' => __( 'Search Respondents', 'supportflow' ),
@@ -300,7 +301,22 @@ class SupportFlow {
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
 		);
-		register_taxonomy( $this->respondents_tax, $this->post_type, $args );
+
+		$args_tags_tax = array(
+			'label'             => __( 'Tags', 'supportflow' ),
+			'labels'            => array(
+				'search_items' => __( 'Search Tags', 'supportflow' ),
+				'edit_item'    => __( 'Edit Tag', 'supportflow' ),
+				'update_item'  => __( 'Update Tag', 'supportflow' ),
+				'add_new_item' => __( 'Add New Tag', 'supportflow' ),
+			),
+			'public'            => true,
+			'show_in_nav_menus' => true,
+			'rewrite'           => false,
+		);
+
+		register_taxonomy( $this->respondents_tax, $this->post_type, $args_respondents_tax );
+		register_taxonomy( $this->tags_tax, $this->post_type, $args_tags_tax );
 	}
 
 	/**
