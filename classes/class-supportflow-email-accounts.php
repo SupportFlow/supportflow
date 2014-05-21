@@ -101,7 +101,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			<h2>' . __( 'E-Mail Accounts', 'supportflow' ) . '</h2>';
 
 		// Create new account
-		if ( 'add' == $action && isset( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'] ) ) {
+		if ( 'add' == $action && isset( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'], $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'add_email_account' ) ) {
 			$res = $this->add_email_account( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'] );
 			switch ( $res ) {
 
@@ -128,7 +128,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		}
 
 		// Delete existing account
-		if ( 'delete' == $action && isset( $_POST['account_id'] ) ) {
+		if ( 'delete' == $action && isset( $_POST['account_id'], $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'delete_email_account' ) ) {
 			$res = $this->remove_email_account( $_POST['account_id'] );
 			switch ( $res ) {
 
@@ -150,6 +150,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
 		<form method="POST" action="edit.php?post_type=sf_thread&page=sf_accounts">
 			<input type="hidden" name="action" value="add" />
+			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Host:', 'supportflow' ) ?></th>
@@ -202,10 +203,11 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				}
 
 				var account_key = jQuery(this).data('account-id');
-				var form = "<form method='POST' action='edit.php?post_type=sf_thread&page=sf_accounts'>" +
-					"<input type='hidden' name='action' value='delete' />" +
-					"<input type='hidden' name='account_id' value=" + account_key + " />" +
-					"</form>";
+				var form = '<form method="POST" action="edit.php?post_type=sf_thread&page=sf_accounts">' +
+					'<input type="hidden" name="action" value="delete" />' +
+					'<?php wp_nonce_field( 'delete_email_account') ?>' +
+					'<input type="hidden" name="account_id" value=' + account_key + ' />' +
+					'</form>';
 
 				jQuery(form).submit();
 			});
