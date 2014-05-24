@@ -297,13 +297,13 @@ class SupportFlow {
 			$this->predefinded_replies_type, array(
 				'labels'             => array(
 					'menu_name'          => __( 'SupportFlow', 'supportflow' ),
-					'name'               => __( 'Predefined replies', 'supportflow' ),
+					'name'               => __( 'Predefined Replies', 'supportflow' ),
 					'singular_name'      => __( 'Predefined Reply', 'supportflow' ),
 					'all_items'          => __( 'All predefined replies', 'supportflow' ),
 					'add_new'            => __( 'New predefined reply', 'supportflow' ),
 					'add_new_item'       => __( 'New predefined reply', 'supportflow' ),
-					'edit_item'          => __( 'Edit predefined reply', 'supportflow' ),
-					'new_item'           => __( 'New predefined reply', 'supportflow' ),
+					'edit_item'          => __( 'Edit Predefined reply', 'supportflow' ),
+					'new_item'           => __( 'New Predefined Reply', 'supportflow' ),
 					'view_item'          => __( 'View predefined reply', 'supportflow' ),
 					'search_items'       => __( 'Search predefined replies', 'supportflow' ),
 					'not_found'          => __( 'No predefined reply found', 'supportflow' ),
@@ -314,7 +314,7 @@ class SupportFlow {
 				'publicly_queryable' => false,
 				'show_in_menu'       => false,
 				'supports'           => array(
-					'title', 'editor', 'revisions',
+					'title', 'editor',
 				),
 			)
 		);
@@ -327,8 +327,8 @@ class SupportFlow {
 		$post_type                = $this->post_type;
 		$predefinded_replies_type = $this->predefinded_replies_type;
 
-		add_submenu_page( "edit.php?post_type=$post_type", 'All predefined replies', 'All predefined replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
-		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", 'All Predefined replies', 'All Predefined Replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", 'New Predefined reply', 'New Predefined Reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
 
 	}
 
