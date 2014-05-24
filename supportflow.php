@@ -160,10 +160,12 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type       = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
-		$this->respondents_tax = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
-		$this->tags_tax        = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type    = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
+		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
+		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
+		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
+		$this->comment_type             = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
 
 		$this->email_term_prefix = 'sf-';
 
@@ -246,6 +248,8 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
+		add_action( 'init', array( $this, 'action_init_register_predefined_replies' ) );
+		add_action( 'admin_menu', array( $this, 'action_admin_menu_predefined_replies' ) );
 
 		add_filter( 'wp_insert_post_empty_content', array( $this, 'filter_wp_insert_post_empty_content' ), 10, 2 );
 
@@ -282,6 +286,50 @@ class SupportFlow {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Register the custom post type to create predefined replies
+	 * @uses  register_post_type() To register the post type
+	 */
+	function action_init_register_predefined_replies() {
+		register_post_type(
+			$this->predefinded_replies_type, array(
+				'labels'             => array(
+					'menu_name'          => __( 'SupportFlow', 'supportflow' ),
+					'name'               => __( 'Predefined replies', 'supportflow' ),
+					'singular_name'      => __( 'Predefined Reply', 'supportflow' ),
+					'all_items'          => __( 'All predefined replies', 'supportflow' ),
+					'add_new'            => __( 'New predefined reply', 'supportflow' ),
+					'add_new_item'       => __( 'New predefined reply', 'supportflow' ),
+					'edit_item'          => __( 'Edit predefined reply', 'supportflow' ),
+					'new_item'           => __( 'New predefined reply', 'supportflow' ),
+					'view_item'          => __( 'View predefined reply', 'supportflow' ),
+					'search_items'       => __( 'Search predefined replies', 'supportflow' ),
+					'not_found'          => __( 'No predefined reply found', 'supportflow' ),
+					'not_found_in_trash' => __( 'No predefined reply found in trash', 'supportflow' ),
+				),
+				'public'             => true,
+				'show_ui'            => true,
+				'publicly_queryable' => false,
+				'show_in_menu'       => false,
+				'supports'           => array(
+					'title', 'editor', 'revisions',
+				),
+			)
+		);
+	}
+
+	/**
+	 * Add predefined options under Supportflow menu
+	 */
+	public function action_admin_menu_predefined_replies() {
+		$post_type                = $this->post_type;
+		$predefinded_replies_type = $this->predefinded_replies_type;
+
+		add_submenu_page( "edit.php?post_type=$post_type", 'All predefined replies', 'All predefined replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
+
 	}
 
 	/**
