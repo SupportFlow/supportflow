@@ -99,7 +99,7 @@ var supportflow = {};
 			message           : supportflow.single_thread_message.val(),
 			supportflow_widget: true,
 		}
-		$.post(supportflow.get_ajax_url('add-thread-comment'), data, supportflow.handle_new_message_response);
+		$.post(supportflow.get_ajax_url('add-thread-reply'), data, supportflow.handle_new_message_response);
 	}
 
 	supportflow.enable_thread_form = function (form, clear_form, submit_text) {

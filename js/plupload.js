@@ -3,15 +3,15 @@ jQuery(document).ready(function ($) {
 
 		/* Selectors */
 		browser : '#upload-indicator',
-		dropzone: '#comment-reply',
+		dropzone: '#thread-reply-box',
 
 		/* Callbacks */
 		success : function (attachment) {
-			$('#comment-attachments').val($('#comment-attachments').val() + ',' + attachment.id);
+			$('#reply-attachments').val($('#reply-attachments').val() + ',' + attachment.id);
 			$('#upload-messages').hide();
 			$('<li>', {
 				html: '<a target="_blank" href="' + attachment.url + '">' + attachment.title + '</a>',
-			}).appendTo($('ul#comment-attachments-list'));
+			}).appendTo($('ul#replies-attachments-list'));
 			$('#upload-messages').removeClass('uploading');
 		},
 

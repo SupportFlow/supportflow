@@ -162,8 +162,8 @@ class SupportFlow {
 
 		$this->post_type       = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
 		$this->respondents_tax = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
+		$this->reply_type      = apply_filters( 'supportflow_thread_reply_type', 'sf_thread' );
 		$this->tags_tax        = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type    = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
 
 		$this->email_term_prefix = 'sf-';
 
@@ -278,7 +278,7 @@ class SupportFlow {
 				'public'        => true,
 				'menu_position' => 3,
 				'supports'      => array(
-					'comments',
+					''
 				),
 			)
 		);
@@ -427,12 +427,12 @@ class SupportFlow {
 
 		// If there was a message, add it to the thread
 		if ( ! empty( $args['message'] ) && ! empty( $args['respondent_email'] ) ) {
-			$comment_details = array(
-				'comment_author'       => $args['respondent_name'],
-				'comment_author_email' => $args['respondent_email'],
-				'user_id'              => $args['respondent_id'],
+			$reply_details = array(
+				'reply_author'       => $args['respondent_name'],
+				'reply_author_email' => $args['respondent_email'],
+				'user_id'            => $args['respondent_id'],
 			);
-			$this->add_thread_comment( $thread_id, $args['message'], $comment_details );
+			$this->add_thread_reply( $thread_id, $args['message'], $reply_details );
 		}
 
 		return $thread_id;
@@ -455,7 +455,7 @@ class SupportFlow {
 	}
 
 	/**
-	 * @todo This should produce an object with thread details, respondents, and comments
+	 * @todo This should produce an object with thread details, respondents, and replies
 	 */
 	public function get_thread( $thread_id ) {
 
@@ -463,7 +463,7 @@ class SupportFlow {
 	}
 
 	/**
-	 * @todo This should produce a series of thread objects with respondents, comments, etc.
+	 * @todo This should produce a series of thread objects with respondents, replies, etc.
 	 */
 	public function get_threads( $args = array() ) {
 
@@ -587,20 +587,20 @@ class SupportFlow {
 	}
 
 	/**
-	 * Get all of the comments associated with a thread
+	 * Get all of the replies associated with a thread
 	 */
-	public function get_thread_comments( $thread_id, $args = array() ) {
+	public function get_thread_replies( $thread_id, $args = array() ) {
 
 		$args['post_id'] = $thread_id;
-		$thread_comments = SupportFlow()->get_comments( $args );
+		$thread_replies  = SupportFlow()->get_replies( $args );
 
-		return $thread_comments;
+		return $thread_replies;
 	}
 
 	/**
-	 * Get all comments based on various arguments
+	 * Get all replies based on various arguments
 	 */
-	public function get_comments( $args ) {
+	public function get_replies( $args ) {
 
 		$default_args = array(
 			'status'  => 'public', // 'public', 'private', 'all'
@@ -609,70 +609,71 @@ class SupportFlow {
 			'order'   => 'DESC', // 'DESC', 'ASC',
 		);
 
-		$args         = array_merge( $default_args, $args );
-		$comment_args = array(
-			'search'       => $args['search'],
-			'post_id'      => $args['post_id'],
-			'status'       => $args['status'],
-			'comment_type' => $this->comment_type,
-			'order'        => $args['order'],
+		$args      = array_merge( $default_args, $args );
+		$post_args = array(
+			'search'      => $args['search'],
+			'post_parent' => $args['post_id'],
+			'post_status' => $args['status'],
+			'post_type'   => $this->reply_type,
+			'order'       => $args['order'],
 		);
+		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
+		$thread_replies = get_posts( $post_args );
 
-		add_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ), 10, 2 );
-		$thread_comments = get_comments( $comment_args );
-		remove_filter( 'comments_clauses', array( $this, 'filter_comment_clauses' ) );
+		remove_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ) );
 
-		return $thread_comments;
+		return $thread_replies;
 	}
 
 	/**
-	 * Convert 'any' comment_approved requests to the proper SQL
+	 * Convert 'any' reply approved requests to the proper SQL
 	 */
-	public function filter_comment_clauses( $clauses, $query ) {
-		$old_comment_approved = "( comment_approved = '0' OR comment_approved = '1' )";
+	public function filter_reply_clauses( $clauses, $query ) {
+
+		$old_reply_approved = "( post_status = '0' OR post_status = '1' )";
 		if ( in_array( $query->query_vars['status'], array( 'public', 'private' ) ) ) {
-			$new_comment_approved = "comment_approved = '{$query->query_vars['status']}' ";
+			$new_reply_approved = "post_status = '{$query->query_vars['status']}' ";
 		} else {
-			$new_comment_approved = "comment_approved IN ( 'private', 'public' )";
+			$new_reply_approved = "post_status IN ( 'private', 'public' )";
 		}
-		$clauses['where'] = str_replace( $old_comment_approved, $new_comment_approved, $clauses['where'] );
+		$clauses['where'] = str_replace( $old_reply_approved, $new_reply_approved, $clauses['where'] );
 
 		return $clauses;
 	}
 
 	/**
-	 * Get the total number of comments associated with a thread
+	 * Get the total number of replies associated with a thread
 	 *
-	 * @todo support filtering to specific types or commenters
+	 * @todo support filtering to specific types or replier
 	 */
-	public function get_thread_comment_count( $thread_id, $args = array() ) {
+	public function get_thread_replies_count( $thread_id, $args = array() ) {
 		global $wpdb;
 
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_post_ID =%s AND comment_type = %s", $thread_id, $this->comment_type ) );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_parent =%s AND post_type = %s", $thread_id, $this->post_type ) );
 
 		return (int) $count;
 	}
 
 	/**
-	 * Add a comment to a given thread
+	 * Add a reply to a given thread
 	 */
-	public function add_thread_comment( $thread_id, $comment_text, $details = array() ) {
+	public function add_thread_reply( $thread_id, $reply_text, $details = array() ) {
 		global $wpdb;
 
 		$default_details = array(
-			'time'                 => current_time( 'mysql' ),
-			'comment_author'       => '',
-			'comment_author_email' => '',
-			'user_id'              => '',
-			'comment_approved'     => 'public',
+			'time'               => current_time( 'mysql' ),
+			'reply_author'       => '',
+			'reply_author_email' => '',
+			'user_id'            => '',
+			'post_status'        => 'public',
 		);
 
 		// @todo This actually probably shouldn't default to current user, so
 		// we don't have to mandate the arguments be assigned each time
 		if ( $user = wp_get_current_user() ) {
-			$default_details['comment_author']       = $user->display_name;
-			$default_details['comment_author_email'] = $user->user_email;
-			$default_details['user_id']              = $user->ID;
+			$default_details['reply_author']       = $user->display_name;
+			$default_details['reply_author_email'] = $user->user_email;
+			$default_details['user_id']            = $user->ID;
 		}
 
 		$details = array_merge( $default_details, $details );
@@ -685,31 +686,37 @@ class SupportFlow {
 			$attachment_ids = false;
 		}
 
-		$comment    = array(
-			'comment_content'      => esc_sql( $comment_text ),
-			'comment_post_ID'      => (int) $thread_id,
-			'comment_date'         => esc_sql( $details['time'] ),
-			'comment_approved'     => esc_sql( $details['comment_approved'] ),
-			'comment_type'         => esc_sql( $this->comment_type ),
-			'comment_author'       => esc_sql( $details['comment_author'] ),
-			'comment_author_email' => esc_sql( $details['comment_author_email'] ),
-			'user_id'              => (int) $details['user_id'],
+		$reply = array(
+			'post_content' => esc_sql( $reply_text ),
+			'post_parent'  => (int) $thread_id,
+			'post_date'    => esc_sql( $details['time'] ),
+			'post_status'  => esc_sql( $details['post_status'] ),
+			'post_type'    => esc_sql( $this->reply_type ),
+			'post_title'   => 'supportflow reply',
+			'user_id'      => (int) $details['user_id'],
 		);
-		$comment    = apply_filters( 'supportflow_pre_insert_thread_comment', $comment );
-		$comment_id = wp_insert_comment( $comment );
 
+
+		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
+		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+		$reply_id = wp_insert_post( $reply, true );
+		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		// If there are attachment IDs store them as meta
 		if ( ! empty( $attachment_ids ) ) {
-			add_comment_meta( $comment_id, 'attachment_ids', $attachment_ids, true );
+			add_post_meta( $reply_id, 'attachment_ids', $attachment_ids, true );
 		}
 
-		// Adding a thread comment updates the post modified time for the thread
+		add_post_meta( $reply_id, 'reply_author', esc_sql( $details['reply_author'] ) );
+		add_post_meta( $reply_id, 'reply_author_email', esc_sql( $details['reply_author_email'] ) );
+
+
+		// Adding a thread reply updates the post modified time for the thread
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql' ) ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
 
-		do_action( 'supportflow_thread_comment_added', $comment_id );
+		do_action( 'supportflow_thread_reply_added', $reply_id );
 
-		return $comment_id;
+		return $reply_id;
 	}
 
 	/**

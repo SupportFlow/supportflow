@@ -126,27 +126,27 @@ EOB
 			SupportFlow()->update_thread_respondents( $thread_id, $old_thread->email );
 
 			// Get the thread's messages and import those too
-			$old_messages   = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
-			$count_comments = 0;
+			$old_messages  = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
+			$count_replies = 0;
 			foreach ( $old_messages as $old_message ) {
 				$message_args = array(
-					'comment_author'       => $old_message->email,
-					'comment_author_email' => $old_message->email,
-					'time'                 => $old_message->dt,
-					'comment_approved'     => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
+					'reply_author'       => $old_message->email,
+					'reply_author_email' => $old_message->email,
+					'time'               => $old_message->dt,
+					'post_status'        => ( 'note' == $old_message->message_type ) ? 'private' : 'public',
 				);
 				if ( function_exists( 'What_The_Email' ) ) {
 					$old_message->content = What_The_Email()->get_message( $old_message->content );
 				}
-				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $old_message->content, $message_args );
-				add_comment_meta( $comment_id, '_imported_id', $old_message->message_id );
-				$count_comments ++;
+				$reply_id = SupportFlow()->add_thread_reply( $thread_id, $old_message->content, $message_args );
+				add_post_meta( $reply_id, '_imported_id', $old_message->message_id );
+				$count_replies ++;
 			}
 
 			// One the thread is created, log the old thread ID
 			update_post_meta( $thread_id, '_imported_id', $old_thread->thread_id );
 
-			WP_CLI::line( "Created: #{$old_thread->thread_id} '{$old_thread->subject}' with {$count_comments} comments" );
+			WP_CLI::line( "Created: #{$old_thread->thread_id} '{$old_thread->subject}' with {$count_replies} replies" );
 			$count_threads_created ++;
 		}
 

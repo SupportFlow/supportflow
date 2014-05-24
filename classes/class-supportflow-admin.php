@@ -281,15 +281,16 @@ class SupportFlow_Admin extends SupportFlow {
 			}
 		}
 
-		// Do our own custom search handling so we can search against comment text
+		// Do our own custom search handling so we can search against reply text
 		if ( $search = $query->get( 's' ) ) {
-			// Get any comments that match our results
-			$args              = array(
+
+			// Get all replies that match our results
+			$args             = array(
 				'search' => $search,
 				'status' => 'any',
 			);
-			$matching_comments = SupportFlow()->get_comments( $args );
-			$post_ids          = wp_list_pluck( $matching_comments, 'comment_post_ID' );
+			$matching_replies = SupportFlow()->get_replies( $args );
+			$post_ids         = wp_list_pluck( $matching_replies, 'post_parent' );
 
 			$args       = array(
 				's'                      => $search,
@@ -367,14 +368,12 @@ class SupportFlow_Admin extends SupportFlow {
 		$respondents_box = 'tagsdiv-' . SupportFlow()->respondents_tax;
 		remove_meta_box( 'submitdiv', SupportFlow()->post_type, 'side' );
 		remove_meta_box( $respondents_box, SupportFlow()->post_type, 'side' );
-		remove_meta_box( 'commentstatusdiv', SupportFlow()->post_type, 'normal' );
 		remove_meta_box( 'slugdiv', SupportFlow()->post_type, 'normal' );
-		remove_meta_box( 'commentsdiv', SupportFlow()->post_type, 'normal' );
 
 		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
-		add_meta_box( 'supportflow-comments', __( 'Commentss', 'supportflow' ), array( $this, 'meta_box_comments' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
 	}
 
 	/**
@@ -468,10 +467,10 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	/**
-	 * Standard listing of comments includes a form at the top
-	 * and any existing comments listed in reverse chronological order
+	 * Standard listing of replies includes a form at the top
+	 * and any existing replies listed in reverse chronological order
 	 */
-	public function meta_box_comments() {
+	public function meta_box_replies() {
 		global $pagenow;
 
 		$placeholders = array(
@@ -481,17 +480,17 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$rand = array_rand( $placeholders );
 		echo '<h4>' . __( 'Conversation', 'supportflow' ) . '</h4>';
-		echo '<div id="comment-reply">';
+		echo '<div id="thread-reply-box">';
 
-		echo "<textarea id='comment' name='comment' class='thread-comment' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
+		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
-		echo '<div id="comment-attachments-wrap">';
+		echo '<div id="replies-attachments-wrap">';
 		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it', 'supportflow' ) . '</div>';
-		echo '<ul id="comment-attachments-list">';
+		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
-		echo '<input type="hidden" id="comment-attachments" name="comment-attachments" />';
+		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" />';
 		echo '</div>';
 		echo '<div id="submit-action">';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
@@ -509,20 +508,21 @@ class SupportFlow_Admin extends SupportFlow {
 
 		echo '<div class="clear"></div>';
 
-		$this->display_thread_comments();
+		$this->display_thread_replies();
 	}
 
-	public function display_thread_comments() {
+	public function display_thread_replies() {
 
-		$private_comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'private' ) );
-		if ( ! empty( $private_comments ) ) {
-			echo '<ul class="private-comments">';
-			foreach ( $private_comments as $comment ) {
+		$private_replies = SupportFlow()->get_thread_replies( get_the_ID(), array( 'status' => 'private' ) );
+
+		if ( ! empty( $private_replies ) ) {
+			echo '<ul class="private-replies">';
+			foreach ( $private_replies as $reply ) {
 				echo '<li>';
-				echo '<div class="thread-comment">';
-				echo wpautop( stripslashes( $comment->comment_content ) );
-				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
-					echo '<ul class="thread-comment-attachments">';
+				echo '<div class="thread-reply">';
+				echo wpautop( stripslashes( $reply->post_content ) );
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+					echo '<ul class="thread-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
@@ -530,27 +530,30 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$comment_date      = get_comment_date( get_option( 'date_format' ), $comment->comment_ID );
-				$comment_time      = get_comment_date( get_option( 'time_format' ), $comment->comment_ID );
-				$comment_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $comment->comment_author, $comment_date, $comment_time );
-				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
+				$reply_date      = mysql2date( get_option( 'date_format' ), $reply->post_date_gmt );
+				$reply_time      = mysql2date( get_option( 'time_format' ), $reply->post_date_gmt );
+				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
+				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, $reply_date, $reply_time );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
 		}
 
-		$comments = SupportFlow()->get_thread_comments( get_the_ID(), array( 'status' => 'public' ) );
-		if ( ! empty( $comments ) ) {
-			echo '<ul class="thread-comments">';
-			foreach ( $comments as $comment ) {
+		$replies = SupportFlow()->get_thread_replies( get_the_ID(), array( 'status' => 'public' ) );
+		if ( ! empty( $replies ) ) {
+			echo '<ul class="thread-replies">';
+			foreach ( $replies as $reply ) {
+				$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
+				$reply_author_email = get_post_meta( $reply->ID, 'reply_author', true );
 				echo '<li>';
-				echo '<div class="comment-avatar">' . get_avatar( $comment->comment_author_email, 72 );
-				echo '<p class="comment-author">' . esc_html( $comment->comment_author ) . '</p>';
+				echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
+				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
 				echo '</div>';
-				echo '<div class="thread-comment">';
-				echo wpautop( stripslashes( $comment->comment_content ) );
-				if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
-					echo '<ul class="thread-comment-attachments">';
+				echo '<div class="thread-reply">';
+				echo wpautop( stripslashes( $reply->post_content ) );
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+					echo '<ul class="thread-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
 						$attachment_link = wp_get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
@@ -558,8 +561,10 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$comment_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_comment_date( get_option( 'date_format' ), $comment->comment_ID ), get_comment_date( get_option( 'time_format' ), $comment->comment_ID ) );
-				echo '<div class="thread-meta"><span class="comment-timestamp">' . esc_html( $comment_timestamp ) . '</span></div>';
+				$reply_date      = mysql2date( get_option( 'date_format' ), $reply->post_date_gmt );
+				$reply_time      = mysql2date( get_option( 'time_format' ), $reply->post_date_gmt );
+				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), $reply_date, $reply_time );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
@@ -583,7 +588,7 @@ class SupportFlow_Admin extends SupportFlow {
 			'respondents' => __( 'Respondents', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
-			'sf_comments' => '<span class="vers"><img alt="' . esc_attr__( 'Comments', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+			'sf_replies'  => '<span class="vers"><img alt="' . esc_attr__( 'Replies', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
 			'created'     => __( 'Created', 'support' ),
 		);
 
@@ -601,12 +606,14 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	/**
-	 * Use the most recent public comment as the post excerpt
+	 * Use the most recent public reply as the post excerpt
 	 * on the Manage Threads view so mode=excerpt works well
 	 */
 	public function filter_get_the_excerpt( $orig ) {
-		if ( $comment = array_pop( SupportFlow()->get_thread_comments( get_the_ID() ) ) ) {
-			return $comment->comment_author . ': "' . wp_trim_excerpt( $comment->comment_content ) . '"';
+		if ( $reply = array_pop( SupportFlow()->get_thread_replies( get_the_ID() ) ) ) {
+			$reply_author = get_post_meta( $reply->ID, 'reply_author' );
+
+			return $reply_author . ': "' . wp_trim_excerpt( $reply->post_content ) . '"';
 		} else {
 			return $orig;
 		}
@@ -647,10 +654,10 @@ class SupportFlow_Admin extends SupportFlow {
 				$filter_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
 				break;
-			case 'sf_comments':
-				$comments = SupportFlow()->get_thread_comment_count( $thread_id );
+			case 'sf_replies':
+				$replies = SupportFlow()->get_thread_replies_count( $thread_id );
 				echo '<div class="post-com-count-wrapper">';
-				echo "<span class='comment-count'>{$comments}</span>";
+				echo "<span class='replies-count'>{$replies}</span>";
 				echo '</div>';
 				break;
 			case 'created':
@@ -683,7 +690,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 	/**
 	 * When a thread is saved or updated, make sure we save the respondent
-	 * and new comment data
+	 * and new reply data
 	 *
 	 * @todo nonce and cap checks
 	 */
@@ -698,19 +705,19 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['comment'] ) && ! empty( $_POST['comment'] ) ) {
-			$comment    = wp_filter_nohtml_kses( $_POST['comment'] );
+		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
+			$reply      = wp_filter_nohtml_kses( $_POST['reply'] );
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
-			if ( ! empty( $_POST['comment-attachments'] ) ) {
-				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['comment-attachments'], ',' ) ) );
+			if ( ! empty( $_POST['reply-attachments'] ) ) {
+				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['reply-attachments'], ',' ) ) );
 			} else {
 				$attachment_ids = '';
 			}
-			$comment_args = array(
-				'comment_approved' => $visibility,
-				'attachment_ids'   => $attachment_ids,
+			$reply_args = array(
+				'post_status'    => $visibility,
+				'attachment_ids' => $attachment_ids,
 			);
-			SupportFlow()->add_thread_comment( $thread_id, $comment, $comment_args );
+			SupportFlow()->add_thread_reply( $thread_id, $reply, $reply_args );
 		}
 
 	}

@@ -14,10 +14,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 	public function setup_actions() {
 
-		add_filter( 'supportflow_emails_comment_notify_subject', array( $this, 'filter_comment_notify_subject' ), 10, 3 );
+		add_filter( 'supportflow_emails_reply_notify_subject', array( $this, 'filter_reply_notify_subject' ), 10, 3 );
 	}
 
-	public function filter_comment_notify_subject( $subject, $comment_id, $thread_id ) {
+	public function filter_reply_notify_subject( $subject, $reply_id, $thread_id ) {
 
 		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_thread( $thread_id ) . ']';
 
@@ -152,11 +152,11 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 
 		if ( $thread_id ) {
-			$message_args = array(
-				'comment_author'       => $respondent_name,
-				'comment_author_email' => $respondent_email,
+			$reply_args = array(
+				'reply_author'       => $respondent_name,
+				'reply_author_email' => $respondent_email,
 			);
-			SupportFlow()->add_thread_comment( $thread_id, $message, $message_args );
+			SupportFlow()->add_thread_reply( $thread_id, $message, $reply_args );
 		} else {
 			// If this wasn't in reply to an existing message, create a new thread
 			$new_thread_args = array(
@@ -173,7 +173,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
 		}
 
-		$new_comment = array_pop( SupportFlow()->get_thread_comments( $thread_id ) );
+		$new_reply = array_pop( SupportFlow()->get_thread_replies( $thread_id ) );
 
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
 		$respondents = array();
@@ -192,9 +192,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		// Store the original email ID so we don't accidentally dupe it
 		$email_id = trim( $email->headers->message_id, '<>' );
-		if ( is_object( $new_comment ) ) {
-			update_comment_meta( $new_comment->comment_ID, self::email_id_key, $email_id );
-			update_comment_meta( $new_comment->comment_ID, 'attachment_ids', $new_attachment_ids );
+		if ( is_object( $new_reply ) ) {
+			update_post_meta( $new_reply->ID, self::email_id_key, $email_id );
+			update_post_meta( $new_reply->ID, 'attachment_ids', $new_attachment_ids );
 		}
 
 		return true;
