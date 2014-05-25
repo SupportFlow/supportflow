@@ -54,7 +54,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 }
 
 class SupportFlow_Email_Accounts extends SupportFlow {
-	protected $_email_accounts;
+	protected $email_accounts;
 
 	const SUCCESS                  = 0;
 	const ACCOUNT_EXISTS           = 1;
@@ -69,7 +69,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
 
 		// Get existing E-Mail accounts from database
-		$email_accounts = & $this->_email_accounts;
+		$email_accounts = & $this->email_accounts;
 		$email_accounts = get_option( 'sf_email_accounts' );
 		if ( ! is_array( $email_accounts ) ) {
 			$email_accounts = array();
@@ -141,7 +141,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			}
 		}
 
-		$email_accounts_table = new SupportFlow_Email_Accounts_Table( $this->get_email_accounts() );
+		$email_accounts_table = new SupportFlow_Email_Accounts_Table( $this->email_accounts );
 		$email_accounts_table->prepare_items();
 		$email_accounts_table->display();
 
@@ -219,7 +219,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Add a new E-Mail account to database
 	 */
 	function add_email_account( $imap_host, $imap_port, $smtp_host, $smtp_port, $username, $password, $test_login = true ) {
-		$email_accounts = & $this->_email_accounts;
+		$email_accounts = & $this->email_accounts;
 		sanitize_text_field( $imap_host, $imap_port, $smtp_port, $username, $password );
 
 		if ( $this->is_exist_email_account( $imap_host, $smtp_host, $username ) ) {
@@ -262,7 +262,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Remove an E-Mail account from database
 	 */
 	function remove_email_account( $account_id ) {
-		$email_accounts = & $this->_email_accounts;
+		$email_accounts = & $this->email_accounts;
 
 		if ( ! isset( $email_accounts[$account_id] ) ) {
 			return self::NO_ACCOUNT_EXISTS;
@@ -275,19 +275,11 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	}
 
 	/**
-	 * Return the list of all existing E-Mail accounts
-	 * @return array
-	 */
-	function get_email_accounts() {
-		return $this->_email_accounts;
-	}
-
-	/**
 	 * Check if E-Mail account exists in database
 	 * @return boolean
 	 */
 	function is_exist_email_account( $imap_host, $smtp_host, $username ) {
-		$email_accounts = & $this->_email_accounts;
+		$email_accounts = & $this->email_accounts;
 
 		foreach ( $email_accounts as $email_account ) {
 			if (
