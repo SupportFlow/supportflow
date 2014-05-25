@@ -20,8 +20,10 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 				'username'  => $account['username'],
 				'imap_host' => $account['imap_host'],
 				'imap_port' => $account['imap_port'],
+				'imap_ssl'  => $account['imap_ssl'] ? 'True' : 'False',
 				'smtp_host' => $account['smtp_host'],
 				'smtp_port' => $account['smtp_port'],
+				'smtp_ssl'  => $account['smtp_ssl'] ? 'True' : 'False',
 				'action'    => "<a href='#' data-account-id='$account_id' id='delete_email_account'>Delete</a>",
 			);
 		}
@@ -36,8 +38,10 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 			'username'  => __( 'Username', 'supportflow' ),
 			'imap_host' => __( 'IMAP Host', 'supportflow' ),
 			'imap_port' => __( 'IMAP Port', 'supportflow' ),
+			'imap_ssl'  => __( 'IMAP use SSL', 'supportflow' ),
 			'smtp_host' => __( 'SMTP Host', 'supportflow' ),
 			'smtp_port' => __( 'SMTP Port', 'supportflow' ),
+			'smtp_ssl'  => __( 'SMTP use SSL', 'supportflow' ),
 			'action'    => __( 'Action', 'supportflow' ),
 		);
 	}
@@ -113,11 +117,15 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Add/remove E-Mail accounts if submitted by user
 	 */
 	function process_form_submission() {
-		$action = isset( $_POST['action'] ) ? $_POST['action'] : '';
+		$action   = isset( $_POST['action'] ) ? $_POST['action'] : '';
+		$imap_ssl = isset( $_POST['imap_ssl'] ) && 'on' == $_POST['imap_ssl'] ? true : false;
+		$smtp_ssl = isset( $_POST['smtp_ssl'] ) && 'on' == $_POST['smtp_ssl'] ? true : false;
 
 		// Create new account
 		if ( 'add' == $action && isset( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'], $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'add_email_account' ) ) {
-			$res = $this->add_email_account( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'] );
+
+			$res = $this->add_email_account( $_POST['imap_host'], $_POST['imap_port'], $imap_ssl, $_POST['smtp_host'], $_POST['smtp_port'], $smtp_ssl, $_POST['username'], $_POST['password'] );
+
 			switch ( $res ) {
 
 				case self::SUCCESS:
@@ -175,43 +183,55 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
-		<form method="POST" action="<?php echo $form_action ?>">
+		<form method="POST" id="add_new_email_account" action="<?php echo $form_action ?>">
 			<input type="hidden" name="action" value="add" />
 			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Host:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="imap_host" value="<?php echo esc_attr( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
+						<input type="text" required id="imap_host" name="imap_host" value="<?php echo esc_attr( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><?php _e( 'IMAP Server requires SSL: ', 'supportflow' ) ?></th>
+					<td>
+						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo esc_attr( isset( $_POST['imap_ssl'] ) && $_POST['imap_ssl'] == 'on' ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
+						<input type="number" required id="imap_port" name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '143' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Host:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="smtp_host" value="<?php echo esc_attr( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
+						<input type="text" required id="smtp_host" name="smtp_host" value="<?php echo esc_attr( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><?php _e( 'SMTP Server requires SSL: ', 'supportflow' ) ?></th>
+					<td>
+						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo esc_attr( isset( $_POST['smtp_ssl'] ) && $_POST['smtp_ssl'] == 'on' ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
+						<input type="number" required id="smtp_port" name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '25' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Username:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="username" value="<?php echo esc_attr( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
+						<input type="text" required id="username" name="username" value="<?php echo esc_attr( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Password:', 'supportflow' ) ?></th>
-					<td><input type="password" required name="password" /></td>
+					<td><input type="password" required id="password" name="password" /></td>
 				</tr>
 			</table>
 			<?php submit_button( __( 'Add New Server', 'supportflow' ) ); ?>
@@ -242,6 +262,27 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 				jQuery(form).submit();
 			});
+
+
+			jQuery('#add_new_email_account #imap_ssl').change(function () {
+				if (this.checked) {
+					// Change to default IMAP SSL port on enabling SSL
+					jQuery('#add_new_email_account #imap_port').val('993');
+				} else {
+					// Change to default IMAP non-SSL port on disabling SSL
+					jQuery('#add_new_email_account #imap_port').val('143');
+				}
+			});
+
+			jQuery('#add_new_email_account #smtp_ssl').change(function () {
+				if (this.checked) {
+					// Change to default SMTP SSL port on enabling SSL
+					jQuery('#add_new_email_account #smtp_port').val('465');
+				} else {
+					// Change to default SMTP non-SSL port on disabling SSL
+					jQuery('#add_new_email_account #smtp_port').val('25');
+				}
+			});
 		</script>
 	<?php
 	}
@@ -249,12 +290,14 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	/**
 	 * Add a new E-Mail account to database
 	 */
-	function add_email_account( $imap_host, $imap_port, $smtp_host, $smtp_port, $username, $password, $test_login = true ) {
+	function add_email_account( $imap_host, $imap_port, $imap_ssl, $smtp_host, $smtp_port, $smtp_ssl, $username, $password, $test_login = true ) {
 		$email_accounts = & $this->email_accounts;
 		$imap_host      = sanitize_text_field( $imap_host );
 		$imap_port      = sanitize_text_field( $imap_port );
+		$imap_ssl       = sanitize_text_field( $imap_ssl );
 		$smtp_host      = sanitize_text_field( $smtp_host );
 		$smtp_port      = sanitize_text_field( $smtp_port );
+		$smtp_ssl       = sanitize_text_field( $smtp_ssl );
 		$username       = sanitize_text_field( $username );
 		$password       = sanitize_text_field( $password );
 
@@ -264,7 +307,9 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 		if ( $test_login ) {
 			imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
-			if ( $imap_stream = imap_open( "{{$imap_host}:{$imap_port}/ssl}", $username, $password, 0, 0 ) ) {
+			$ssl     = $imap_ssl ? '/ssl' : '';
+			$mailbox = '{' . $imap_host . ':' . $imap_port . $ssl . '}';
+			if ( $imap_stream = imap_open( $mailbox, $username, $password, 0, 0 ) ) {
 				imap_close( $imap_stream );
 			} else {
 				$error = imap_errors()[0];
@@ -283,8 +328,10 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$email_accounts[] = array(
 			'imap_host' => $imap_host,
 			'imap_port' => $imap_port,
+			'imap_ssl'  => $imap_ssl,
 			'smtp_host' => $smtp_host,
 			'smtp_port' => $smtp_port,
+			'smtp_ssl'  => $smtp_ssl,
 			'username'  => $username,
 			'password'  => $password,
 		);
