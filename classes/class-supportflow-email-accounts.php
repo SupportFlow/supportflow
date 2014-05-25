@@ -76,15 +76,15 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	}
 
 	function action_admin_menu() {
-		$post_type = SupportFlow()->post_type;
-
+		$post_type  = SupportFlow()->post_type;
+		$this->slug = 'sf_accounts';
 		// Create a menu (SupportFlow->E-Mail Accounts)
 		add_submenu_page(
 			"edit.php?post_type=$post_type",
 			__( 'SupportFlow E-Mail Accounts', 'supportflow' ),
 			__( 'E-Mail Accounts', 'supportflow' ),
 			'manage_options',
-			'sf_accounts',
+			$this->slug,
 			array( $this, 'settings_page' )
 		);
 
@@ -171,10 +171,11 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Create a form to enter new E-Mail account details
 	 */
 	public function insert_add_new_account_form() {
+		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
-		<form method="POST" action="edit.php?post_type=sf_thread&page=sf_accounts">
+		<form method="POST" action="<?php echo $form_action ?>">
 			<input type="hidden" name="action" value="add" />
 			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
@@ -222,18 +223,20 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Insert JS code required for form submission
 	 */
 	public function insert_js_code() {
+		$msg_title   = __( 'Are you sure want to delete this account.', 'supportflow' );
+		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
 		?>
 		<script type="text/javascript">
 			jQuery('#delete_email_account').click(function (e) {
 				e.preventDefault();
-				if (!confirm('<?php _e( 'Are you sure want to delete this account.', 'supportflow' ) ?>')) {
+				if (!confirm('<?php echo $msg_title ?>')) {
 					return;
 				}
 
 				var account_key = jQuery(this).data('account-id');
-				var form = '<form method="POST" action="edit.php?post_type=sf_thread&page=sf_accounts">' +
+				var form = '<form method="POST" action="<?php echo $form_action ?>">' +
 					'<input type="hidden" name="action" value="delete" />' +
-					'<?php wp_nonce_field( 'delete_email_account') ?>' +
+					'<?php wp_nonce_field( 'delete_email_account'  ) ?>' +
 					'<input type="hidden" name="account_id" value=' + account_key + ' />' +
 					'</form>';
 
