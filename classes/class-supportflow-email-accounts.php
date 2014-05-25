@@ -95,10 +95,26 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Loads the setting page to add/remove E-Mail accounts
 	 */
 	function settings_page() {
-		$action = isset( $_POST['action'] ) ? $_POST['action'] : '';
-
 		echo '<div class="wrap">
 			<h2>' . __( 'E-Mail Accounts', 'supportflow' ) . '</h2>';
+
+		// Add/remove E-Mail accounts if submitted by user
+		$this->process_form_submission();
+
+		$this->list_email_accounts();
+
+		$this->insert_add_new_account_form();
+
+		echo '</div>';
+
+		$this->insert_js_code();
+	}
+
+	/*
+	 * Add/remove E-Mail accounts if submitted by user
+	 */
+	function process_form_submission() {
+		$action = isset( $_POST['action'] ) ? $_POST['action'] : '';
 
 		// Create new account
 		if ( 'add' == $action && isset( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'], $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'add_email_account' ) ) {
@@ -126,7 +142,6 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 					break;
 			}
 		}
-
 		// Delete existing account
 		if ( 'delete' == $action && isset( $_POST['account_id'], $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'delete_email_account' ) ) {
 			$res = $this->remove_email_account( $_POST['account_id'] );
@@ -141,10 +156,22 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			}
 		}
 
+	}
+
+	/**
+	 * List all the existing E-Mail accounts in a table
+	 */
+	public function list_email_accounts() {
 		$email_accounts_table = new SupportFlow_Email_Accounts_Table( $this->email_accounts );
 		$email_accounts_table->prepare_items();
 		$email_accounts_table->display();
 
+	}
+
+	/*
+	 * Create a form to enter new E-Mail account details
+	 */
+	public function insert_add_new_account_form() {
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
@@ -158,35 +185,30 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 						<input type="text" required name="imap_host" value="<?php echo esc_html( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
 					</td>
 				</tr>
-
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></th>
 					<td>
 						<input type="number" required name="imap_port" value="<?php echo esc_html( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
 					</td>
 				</tr>
-
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Host:', 'supportflow' ) ?></th>
 					<td>
 						<input type="text" required name="smtp_host" value="<?php echo esc_html( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
 					</td>
 				</tr>
-
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></th>
 					<td>
 						<input type="number" required name="smtp_port" value="<?php echo esc_html( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
 					</td>
 				</tr>
-
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Username:', 'supportflow' ) ?></th>
 					<td>
 						<input type="text" required name="username" value="<?php echo esc_html( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
 					</td>
 				</tr>
-
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Password:', 'supportflow' ) ?></th>
 					<td><input type="password" required name="password" /></td>
@@ -194,7 +216,14 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			</table>
 			<?php submit_button( __( 'Add New Server', 'supportflow' ) ); ?>
 		</form>
+	<?php
+	}
 
+	/*
+	 * Insert JS code required for form submission
+	 */
+	public function insert_js_code() {
+		?>
 		<script type="text/javascript">
 			jQuery('#delete_email_account').click(function (e) {
 				e.preventDefault();
