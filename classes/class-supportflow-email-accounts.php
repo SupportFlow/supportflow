@@ -13,11 +13,10 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 	function __construct( $accounts ) {
 		parent::__construct();
 
-		$data = & $this->_data;
-		$data = array();
+		$this->_data = array();
 
 		foreach ( $accounts as $account_id => $account ) {
-			$data[] = array(
+			$this->_data[] = array(
 				'username'  => $account['username'],
 				'imap_host' => $account['imap_host'],
 				'imap_port' => $account['imap_port'],
@@ -54,7 +53,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 }
 
 class SupportFlow_Email_Accounts extends SupportFlow {
-	protected $email_accounts;
+	var $email_accounts;
 
 	const SUCCESS                  = 0;
 	const ACCOUNT_EXISTS           = 1;
@@ -129,10 +128,10 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 					echo '<h3>' . __( 'There is an account already exists with same host name and user name. Please create a new account with different settings.', 'supportflow' ) . '</h3>';
 					break;
 				case self::IMAP_HOST_NOT_FOUND:
-					echo '<h3>' . __( 'Unable to connect to ' . esc_html( $_POST['imap_host'] ) . '. Please check your IMAP host name.', 'supportflow' ) . '</h3>';
+					echo '<h3>' . sprintf( __( 'Unable to connect to %s. Please check your IMAP host name.', 'supportflow' ), esc_html( $_POST['imap_host'] ) ) . '</h3>';
 					break;
 				case self::IMAP_TIME_OUT:
-					echo '<h3>' . __( 'Time out while connecting to ' . esc_html( $_POST['imap_host'] ) . '. Please check your IMAP port number and host name.', 'supportflow' ) . '</h3>';
+					echo '<h3>' . sprintf( __( 'Time out while connecting to %s. Please check your IMAP port number and host name.', 'supportflow' ), esc_html( $_POST['imap_host'] ) ) . '</h3>';
 					break;
 				case self::IMAP_INVALID_CRIDENTIALS:
 					echo '<h3>' . __( 'Unable to connect with given username/password combination. Please re-check your username and password', 'supportflow' ) . '</h3>';
@@ -182,31 +181,31 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Host:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="imap_host" value="<?php echo esc_html( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
+						<input type="text" required name="imap_host" value="<?php echo esc_attr( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required name="imap_port" value="<?php echo esc_html( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
+						<input type="number" required name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Host:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="smtp_host" value="<?php echo esc_html( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
+						<input type="text" required name="smtp_host" value="<?php echo esc_attr( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required name="smtp_port" value="<?php echo esc_html( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
+						<input type="number" required name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Username:', 'supportflow' ) ?></th>
 					<td>
-						<input type="text" required name="username" value="<?php echo esc_html( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
+						<input type="text" required name="username" value="<?php echo esc_attr( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
@@ -249,13 +248,18 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 */
 	function add_email_account( $imap_host, $imap_port, $smtp_host, $smtp_port, $username, $password, $test_login = true ) {
 		$email_accounts = & $this->email_accounts;
-		sanitize_text_field( $imap_host, $imap_port, $smtp_port, $username, $password );
+		$imap_host      = sanitize_text_field( $imap_host );
+		$imap_port      = sanitize_text_field( $imap_port );
+		$smtp_host      = sanitize_text_field( $smtp_host );
+		$smtp_port      = sanitize_text_field( $smtp_port );
+		$username       = sanitize_text_field( $username );
+		$password       = sanitize_text_field( $password );
 
-		if ( $this->is_exist_email_account( $imap_host, $smtp_host, $username ) ) {
+		if ( $this->email_account_exists( $imap_host, $smtp_host, $username ) ) {
 			return self::ACCOUNT_EXISTS;
 		}
 
-		if ( true == $test_login ) {
+		if ( $test_login ) {
 			imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
 			if ( $imap_stream = imap_open( "{{$imap_host}:{$imap_port}/ssl}", $username, $password, 0, 0 ) ) {
 				imap_close( $imap_stream );
@@ -292,7 +296,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 */
 	function remove_email_account( $account_id ) {
 		$email_accounts = & $this->email_accounts;
-
+		$account_id     = sanitize_text_field( $account_id );
 		if ( ! isset( $email_accounts[$account_id] ) ) {
 			return self::NO_ACCOUNT_EXISTS;
 		} else {
@@ -307,7 +311,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Check if E-Mail account exists in database
 	 * @return boolean
 	 */
-	function is_exist_email_account( $imap_host, $smtp_host, $username ) {
+	function email_account_exists( $imap_host, $smtp_host, $username ) {
 		$email_accounts = & $this->email_accounts;
 
 		foreach ( $email_accounts as $email_account ) {
