@@ -243,7 +243,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Insert JS code required for form submission
 	 */
 	public function insert_js_code() {
-		$msg_title   = __( 'Are you sure want to delete this account.', 'supportflow' );
+		$msg_title   = __( 'Are you sure want to delete this account?', 'supportflow' );
 		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
 		?>
 		<script type="text/javascript">
@@ -254,13 +254,14 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				}
 
 				var account_key = jQuery(this).data('account-id');
-				var form = '<form method="POST" action="<?php echo $form_action ?>">' +
+				var form = '<form method="POST" id="remove_email_account" action="<?php echo $form_action ?>">' +
 					'<input type="hidden" name="action" value="delete" />' +
 					'<?php wp_nonce_field( 'delete_email_account'  ) ?>' +
 					'<input type="hidden" name="account_id" value=' + account_key + ' />' +
 					'</form>';
 
-				jQuery(form).submit();
+				jQuery('body').append(form);
+				jQuery('#remove_email_account').submit();
 			});
 
 
