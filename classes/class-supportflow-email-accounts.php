@@ -194,15 +194,15 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'IMAP Server requires SSL: ', 'supportflow' ) ?></th>
+					<th scope="row"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo esc_attr( isset( $_POST['imap_ssl'] ) && $_POST['imap_ssl'] == 'on' ? 'checked="checked"' : '' ) ?> />
+						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo esc_attr( ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required id="imap_port" name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '143' ) ?>" />
+						<input type="number" required id="imap_port" name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
@@ -212,15 +212,15 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'SMTP Server requires SSL: ', 'supportflow' ) ?></th>
+					<th scope="row"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo esc_attr( isset( $_POST['smtp_ssl'] ) && $_POST['smtp_ssl'] == 'on' ? 'checked="checked"' : '' ) ?> />
+						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo esc_attr( ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
 					<th scope="row"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></th>
 					<td>
-						<input type="number" required id="smtp_port" name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '25' ) ?>" />
+						<input type="number" required id="smtp_port" name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
