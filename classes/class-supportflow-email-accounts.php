@@ -293,10 +293,10 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	function add_email_account( $imap_host, $imap_port, $imap_ssl, $smtp_host, $smtp_port, $smtp_ssl, $username, $password, $test_login = true ) {
 		$email_accounts = & $this->email_accounts;
 		$imap_host      = sanitize_text_field( $imap_host );
-		$imap_port      = sanitize_text_field( $imap_port );
+		$imap_port      = intval( $imap_port );
 		$imap_ssl       = sanitize_text_field( $imap_ssl );
 		$smtp_host      = sanitize_text_field( $smtp_host );
-		$smtp_port      = sanitize_text_field( $smtp_port );
+		$smtp_port      = intval( $smtp_port );
 		$smtp_ssl       = sanitize_text_field( $smtp_ssl );
 		$username       = sanitize_text_field( $username );
 		$password       = sanitize_text_field( $password );
@@ -346,7 +346,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 */
 	function remove_email_account( $account_id ) {
 		$email_accounts = & $this->email_accounts;
-		$account_id     = sanitize_text_field( $account_id );
+		$account_id     = intval( $account_id );
 		if ( ! isset( $email_accounts[$account_id] ) ) {
 			return self::NO_ACCOUNT_EXISTS;
 		} else {
