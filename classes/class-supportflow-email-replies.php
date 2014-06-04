@@ -15,6 +15,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	public function setup_actions() {
 
 		add_filter( 'supportflow_emails_reply_notify_subject', array( $this, 'filter_reply_notify_subject' ), 10, 3 );
+		add_action( 'sf_cron_retrieve_email_replies', array( $this, 'retrieve_email_replies' ) );
+
 	}
 
 	public function filter_reply_notify_subject( $subject, $reply_id, $thread_id ) {
@@ -22,6 +24,26 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_thread( $thread_id ) . ']';
 
 		return $subject;
+	}
+
+
+	function retrieve_email_replies() {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+
+		$email_accounts = get_option( 'sf_email_accounts' );
+		foreach ( $email_accounts as $email_account ) {
+			$imap_account = array(
+				'host'     => $email_account['imap_host'],
+				'port'     => $email_account['imap_port'],
+				'ssl'      => $email_account['imap_ssl'],
+				'username' => $email_account['username'],
+				'password' => $email_account['password'],
+				'inbox'    => 'INBOX',
+				'archive'  => 'ARCHIVE',
+			);
+
+			$this->download_and_process_email_replies( $imap_account );
+		}
 	}
 
 	/**

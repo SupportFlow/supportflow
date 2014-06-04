@@ -779,4 +779,21 @@ function SupportFlow() {
 	return SupportFlow::instance();
 }
 
+add_filter( 'cron_schedules', function ( $schedules ) {
+	$schedules['five_minutes'] = array(
+		'interval' => 300,
+		'display'  => __( 'Five Minutes' )
+	);
+
+	return $schedules;
+} );
+
+register_activation_hook( __FILE__, function () {
+	wp_schedule_event( time(), 'five_minutes', 'sf_cron_retrieve_email_replies' );
+} );
+
+register_deactivation_hook( __FILE__, function () {
+	wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
+} );
+
 add_action( 'plugins_loaded', 'SupportFlow' );
