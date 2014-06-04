@@ -6,6 +6,7 @@
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
+		add_action( 'wp_ajax_thread_attachment_upload', array( $this, 'action_wp_ajax_thread_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
@@ -60,52 +61,60 @@ class SupportFlow_Admin extends SupportFlow {
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js', array( 'wp-plupload', 'jquery' ) );
-			self::add_default_plupload_settings();
+			wp_enqueue_script( 'supportflow-thread_attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'wp-plupload', 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
-			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 		}
+		wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
+		wp_localize_script( 'supportflow-thread_attachments', 'SFThreadAttachments', array(
+			'uploading'        => __( 'Uploading: ', 'supportflow' ),
+			'failed_uploading' => __( 'Failed uploading: ', 'supportflow' ),
+			'uploaded'         => __( 'Uploaded: ', 'supportflow' )
+		) );
 	}
 
 	/**
-	 * Sets up some default Plupload settings so we can upload media
+	 * Sets up Plupload settings so we can upload media
 	 */
-	private static function add_default_plupload_settings() {
+	private function add_plupload_settings( $js_var_name, $plupload_args = array() ) {
+
 		global $wp_scripts;
 
-		$defaults = array(
+		$plupload_default_settings = array(
 			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
-			'url'                 => add_query_arg( 'post_id', get_the_id(), admin_url( 'admin-ajax.php', 'relative' ) ),
+			'max_file_size'       => wp_max_upload_size(),
+			'url'                 => admin_url( 'admin-ajax.php' ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
 			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*' ) ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
+			'browse_button'       => '',
+			'container'           => '',
+			'drop_element'        => '',
 			'multipart_params'    => array(
-				'action'   => 'upload-attachment',
-				'_wpnonce' => wp_create_nonce( 'media-form' )
-			)
+				'_ajax_nonce' => '',
+				'action'      => '',
+			),
 		);
 
-		$settings = array(
-			'defaults' => $defaults,
-			'browser'  => array(
-				'mobile'    => wp_is_mobile(),
-				'supported' => _device_can_upload(),
-			)
-		);
+		$plupload_args = array_replace( $plupload_default_settings, $plupload_args );
+		echo "<script type='text/javascript'>var $js_var_name = " . json_encode( $plupload_args ) . ";</script>";
+	}
 
-		$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
-		$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
+	public function action_wp_ajax_thread_attachment_upload() {
+		check_ajax_referer( 'thread_attachment_upload' );
+		$attachment_id  = media_handle_upload( 'async-upload', 0 );
+		$attachment_url = wp_get_attachment_url( $attachment_id );
 
-		if ( ! empty( $data ) ) {
-			$script = "$data\n$script";
-		}
+		echo json_encode( array(
+			'id'  => $attachment_id,
+			'url' => $attachment_url,
+		) );
 
-		$wp_scripts->add_data( 'wp-plupload', 'data', $script );
+		exit;
 	}
 
 	/**
@@ -543,13 +552,14 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</select></div>';
 
 		echo '<div id="thread-reply-box">';
-
 		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
 		echo '<div id="replies-attachments-wrap">';
-		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it', 'supportflow' ) . '</div>';
+		echo '<div class="drag-drop-buttons">';
+		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Select Files', 'supportflow' ) ) . '" class="button" />';
+		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
 		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" />';
