@@ -33,7 +33,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 	}
 
 	function column_default( $item, $column_name ) {
-		return $item[$column_name];
+		return $item[ $column_name ];
 	}
 
 	function get_columns() {
