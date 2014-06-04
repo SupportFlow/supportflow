@@ -765,6 +765,10 @@ class SupportFlow {
 		return SupportFlow()->extend->permissions->get_cap( $cap );
 	}
 
+	/**
+	 * Convert multiple comma seperated E-Mail ID's into a array
+	 * @return array
+	 */
 	public function extract_email_ids( $string ) {
 		$emails = str_replace( ' ', '', $string );
 		$emails = explode( ',', $emails );
