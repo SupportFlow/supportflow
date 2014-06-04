@@ -194,49 +194,49 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row"><?php _e( 'IMAP Host:', 'supportflow' ) ?></th>
+					<th scope="row"><label for="imap_host"><?php _e( 'IMAP Host:', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="text" required id="imap_host" name="imap_host" value="<?php echo esc_attr( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></th>
+					<th scope="row"><label for="imap_ssl"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo esc_attr( ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></th>
+					<th scope="row"><label for="imap_port"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="number" required id="imap_port" name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'SMTP Host:', 'supportflow' ) ?></th>
+					<th scope="row"><label for="smtp_host"><?php _e( 'SMTP Host:', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="text" required id="smtp_host" name="smtp_host" value="<?php echo esc_attr( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></th>
+					<th scope="row"><label for="smtp_ssl"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo esc_attr( ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></th>
+					<th scope="row"><label for="smtp_port"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="number" required id="smtp_port" name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'Username:', 'supportflow' ) ?></th>
+					<th scope="row"><label for="username"><?php _e( 'Username:', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="text" required id="username" name="username" value="<?php echo esc_attr( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><?php _e( 'Password:', 'supportflow' ) ?></th>
+					<th scope="row"><label for="password"><?php _e( 'Password:', 'supportflow' ) ?></label></th>
 					<td><input type="password" required id="password" name="password" /></td>
 				</tr>
 			</table>
