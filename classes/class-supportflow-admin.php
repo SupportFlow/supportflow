@@ -414,6 +414,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
 	}
 
@@ -506,6 +507,19 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
+	}
+
+	/**
+	 * Add a form element where you can choose cc and bcc receiver of reply
+	 */
+	public function meta_box_cc_bcc() {
+		?>
+		<p class="description"> <?php _e( "Please add all the E-Mail ID's seperated by comma.", 'supportflow' ) ?></p>
+		<h4 class="inline"><?php _e( "CC: ", 'supportflow' ) ?></h4>
+		<input type="text" id="cc" name="cc" style="width:100%" />
+		<h4 class="inline"> <?php _e( "BCC: ", 'supportflow' ) ?></h4>
+		<input type="text" id="bcc" name="bcc" style="width:100%" />
+	<?php
 	}
 
 	/**
