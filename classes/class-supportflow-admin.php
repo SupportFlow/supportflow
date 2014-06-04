@@ -64,14 +64,13 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_enqueue_script( 'supportflow-thread_attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'wp-plupload', 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
-
-			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
-			wp_localize_script( 'supportflow-thread_attachments', 'SFThreadAttachments', array(
-				'uploading'        => __( 'Uploading: ', 'supportflow' ),
-				'failed_uploading' => __( 'Failed uploading: ', 'supportflow' ),
-				'uploaded'         => __( 'Uploaded: ', 'supportflow' )
-			) );
 		}
+		wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
+		wp_localize_script( 'supportflow-thread_attachments', 'SFThreadAttachments', array(
+			'uploading'        => __( 'Uploading: ', 'supportflow' ),
+			'failed_uploading' => __( 'Failed uploading: ', 'supportflow' ),
+			'uploaded'         => __( 'Uploaded: ', 'supportflow' )
+		) );
 	}
 
 	/**
