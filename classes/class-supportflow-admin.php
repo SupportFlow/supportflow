@@ -606,12 +606,19 @@ class SupportFlow_Admin extends SupportFlow {
 			foreach ( $private_replies as $reply ) {
 				echo '<li>';
 				echo '<div class="thread-reply">';
-				echo wpautop( stripslashes( $reply->post_content ) );
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+				$post_content = wpautop( stripslashes( $reply->post_content ) );
+				// Make link clickable
+				$post_content = preg_replace( '!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1">$1</a>', $post_content );
+				echo $post_content;
+				$attachment_args = array(
+					'post_parent' => $reply->ID,
+					'post_type'   => 'attachment'
+				);
+				if ( $attachments = get_posts( $attachment_args ) ) {
 					echo '<ul class="thread-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
+					foreach ( $attachments as $attachment ) {
+						$attachment_link = wp_get_attachment_url( $attachment->ID );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -635,12 +642,19 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
 				echo '</div>';
 				echo '<div class="thread-reply">';
-				echo wpautop( stripslashes( $reply->post_content ) );
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+				$post_content = wpautop( stripslashes( $reply->post_content ) );
+				// Make link clickable
+				$post_content = preg_replace( '!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1">$1</a>', $post_content );
+				echo $post_content;
+				$attachment_args = array(
+					'post_parent' => $reply->ID,
+					'post_type'   => 'attachment'
+				);
+				if ( $attachments = get_posts( $attachment_args ) ) {
 					echo '<ul class="thread-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
+					foreach ( $attachments as $attachment ) {
+						$attachment_link = wp_get_attachment_url( $attachment->ID );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
