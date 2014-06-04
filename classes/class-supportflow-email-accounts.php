@@ -1,12 +1,15 @@
 <?php
 /**
- *
+ * Setting page to add/remove new E-Mail accounts to get replies
  */
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
+/**
+ * Table to show existing E-Mail accounts with a option to remove existing
+ */
 class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 	protected $_data;
 
@@ -56,6 +59,9 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 	}
 }
 
+/**
+ * Setting page to add/remove new E-Mail accounts to get replies
+ */
 class SupportFlow_Email_Accounts extends SupportFlow {
 	var $email_accounts;
 
