@@ -4,8 +4,6 @@
  */
 class SupportFlow_Email_Replies extends SupportFlow {
 
-	var $imap_connection;
-
 	const email_id_key = 'orig_email_id';
 
 	function __construct() {
@@ -50,23 +48,27 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	 * Primary method for downloading and processing email replies
 	 */
 	public function download_and_process_email_replies( $connection_details ) {
+		imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
 
-		$inbox   = $connection_details['inbox'];
-		$archive = $connection_details['archive'];
+		$ssl = $connection_details['ssl'] ? '/ssl' : '';
 
-		$this->imap_connection = imap_open( $connection_details['host'], $connection_details['username'], $connection_details['password'] );
-		if ( ! $this->imap_connection ) {
+		$mailbox     = "{{$connection_details['host']}:{$connection_details['port']}{$ssl}}";
+		$inbox       = "{$mailbox}{$connection_details['inbox']}";
+		$archive_box = "{$mailbox}{$connection_details['archive']}";
+
+		$imap_connection = imap_open( $mailbox, $connection_details['username'], $connection_details['password'] );
+		if ( ! $imap_connection ) {
 			return new WP_Error( 'connection-error', __( 'Error connecting to mailbox', 'supportflow' ) );
 		}
 
 		// Check to see if the archive mailbox exists, and create it if it doesn't
-		$mailboxes = imap_getmailboxes( $this->imap_connection, $connection_details['host'], '*' );
-		if ( ! wp_filter_object_list( $mailboxes, array( 'name' => $connection_details['host'] . $archive ) ) ) {
-			imap_createmailbox( $this->imap_connection, $connection_details['host'] . $archive );
-		}
+		$mailboxes = imap_getmailboxes( $imap_connection, $mailbox, '*' );
 
+		if ( ! wp_filter_object_list( $mailboxes, array( 'name' => $archive_box ) ) ) {
+			imap_createmailbox( $imap_connection, $archive_box );
+		}
 		// Make sure here are new emails to process
-		$email_count = imap_num_msg( $this->imap_connection );
+		$email_count = imap_num_msg( $imap_connection );
 		if ( $email_count < 1 ) {
 			return false;
 		}
@@ -75,15 +77,15 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$success = 0;
 		for ( $i = 1; $i <= $email_count; $i ++ ) {
 			$email            = new stdClass;
-			$email->headers   = imap_headerinfo( $this->imap_connection, $i );
-			$email->structure = imap_fetchstructure( $this->imap_connection, $i );
-			$email->body      = $this->get_body_from_connection( $this->imap_connection, $i );
+			$email->headers   = imap_headerinfo( $imap_connection, $i );
+			$email->structure = imap_fetchstructure( $imap_connection, $i );
+			$email->body      = $this->get_body_from_connection( $imap_connection, $i );
 
 			// @todo Confirm this a message we want to process
-			$ret = $this->process_email( $email, $i );
+			$ret = $this->process_email($imap_connection, $email, $i, $connection_details['username'] );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
-				imap_mail_move( $this->imap_connection, $i, $archive );
+				imap_mail_move( $imap_connection, $i, $connection_details['archive'] );
 				$success ++;
 			}
 		}
@@ -94,47 +96,49 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	/**
 	 * Given an email object, maybe create a new ticket
 	 */
-	public function process_email( $email, $i ) {
+	public function process_email($imap_connection, $email, $i, $to ) {
 
 		$new_attachment_ids = array();
 
 		$k = 0;
-		foreach ( $email->structure->parts as $email_part ) {
+		if ( isset( $email->structure->parts ) ) {
+			foreach ( $email->structure->parts as $email_part ) {
 
-			// We should at least be dealing with something that resembles an email object at this point
-			if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) ) {
-				continue;
-			}
-
-			if ( 'ATTACHMENT' == $email_part->disposition ) {
-				// We need to add 2 to our array key each time to get the correct email part
-				//@todo this needs more testing with different emails, should be smarter about which parts
-				$raw_attachment_data = imap_fetchbody( $this->imap_connection, $i, $k + 2 );
-
-				// The raw data from imap is base64 encoded, but php-imap has us covered!
-				$attachment_data = imap_base64( $raw_attachment_data );
-
-				$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
-				touch( $temp_file );
-				$temp_handle = fopen( $temp_file, 'w+' );
-				fwrite( $temp_handle, $attachment_data );
-				fclose( $temp_handle );
-
-				$file_array = array(
-					'tmp_name' => $temp_file,
-					'name'     => $email_part->dparameters[0]->value,
-				);
-
-				$upload_result = media_handle_sideload( $file_array, null );
-
-				if ( is_wp_error( $upload_result ) ) {
-					WP_CLI::warning( $upload_result->get_error_message() );
-				} else {
-					$new_attachment_ids[] = $upload_result;
+				// We should at least be dealing with something that resembles an email object at this point
+				if ( ! isset( $email_part->disposition ) || ! isset( $email_part->subtype ) || ! isset( $email_part->dparameters[0]->value ) ) {
+					continue;
 				}
 
+				if ( 'ATTACHMENT' == $email_part->disposition ) {
+					// We need to add 2 to our array key each time to get the correct email part
+					//@todo this needs more testing with different emails, should be smarter about which parts
+					$raw_attachment_data = imap_fetchbody( $imap_connection, $i, $k + 2 );
+
+					// The raw data from imap is base64 encoded, but php-imap has us covered!
+					$attachment_data = imap_base64( $raw_attachment_data );
+
+					$temp_file = get_temp_dir() . time() . '_supportflow_temp.tmp';
+					touch( $temp_file );
+					$temp_handle = fopen( $temp_file, 'w+' );
+					fwrite( $temp_handle, $attachment_data );
+					fclose( $temp_handle );
+
+					$file_array = array(
+						'tmp_name' => $temp_file,
+						'name'     => $email_part->dparameters[0]->value,
+					);
+
+					$upload_result = media_handle_sideload( $file_array, null );
+
+					if ( is_wp_error( $upload_result ) ) {
+						WP_CLI::warning( $upload_result->get_error_message() );
+					} else {
+						$new_attachment_ids[] = $upload_result;
+					}
+
+				}
+				$k ++;
 			}
-			$k ++;
 		}
 
 		if ( ! empty( $email->headers->subject ) ) {
@@ -143,8 +147,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$subject = sprintf( __( 'New thread from %s', 'supportflow' ), $email->headers->fromaddress );
 		}
 
-		$respondent_name  = $email->headers->from[0]->personal;
-		$respondent_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
+		$reply_author       = isset( $email->headers->from[0]->personal ) ? $email->headers->from[0]->personal : '';
+		$reply_author_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
 
 		// Parse out the reply body
 		if ( function_exists( 'What_The_Email' ) ) {
@@ -157,7 +161,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		if ( function_exists( 'What_The_Email' ) ) {
 			$check_strings = array(
 				'subject' => $subject,
-				'sender'  => $respondent_email,
+				'sender'  => $reply_author_email,
 				'message' => $message,
 			);
 			foreach ( $check_strings as $key => $value ) {
@@ -173,30 +177,6 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$thread_id = SupportFlow()->get_thread_from_secret( $matches[1] );
 		}
 
-		if ( $thread_id ) {
-			$reply_args = array(
-				'reply_author'       => $respondent_name,
-				'reply_author_email' => $respondent_email,
-			);
-			SupportFlow()->add_thread_reply( $thread_id, $message, $reply_args );
-		} else {
-			// If this wasn't in reply to an existing message, create a new thread
-			$new_thread_args = array(
-				'subject'          => $subject,
-				'respondent_name'  => $respondent_name,
-				'respondent_email' => $respondent_email,
-				'message'          => $message,
-			);
-			$thread_id       = SupportFlow()->create_thread( $new_thread_args );
-		}
-
-		foreach ( $new_attachment_ids as $new_attachment_id ) {
-			// Associate the thread ID as the parent to our new attachment
-			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $thread_id, 'post_status' => 'inherit' ) );
-		}
-
-		$new_reply = array_pop( SupportFlow()->get_thread_replies( $thread_id ) );
-
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
 		$respondents = array();
 		$fields      = array( 'to', 'cc' );
@@ -204,19 +184,47 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			if ( ! empty( $email->headers->$field ) ) {
 				foreach ( $email->headers->$field as $recipient ) {
 					$email_address = $recipient->mailbox . '@' . $recipient->host;
-					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address ) {
+					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address && strcasecmp( $email_address, $to ) != 0 ) {
 						$respondents[] = $email_address;
 					}
 				}
 			}
 		}
-		SupportFlow()->update_thread_respondents( $thread_id, $respondents, true );
+		$respondents[] = $reply_author_email;
+
+		if ( $thread_id ) {
+			$reply_args = array(
+				'reply_author'       => $reply_author,
+				'reply_author_email' => $reply_author_email,
+			);
+			SupportFlow()->update_thread_respondents( $thread_id, $respondents, true );
+			SupportFlow()->add_thread_reply( $thread_id, $message, $reply_args );
+
+		} else {
+			// If this wasn't in reply to an existing message, create a new thread
+			$new_thread_args = array(
+				'subject'            => $subject,
+				'reply_author'       => $reply_author,
+				'reply_author_email' => $reply_author_email,
+				'message'            => $message,
+				'respondent_email'   => $respondents,
+			);
+
+			$thread_id = SupportFlow()->create_thread( $new_thread_args );
+		}
+
+		$all_replies = SupportFlow()->get_thread_replies( $thread_id );
+		$new_reply   = $all_replies[count( $all_replies ) - 1];
+
+		foreach ( $new_attachment_ids as $new_attachment_id ) {
+			// Associate the thread ID as the parent to our new attachment
+			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $new_reply->ID, 'post_status' => 'inherit' ) );
+		}
 
 		// Store the original email ID so we don't accidentally dupe it
 		$email_id = trim( $email->headers->message_id, '<>' );
 		if ( is_object( $new_reply ) ) {
 			update_post_meta( $new_reply->ID, self::email_id_key, $email_id );
-			update_post_meta( $new_reply->ID, 'attachment_ids', $new_attachment_ids );
 		}
 
 		return true;
