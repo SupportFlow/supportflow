@@ -762,6 +762,15 @@ class SupportFlow {
 		return SupportFlow()->extend->permissions->get_cap( $cap );
 	}
 
+	public function extract_email_ids( $string ) {
+		$emails = str_replace( ' ', '', $string );
+		$emails = explode( ',', $emails );
+		$emails = array_filter( $emails, function ( $email ) {
+			return sanitize_email( $email ) == $email && '' != $email;
+		} );
+
+		return $emails;
+	}
 }
 
 /**
