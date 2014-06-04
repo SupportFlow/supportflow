@@ -809,9 +809,14 @@ class SupportFlow_Admin extends SupportFlow {
 			} else {
 				$attachment_ids = '';
 			}
+			$cc  = ( ! empty( $_POST['cc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['cc'] ) : '';
+			$bcc = ( ! empty( $_POST['bcc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['bcc'] ) : '';
+
 			$reply_args = array(
 				'post_status'    => $visibility,
 				'attachment_ids' => $attachment_ids,
+				'cc'             => $cc,
+				'bcc'            => $bcc,
 			);
 			SupportFlow()->add_thread_reply( $thread_id, $reply, $reply_args );
 		}

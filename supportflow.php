@@ -674,6 +674,8 @@ class SupportFlow {
 			'reply_author_email' => '',
 			'user_id'            => '',
 			'post_status'        => 'public',
+			'cc'                 => array(),
+			'bcc'                => array(),
 		);
 
 		// @todo This actually probably shouldn't default to current user, so
@@ -721,8 +723,7 @@ class SupportFlow {
 		// Adding a thread reply updates the post modified time for the thread
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql' ) ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
-
-		do_action( 'supportflow_thread_reply_added', $reply_id );
+		do_action( 'supportflow_thread_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 
 		return $reply_id;
 	}

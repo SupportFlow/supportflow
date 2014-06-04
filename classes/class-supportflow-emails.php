@@ -21,7 +21,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// When a new reply is added to a thread, notify the respondents and the agents
 		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_agents_thread_replies' ) );
-		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_respondents_thread_replies' ) );
+		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_respondents_thread_replies' ), 10, 3 );
 	}
 
 	/**
@@ -78,16 +78,13 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
-		foreach ( $agent_emails as $agent_email ) {
-			self::mail( $agent_email, $subject, $message );
-		}
+		self::mail( $subject, $message, $agent_emails );
 	}
 
 	/**
 	 * When a new reply is added to the thread, notify all of the respondents on the thread
 	 */
-	public function notify_respondents_thread_replies( $reply_id ) {
-
+	public function notify_respondents_thread_replies( $reply_id, $cc = array(), $bcc = array() ) {
 		// Respondents shouldn't receive private replies
 		$reply = get_post( $reply_id );
 		if ( ! $reply || 'private' == $reply->post_status ) {
@@ -118,9 +115,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
 
-		foreach ( $respondents as $respondent_email ) {
-			self::mail( $respondent_email, $subject, $message );
-		}
+		self::mail( $subject, $message, $respondents, $cc, $bcc );
 	}
 
 	/**
