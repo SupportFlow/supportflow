@@ -5,9 +5,6 @@
 
 class SupportFlow_Emails extends SupportFlow {
 
-	private $from_name = false;
-	private $from_email = false;
-
 	function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
@@ -16,9 +13,6 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Register the notifications to happen on which actions
 	 */
 	public function setup_actions() {
-
-		$this->from_name  = apply_filters( 'supportflow_emails_from_name', $this->from_name );
-		$this->from_email = apply_filters( 'supportflow_emails_from_address', $this->from_email );
 
 		// Don't send out any notifications when importing or using WP-CLI
 		if ( ( defined( 'WP_IMPORTING' ) && WP_IMPORTING ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
@@ -132,35 +126,32 @@ class SupportFlow_Emails extends SupportFlow {
 	/**
 	 * Send an email from SupportFlow
 	 */
-	public function mail( $respondent_email, $subject, $message ) {
+	public function mail( $subject, $message, $to, $cc = array(), $bcc = array(), $from_email = null, $from_name = null ) {
 
-		add_filter( 'wp_mail_from', array( $this, 'filter_wp_mail_from' ) );
-		add_filter( 'wp_mail_from_name', array( $this, 'filter_wp_mail_from_name' ) );
-		wp_mail( $respondent_email, $subject, $message );
-		remove_filter( 'wp_mail_from', array( $this, 'filter_wp_mail_from' ) );
-		remove_filter( 'wp_mail_from_name', array( $this, 'filter_wp_mail_from_name' ) );
-	}
+		$from_email = apply_filters( 'supportflow_mail_from_email', $from_email );
+		$from_name  = apply_filters( 'supportflow_mail_from_name', $from_name );
 
-	/**
-	 * Filter the 'from address' value used by wp_mail
-	 */
-	public function filter_wp_mail_from( $from_email ) {
-		if ( $this->from_email ) {
-			return $this->from_email;
-		} else {
-			$from_email;
+		$headers = '';
+
+		if ( ! empty( $from_email ) && ! empty( $from_name ) ) {
+			$headers .= "From: $from_name <$from_email>\r\n";
+		} elseif ( ! empty( $from_email ) && empty( $from_name ) ) {
+			$headers .= "From: $from_email\r\n";
 		}
-	}
 
-	/**
-	 * Filter the 'from name' value used by wp_mail
-	 */
-	public function filter_wp_mail_from_name( $from_name ) {
-		if ( $this->from_name ) {
-			return $this->from_name;
-		} else {
-			$from_name;
+		if ( is_array( $cc ) && ! empty( $cc ) ) {
+			$headers .= "Cc: " . implode( ', ', $cc ) . "\r\n";
+		} elseif ( is_string( $cc ) && ! empty( $cc ) ) {
+			$headers .= "Cc: $cc\r\n";
 		}
+
+		if ( is_array( $bcc ) && ! empty( $bcc ) ) {
+			$headers .= "Bcc: " . implode( ', ', $bcc ) . "\r\n";
+		} elseif ( is_string( $bcc ) && ! empty( $cc ) ) {
+			$headers .= "Bcc: $bcc\r\n";
+		}
+
+		wp_mail( $to, $subject, $message, $headers );
 	}
 }
 
