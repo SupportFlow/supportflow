@@ -61,10 +61,10 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'agent' );
 
 		$message = stripslashes( $reply->post_content );
-		if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+		if ( $attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
 			$message .= "\n";
-			foreach ( $attachment_ids as $attachment_id ) {
-				$message .= "\n" . wp_get_attachment_url( $attachment_id );
+			foreach ( $attachments as $attachment ) {
+				$message .= "\n" . wp_get_attachment_url( $attachment->ID );
 			}
 		}
 		// Ticket details that are relevant to the agent
@@ -96,7 +96,8 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
-			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' ), $respondents );
+			$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
+			$key                = array_search( $reply_author_email, $respondents );
 			if ( false !== $key ) {
 				unset( $respondents[$key] );
 			}
@@ -106,10 +107,10 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'respondent' );
 
 		$message = stripslashes( $reply->post_content );
-		if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+		if ( $attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
 			$message .= "\n";
-			foreach ( $attachment_ids as $attachment_id ) {
-				$message .= "\n" . wp_get_attachment_url( $attachment_id );
+			foreach ( $attachments as $attachment ) {
+				$message .= "\n" . wp_get_attachment_url( $attachment->ID );
 			}
 		}
 

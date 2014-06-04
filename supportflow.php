@@ -392,14 +392,15 @@ class SupportFlow {
 		$post_statuses = $this->post_statuses;
 
 		$defaults = array(
-			'subject'          => '',
-			'message'          => '',
-			'date'             => '',
-			'respondent_id'    => 0, // If the requester has a WordPress account (ID or username)
-			'respondent_name'  => '', // Otherwise supply a name
-			'respondent_email' => '', // And an e-mail address
-			'status'           => key( $post_statuses ),
-			'assignee'         => - 1, // WordPress user ID or username of ticket assignee/owner
+			'subject'            => '',
+			'message'            => '',
+			'date'               => '',
+			'respondent_id'      => 0, // If the requester has a WordPress account (ID or username)
+			'respondent_email'   => array(), // And an e-mail address
+			'reply_author'       => '',
+			'reply_author_email' => '',
+			'status'             => key( $post_statuses ),
+			'assignee'           => - 1, // WordPress user ID or username of ticket assignee/owner
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -416,8 +417,7 @@ class SupportFlow {
 			$args['status'] = $defaults['status'];
 		}
 		$thread['post_status'] = $args['status'];
-
-		$thread_id = wp_insert_post( $thread, true );
+		$thread_id             = wp_insert_post( $thread );
 
 		if ( is_wp_error( $thread_id ) ) {
 			return $thread_id;
@@ -431,8 +431,8 @@ class SupportFlow {
 		// If there was a message, add it to the thread
 		if ( ! empty( $args['message'] ) && ! empty( $args['respondent_email'] ) ) {
 			$reply_details = array(
-				'reply_author'       => $args['respondent_name'],
-				'reply_author_email' => $args['respondent_email'],
+				'reply_author'       => $args['reply_author'],
+				'reply_author_email' => $args['reply_author_email'],
 				'user_id'            => $args['respondent_id'],
 			);
 			$this->add_thread_reply( $thread_id, $args['message'], $reply_details );
@@ -697,7 +697,7 @@ class SupportFlow {
 		}
 
 		$reply = array(
-			'post_content' => esc_sql( $reply_text ),
+			'post_content' => ( $reply_text ),
 			'post_parent'  => (int) $thread_id,
 			'post_date'    => esc_sql( $details['time'] ),
 			'post_status'  => esc_sql( $details['post_status'] ),
@@ -712,8 +712,10 @@ class SupportFlow {
 		$reply_id = wp_insert_post( $reply, true );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		// If there are attachment IDs store them as meta
-		if ( ! empty( $attachment_ids ) ) {
-			add_post_meta( $reply_id, 'attachment_ids', $attachment_ids, true );
+		if ( is_array( $attachment_ids ) ) {
+			foreach ( $attachment_ids as $attachment_id ) {
+				wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $reply_id ) );
+			}
 		}
 
 		add_post_meta( $reply_id, 'reply_author', esc_sql( $details['reply_author'] ) );
