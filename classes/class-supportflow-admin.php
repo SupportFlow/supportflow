@@ -492,7 +492,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$respondents        = SupportFlow()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
 		$respondents_string = implode( ', ', $respondents );
-		$placeholder        = __( 'Who are you starting a conversation with?', 'supportflow' );
+		$respondents_string .= empty( $respondents_string ) ? '' : ', ';
+		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';

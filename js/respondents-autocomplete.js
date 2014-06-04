@@ -33,21 +33,25 @@ jQuery(document).ready(function ($) {
 					response($.map(data.respondents, function (item) {
 
 						// normaliz input
-						var resps = $('#respondents').val().replace(" ", '').split(",");
+						var resps = $('#respondents').val().split(' ').join('').split(",");
 
 						// remove partial respondent
 						resps.pop();
 
-						// replace with full email
-						resps.push(item.name);
+						// Check if e-mail id already exists
+						if (-1 == $.inArray(item.name, resps)) {
 
-						// make it a string
-						var retval = resps.join(", ");
+							// replace with full email
+							resps.push(item.name);
 
-						// return those respondents!
-						return {
-							label: item.name,
-							value: retval
+							// make it a string
+							var retval = resps.join(", ") + ", ";
+
+							// return those respondents!
+							return {
+								label: item.name,
+								value: retval
+							}
 						}
 					}));
 				}
