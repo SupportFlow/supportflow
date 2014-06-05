@@ -33,6 +33,25 @@ class SupportFlow_Permissions extends SupportFlow {
 	 */
 	public function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+	}
+
+	public function action_admin_menu() {
+		$this->slug = 'sf_permissions';
+
+		add_submenu_page(
+			'edit.php?post_type=' . SupportFlow()->post_type,
+			__( 'Permissions', 'supportflow' ),
+			__( 'Permissions', 'supportflow' ),
+			'manage_options',
+			$this->slug,
+			array( $this, 'permissions_page' )
+		);
+
+	}
+
+	public function permissions_page() {
+
 	}
 
 	/**
