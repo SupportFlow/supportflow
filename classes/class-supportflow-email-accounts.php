@@ -202,7 +202,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				<tr valign="top">
 					<th scope="row"><label for="imap_ssl"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
-						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo esc_attr( ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
+						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo checked( ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
@@ -220,7 +220,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				<tr valign="top">
 					<th scope="row"><label for="smtp_ssl"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
-						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo esc_attr( ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ? 'checked="checked"' : '' ) ?> />
+						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo checked( ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
