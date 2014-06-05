@@ -186,6 +186,8 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 */
 	public function insert_add_new_account_form() {
 		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
+		$imap_ssl_enabled = ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] );
+		$smtp_ssl_enabled = ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] );
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
@@ -202,7 +204,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				<tr valign="top">
 					<th scope="row"><label for="imap_ssl"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
-						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo checked( ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ) ?> />
+						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo checked( $imap_ssl_enabled ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
@@ -220,7 +222,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				<tr valign="top">
 					<th scope="row"><label for="smtp_ssl"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></label></th>
 					<td>
-						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php echo checked( ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] ) ) ?> />
+						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php checked( $smtp_ssl_enabled ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
