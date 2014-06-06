@@ -19,6 +19,11 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 		$this->_data = array();
 
 		foreach ( $accounts as $account_id => $account ) {
+			// Account is deleted
+			if ( empty( $account ) ) {
+				continue;
+			}
+
 			$this->_data[] = array(
 				'table_username'  => $account['username'],
 				'table_imap_host' => $account['imap_host'],
@@ -359,7 +364,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		if ( ! isset( $email_accounts[$account_id] ) ) {
 			return self::NO_ACCOUNT_EXISTS;
 		} else {
-			unset( $email_accounts[$account_id] );
+			$email_accounts[$account_id] = null;
 			update_option( 'sf_email_accounts', $email_accounts );
 
 			return self::SUCCESS;
@@ -374,6 +379,11 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$email_accounts = & $this->email_accounts;
 
 		foreach ( $email_accounts as $email_account ) {
+			// Account is deleted
+			if ( empty( $email_account ) ) {
+				continue;
+			}
+
 			if (
 				$email_account['imap_host'] == $imap_host &&
 				$email_account['smtp_host'] == $smtp_host &&
