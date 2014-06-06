@@ -20,14 +20,14 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 
 		foreach ( $accounts as $account_id => $account ) {
 			$this->_data[] = array(
-				'username'  => $account['username'],
-				'imap_host' => $account['imap_host'],
-				'imap_port' => $account['imap_port'],
-				'imap_ssl'  => $account['imap_ssl'] ? 'True' : 'False',
-				'smtp_host' => $account['smtp_host'],
-				'smtp_port' => $account['smtp_port'],
-				'smtp_ssl'  => $account['smtp_ssl'] ? 'True' : 'False',
-				'action'    => "<a href='#' data-account-id='$account_id' id='delete_email_account'>Delete</a>",
+				'table_username'  => $account['username'],
+				'table_imap_host' => $account['imap_host'],
+				'table_imap_port' => $account['imap_port'],
+				'table_imap_ssl'  => $account['imap_ssl'] ? 'True' : 'False',
+				'table_smtp_host' => $account['smtp_host'],
+				'table_smtp_port' => $account['smtp_port'],
+				'table_smtp_ssl'  => $account['smtp_ssl'] ? 'True' : 'False',
+				'table_action'    => "<a href='#' data-account-id='$account_id' id='delete_email_account'>Delete</a>",
 			);
 		}
 	}
@@ -38,14 +38,14 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 
 	function get_columns() {
 		return array(
-			'username'  => __( 'Username', 'supportflow' ),
-			'imap_host' => __( 'IMAP Host', 'supportflow' ),
-			'imap_port' => __( 'IMAP Port', 'supportflow' ),
-			'imap_ssl'  => __( 'IMAP use SSL', 'supportflow' ),
-			'smtp_host' => __( 'SMTP Host', 'supportflow' ),
-			'smtp_port' => __( 'SMTP Port', 'supportflow' ),
-			'smtp_ssl'  => __( 'SMTP use SSL', 'supportflow' ),
-			'action'    => __( 'Action', 'supportflow' ),
+			'table_username'  => __( 'Username', 'supportflow' ),
+			'table_imap_host' => __( 'IMAP Host', 'supportflow' ),
+			'table_imap_port' => __( 'IMAP Port', 'supportflow' ),
+			'table_imap_ssl'  => __( 'IMAP use SSL', 'supportflow' ),
+			'table_smtp_host' => __( 'SMTP Host', 'supportflow' ),
+			'table_smtp_port' => __( 'SMTP Port', 'supportflow' ),
+			'table_smtp_ssl'  => __( 'SMTP use SSL', 'supportflow' ),
+			'table_action'    => __( 'Action', 'supportflow' ),
 		);
 	}
 
