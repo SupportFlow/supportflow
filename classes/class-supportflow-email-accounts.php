@@ -74,7 +74,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	const ACCOUNT_EXISTS           = 1;
 	const NO_ACCOUNT_EXISTS        = 2;
 	const IMAP_HOST_NOT_FOUND      = 3;
-	const IMAP_INVALID_CRIDENTIALS = 4;
+	const IMAP_INVALID_CREDENTIALS = 4;
 	const IMAP_TIME_OUT            = 5;
 	const IMAP_CONNECTION_FAILED   = 6;
 
@@ -152,7 +152,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				case self::IMAP_TIME_OUT:
 					echo '<h3>' . sprintf( __( 'Time out while connecting to %s. Please check your IMAP port number and host name.', 'supportflow' ), esc_html( $_POST['imap_host'] ) ) . '</h3>';
 					break;
-				case self::IMAP_INVALID_CRIDENTIALS:
+				case self::IMAP_INVALID_CREDENTIALS:
 					echo '<h3>' . __( 'Unable to connect with given username/password combination. Please re-check your username and password', 'supportflow' ) . '</h3>';
 					break;
 				case self::IMAP_CONNECTION_FAILED:
@@ -332,7 +332,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				} elseif ( (string) strpos( $error, 'Timed out' ) != '' ) {
 					return self::IMAP_TIME_OUT;
 				} elseif ( (string) strpos( $error, 'Invalid credentials' ) != '' ) {
-					return self::IMAP_INVALID_CRIDENTIALS;
+					return self::IMAP_INVALID_CREDENTIALS;
 				} else {
 					return self::IMAP_CONNECTION_FAILED;
 				}
