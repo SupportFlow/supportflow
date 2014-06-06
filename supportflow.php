@@ -647,10 +647,15 @@ class SupportFlow {
 	 * @todo support filtering to specific types or replier
 	 */
 	public function get_thread_replies_count( $thread_id, $args = array() ) {
-		global $wpdb;
+		$args = array(
+			'posts_per_page' => 1,
+			'post_type'      => $this->post_type,
+			'post_status'    => 'public',
+			'post_parent'    => $thread_id,
+		);
 
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_parent =%s AND post_type = %s", $thread_id, $this->post_type ) );
-
+		$query = new WP_Query( $args );
+		$count = $query->found_posts;
 		return (int) $count;
 	}
 
