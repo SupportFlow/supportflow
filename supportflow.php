@@ -277,9 +277,7 @@ class SupportFlow {
 				),
 				'public'        => true,
 				'menu_position' => 3,
-				'supports'      => array(
-					''
-				),
+				'supports'      => false,
 			)
 		);
 	}
