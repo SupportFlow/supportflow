@@ -530,10 +530,8 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$reply_date      = mysql2date( get_option( 'date_format' ), $reply->post_date_gmt );
-				$reply_time      = mysql2date( get_option( 'time_format' ), $reply->post_date_gmt );
 				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, $reply_date, $reply_time );
+				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date(), get_the_time() );
 				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
@@ -561,9 +559,7 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$reply_date      = mysql2date( get_option( 'date_format' ), $reply->post_date_gmt );
-				$reply_time      = mysql2date( get_option( 'time_format' ), $reply->post_date_gmt );
-				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), $reply_date, $reply_time );
+				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date(), get_the_time() );
 				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
 				echo '</li>';
 			}
