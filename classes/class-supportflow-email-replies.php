@@ -30,6 +30,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		$email_accounts = get_option( 'sf_email_accounts' );
 		foreach ( $email_accounts as $id => $email_account ) {
+			if ( empty( $email_account ) ) {
+				continue;
+			}
 			$imap_account = array(
 				'host'     => $email_account['imap_host'],
 				'port'     => $email_account['imap_port'],
