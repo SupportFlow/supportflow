@@ -29,7 +29,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		require_once ABSPATH . 'wp-admin/includes/admin.php';
 
 		$email_accounts = get_option( 'sf_email_accounts' );
-		foreach ( $email_accounts as $email_account ) {
+		foreach ( $email_accounts as $id => $email_account ) {
 			$imap_account = array(
 				'host'     => $email_account['imap_host'],
 				'port'     => $email_account['imap_port'],
@@ -38,6 +38,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'password' => $email_account['password'],
 				'inbox'    => 'INBOX',
 				'archive'  => 'ARCHIVE',
+				'account_id' => $id,
 			);
 
 			$this->download_and_process_email_replies( $imap_account );
@@ -82,7 +83,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$email->body      = $this->get_body_from_connection( $imap_connection, $i );
 
 			// @todo Confirm this a message we want to process
-			$ret = $this->process_email($imap_connection, $email, $i, $connection_details['username'] );
+			$ret = $this->process_email( $imap_connection, $email, $i, $connection_details['username'], $connection_details['account_id'] );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
 				imap_mail_move( $imap_connection, $i, $connection_details['archive'] );
@@ -96,7 +97,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	/**
 	 * Given an email object, maybe create a new ticket
 	 */
-	public function process_email($imap_connection, $email, $i, $to ) {
+	public function process_email( $imap_connection, $email, $i, $to, $email_account_id ) {
 
 		$new_attachment_ids = array();
 
@@ -208,6 +209,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'reply_author_email' => $reply_author_email,
 				'message'            => $message,
 				'respondent_email'   => $respondents,
+				'email_account'      => $email_account_id,
 			);
 
 			$thread_id = SupportFlow()->create_thread( $new_thread_args );

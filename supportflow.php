@@ -401,6 +401,7 @@ class SupportFlow {
 			'reply_author_email' => '',
 			'status'             => key( $post_statuses ),
 			'assignee'           => - 1, // WordPress user ID or username of ticket assignee/owner
+			'email_account'      => 0,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -426,6 +427,10 @@ class SupportFlow {
 		// Assign the respondent(s)
 		if ( ! empty( $args['respondent_email'] ) ) {
 			$this->update_thread_respondents( $thread_id, $args['respondent_email'] );
+		}
+
+		if ( ! empty( $args['email_account'] ) ) {
+			update_post_meta( $thread_id, 'email_account', $args['email_account'] );
 		}
 
 		// If there was a message, add it to the thread

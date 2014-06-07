@@ -451,6 +451,22 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</select>';
 		echo '</div>';
 
+		// Post E-Mail account drop down
+		if ( 'post-new.php' == $pagenow ) {
+			$email_accounts = get_option( 'sf_email_accounts' );
+			echo '<div class="misc-pub-section">';
+			echo '<label for="post_email_account">' . __( 'Account', 'supportflow' ) . ':</label>';
+			echo '<select id="post_email_account" name="post_email_account">';
+			foreach ( $email_accounts as $id => $email_account ) {
+				if ( empty( $email_account ) ) {
+					continue;
+				}
+				echo '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';
+			}
+			echo '</select>';
+			echo '</div>';
+		}
+
 		// Agent assignment dropdown
 		$post_author = get_post( get_the_ID() )->post_author;
 		echo '<div class="misc-pub-section">';
@@ -799,6 +815,11 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( isset( $_POST['respondents'] ) ) {
 			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
+		}
+
+		if ( isset( $_POST['post_email_account'] ) && ! empty( $_POST['post_email_account'] ) ) {
+			$email_account = (int) $_POST['post_email_account'];
+			update_post_meta( $thread_id, 'email_account', $email_account );
 		}
 
 		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
