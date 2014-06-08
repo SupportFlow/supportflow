@@ -38,6 +38,16 @@ class SupportFlow_Emails extends SupportFlow {
 		// One agent by default, but easily allow notifications to a triage team
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'reply' );
 
+		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
+		$smtp_account     = array(
+			'host'     => $email_accounts[$email_account_id]['smtp_host'],
+			'port'     => $email_accounts[$email_account_id]['smtp_port'],
+			'ssl'      => $email_accounts[$email_account_id]['smtp_ssl'],
+			'username' => $email_accounts[$email_account_id]['username'],
+			'password' => $email_accounts[$email_account_id]['password'],
+		);
+
 		if ( empty( $agent_ids ) ) {
 			return;
 		}
@@ -78,7 +88,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
-		self::mail( $subject, $message, $agent_emails );
+		self::mail( $subject, $message, $agent_emails, $smtp_account );
 	}
 
 	/**
@@ -93,6 +103,16 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$thread      = SupportFlow()->get_thread( $reply->post_parent );
 		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
+
+		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
+		$smtp_account     = array(
+			'host'     => $email_accounts[$email_account_id]['smtp_host'],
+			'port'     => $email_accounts[$email_account_id]['smtp_port'],
+			'ssl'      => $email_accounts[$email_account_id]['smtp_ssl'],
+			'username' => $email_accounts[$email_account_id]['username'],
+			'password' => $email_accounts[$email_account_id]['password'],
+		);
 
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
@@ -116,13 +136,13 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
 
-		self::mail( $subject, $message, $respondents, $cc, $bcc );
+		self::mail( $subject, $message, $respondents, $smtp_account, $cc, $bcc );
 	}
 
 	/**
 	 * Send an email from SupportFlow
 	 */
-	public function mail( $subject, $message, $to, $cc = array(), $bcc = array(), $from_email = null, $from_name = null ) {
+	public function mail( $subject, $message, $to, $smtp_account = null, $cc = array(), $bcc = array(), $from_email = null, $from_name = null ) {
 
 		$from_email = apply_filters( 'supportflow_mail_from_email', $from_email );
 		$from_name  = apply_filters( 'supportflow_mail_from_name', $from_name );
@@ -147,8 +167,29 @@ class SupportFlow_Emails extends SupportFlow {
 			$headers .= "Bcc: $bcc\r\n";
 		}
 
+		if ( ! empty( $smtp_account ) ) {
+			$this->smtp_account = $smtp_account;
+			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+		}
+
 		wp_mail( $to, $subject, $message, $headers );
+
+		if ( ! empty( $smtp_account ) ) {
+			$this->smtp_account = null;
+			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+		}
 	}
+
+	public function action_set_smtp_settings( $phpmailer ) {
+		$phpmailer->IsSMTP();
+		$phpmailer->Host       = $this->smtp_account['host'];
+		$phpmailer->Port       = (int) $this->smtp_account['port'];
+		$phpmailer->SMTPSecure = $this->smtp_account['ssl'] ? 'ssl' : '';
+		$phpmailer->Username   = $this->smtp_account['username'];
+		$phpmailer->Password   = $this->smtp_account['password'];
+		$phpmailer->SMTPAuth   = true;
+	}
+
 }
 
 SupportFlow()->extend->emails = new SupportFlow_Emails();
