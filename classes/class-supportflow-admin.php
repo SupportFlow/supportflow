@@ -653,7 +653,7 @@ class SupportFlow_Admin extends SupportFlow {
 			echo '<ul class="thread-replies">';
 			foreach ( $replies as $reply ) {
 				$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_author_email = get_post_meta( $reply->ID, 'reply_author', true );
+				$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
 				echo '<li>';
 				echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
 				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
