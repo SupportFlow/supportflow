@@ -32,7 +32,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 				'table_smtp_host' => $account['smtp_host'],
 				'table_smtp_port' => $account['smtp_port'],
 				'table_smtp_ssl'  => $account['smtp_ssl'] ? 'True' : 'False',
-				'table_action'    => "<a href='#' data-account-id='$account_id' id='delete_email_account'>Delete</a>",
+				'table_action'    => "<a href='#' data-account-id='$account_id' class='delete_email_account'>Delete</a>",
 			);
 		}
 	}
@@ -260,7 +260,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
 		?>
 		<script type="text/javascript">
-			jQuery('#delete_email_account').click(function (e) {
+			jQuery('.delete_email_account').click(function (e) {
 				e.preventDefault();
 				if (!confirm('<?php echo $msg_title ?>')) {
 					return;
