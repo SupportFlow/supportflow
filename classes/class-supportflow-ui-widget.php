@@ -29,39 +29,39 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			case 'create-thread':
 			case 'get-thread':
 				$response['widget_title'] = get_the_title( (int) $response['thread_id'] );
-				$response['html']         = $this->render_single_thread_comments_html( (int) $response['thread_id'] );
+				$response['html']         = $this->render_single_thread_replies_html( (int) $response['thread_id'] );
 				break;
-			case 'add-thread-comment':
-				$comment          = get_comment( $response['comment_id'] );
-				$response['html'] = '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
+			case 'add-thread-reply':
+				$reply            = get_post( $response['comment_id'] );
+				$response['html'] = '<li>' . $this->render_single_reply_html( $reply ) . '</li>';
 				break;
 		}
 
 		return $response;
 	}
 
-	public function render_single_thread_comments_html( $thread_id ) {
+	public function render_single_thread_replies_html( $thread_id ) {
 
-		$comments = SupportFlow()->get_thread_comments( $thread_id, array( 'status' => 'public', 'order' => 'ASC' ) );
+		$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'status' => 'public', 'order' => 'ASC' ) );
 
-		$output = '<ul class="thread-comments">';
-		foreach ( $comments as $comment ) {
-			$output .= '<li>' . $this->render_single_comment_html( $comment ) . '</li>';
+		$output = '<ul class="thread-replies">';
+		foreach ( $replies as $reply ) {
+			$output .= '<li>' . $this->render_single_reply_html( $reply ) . '</li>';
 		}
 		$output .= '</ul>';
 
 		return $output;
 	}
 
-	public function render_single_comment_html( $comment ) {
-		$comment_timestamp = get_comment_date( 'M. n', $comment->comment_ID );
-
-		$output = '<div class="thread-comment-body">'
-			. wpautop( stripslashes( $comment->comment_content ) )
+	public function render_single_reply_html( $reply ) {
+		$reply_timestamp = mysql2date( 'M. n', $reply->post_date_gmt );
+		$reply_author    = get_post_meta( $reply->ID, 'reply_author' );
+		$output          = '<div class="thread-reply-body">'
+			. wpautop( stripslashes( $reply->post_content ) )
 			. '</div>'
-			. '<div class="thread-comment-meta">'
-			. '<span class="thread-comment-author">' . esc_html( $comment->comment_author ) . '</span>'
-			. '<span class="thread-comment-timestamp">' . esc_html( $comment_timestamp ) . '</span>'
+			. '<div class="thread-reply-meta">'
+			. '<span class="thread-reply-author">' . esc_html( $reply_author ) . '</span>'
+			. '<span class="thread-reply-timestamp">' . esc_html( $reply_timestamp ) . '</span>'
 			. '</div>';
 
 		return $output;
@@ -79,10 +79,10 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			foreach ( $threads as $thread ) {
 				$output .= '<li id="thread-' . $thread->ID . '">';
 				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
-				$output .= '<div class="thread-comments">';
-				$comments     = SupportFlow()->get_thread_comments( $thread->ID, array( 'status' => 'public' ) );
-				$last_comment = array_shift( $comments );
-				$output .= $this->render_single_comment_html( $last_comment );
+				$output .= '<div class="thread-replies">';
+				$replies    = SupportFlow()->get_thread_replies( $thread->ID, array( 'status' => 'public' ) );
+				$last_reply = array_shift( $replies );
+				$output .= $this->render_single_reply_html( $last_reply );
 				$output .= '</div>';
 				$output .= '</li>';
 			}
@@ -131,45 +131,45 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			array(),
 			mt_rand() // For cache busting during development
 		); ?>
-<html>
-<head>
-	<title><?php _e( 'Support', 'supportflow' ); ?></title>
+		<html>
+		<head>
+			<title><?php _e( 'Support', 'supportflow' ); ?></title>
 
-	<?php wp_head(); ?>
-</head>
-<body>
+			<?php wp_head(); ?>
+		</head>
+		<body>
 
-<div id="supportflow-widget">
-	<button id="supportflow-back"><?php _e( 'All Threads', 'supportflow' ); ?></button>
-	<h1 id="widget-title"><?php echo $widget_title; ?></h1>
+		<div id="supportflow-widget">
+			<button id="supportflow-back"><?php _e( 'All Threads', 'supportflow' ); ?></button>
+			<h1 id="widget-title"><?php echo $widget_title; ?></h1>
 
-	<div id="supportflow-newthread-box">
-		<button id="supportflow-newthread"><?php _e( 'Start a new thread', 'supportflow' ); ?></button>
-		<form id="supportflow-newthread-form">
-			<input type="text" id="new-thread-subject" name="new-thread-subject" class="thread-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportflow' ); ?>" autocomplete="off" />
-			<textarea id="new-thread-message" name="new-thread-message" class="thread-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportflow' ); ?>" autocomplete="off"></textarea>
-			<input id="new-thread-submit" type="submit" name="new-thread-submit" class="submit-button" value="<?php echo esc_attr( $start_thread_text ); ?>" />
-		</form>
-	</div>
+			<div id="supportflow-newthread-box">
+				<button id="supportflow-newthread"><?php _e( 'Start a new thread', 'supportflow' ); ?></button>
+				<form id="supportflow-newthread-form">
+					<input type="text" id="new-thread-subject" name="new-thread-subject" class="thread-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportflow' ); ?>" autocomplete="off" />
+					<textarea id="new-thread-message" name="new-thread-message" class="thread-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportflow' ); ?>" autocomplete="off"></textarea>
+					<input id="new-thread-submit" type="submit" name="new-thread-submit" class="submit-button" value="<?php echo esc_attr( $start_thread_text ); ?>" />
+				</form>
+			</div>
 
-	<div id="supportflow-all-threads">
-		<?php echo $this->render_all_threads_html(); ?>
-	</div>
+			<div id="supportflow-all-threads">
+				<?php echo $this->render_all_threads_html(); ?>
+			</div>
 
-	<div id="supportflow-single-thread">
-		<div id="supportflow-thread-body">
+			<div id="supportflow-single-thread">
+				<div id="supportflow-thread-body">
+				</div>
+				<form id="supportflow-existing-thread-form">
+					<textarea id="existing-thread-message" name="existing-thread-message" class="thread-message" cols="25" rows="6" autocomplete="off"></textarea>
+					<input id="existing-thread-submit" type="submit" name="existing-thread-submit" class="submit-button" value="<?php echo esc_attr( $send_reply_text ); ?>" />
+					<input id="existing-thread-id" name="thread-id" type="hidden" />
+				</form>
+			</div>
 		</div>
-		<form id="supportflow-existing-thread-form">
-			<textarea id="existing-thread-message" name="existing-thread-message" class="thread-message" cols="25" rows="6" autocomplete="off"></textarea>
-			<input id="existing-thread-submit" type="submit" name="existing-thread-submit" class="submit-button" value="<?php echo esc_attr( $send_reply_text ); ?>" />
-			<input id="existing-thread-id" name="thread-id" type="hidden" />
-		</form>
-	</div>
-</div>
 
-</body>
-</html>
-<?php
+		</body>
+		</html>
+		<?php
 
 		exit();
 	}

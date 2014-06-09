@@ -25,24 +25,24 @@ class SupportFlow_Emails extends SupportFlow {
 			return;
 		}
 
-		// When a new comment is added to a thread, notify the respondents and the agents
-		add_action( 'supportflow_thread_comment_added', array( $this, 'notify_agents_thread_comment' ) );
-		add_action( 'supportflow_thread_comment_added', array( $this, 'notify_respondents_thread_comment' ) );
+		// When a new reply is added to a thread, notify the respondents and the agents
+		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_agents_thread_replies' ) );
+		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_respondents_thread_replies' ) );
 	}
 
 	/**
-	 * When a new comment is added to the thread, notify the agent on the thread if there is one
+	 * When a new reply is added to the thread, notify the agent on the thread if there is one
 	 */
-	public function notify_agents_thread_comment( $comment_id ) {
+	public function notify_agents_thread_replies( $reply_id ) {
 
-		$comment = get_comment( $comment_id );
-		if ( ! $comment ) {
+		$reply = get_post( $reply_id );
+		if ( ! $reply ) {
 			return;
 		}
 
-		$thread = SupportFlow()->get_thread( $comment->comment_post_ID );
+		$thread = SupportFlow()->get_thread( $reply->post_parent );
 		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'comment' );
+		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'reply' );
 
 		if ( empty( $agent_ids ) ) {
 			return;
@@ -55,19 +55,19 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
-		// Don't email the person creating the comment, unless that's desired behavior
-		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
-			$key = array_search( $comment->comment_author_email, $agent_emails );
+		// Don't email the person adding the reply, unless that's desired behavior
+		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
+			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' ), $agent_emails );
 			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
 			}
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID, 'agent' );
+		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'agent' );
 
-		$message = stripslashes( $comment->comment_content );
-		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
+		$message = stripslashes( $reply->post_content );
+		if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
 			$message .= "\n";
 			foreach ( $attachment_ids as $attachment_id ) {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
@@ -82,7 +82,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$assigned_agent = ( $thread->post_author ) ? get_user_by( 'id', $thread->post_author )->display_name : __( 'None assigned', 'supportflow' );
 		$message .= "\n" . sprintf( __( "Agent: %s", 'supportflow' ), $assigned_agent );
 
-		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'agent' );
+		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
 		foreach ( $agent_emails as $agent_email ) {
 			self::mail( $agent_email, $subject, $message );
@@ -90,39 +90,39 @@ class SupportFlow_Emails extends SupportFlow {
 	}
 
 	/**
-	 * When a new comment is added to the thread, notify all of the respondents on the thread
+	 * When a new reply is added to the thread, notify all of the respondents on the thread
 	 */
-	public function notify_respondents_thread_comment( $comment_id ) {
+	public function notify_respondents_thread_replies( $reply_id ) {
 
-		// Respondents shouldn't receive private comments
-		$comment = get_comment( $comment_id );
-		if ( ! $comment || 'private' == $comment->comment_approved ) {
+		// Respondents shouldn't receive private replies
+		$reply = get_post( $reply_id );
+		if ( ! $reply || 'private' == $reply->post_status ) {
 			return;
 		}
 
-		$thread      = SupportFlow()->get_thread( $comment->comment_post_ID );
+		$thread      = SupportFlow()->get_thread( $reply->post_parent );
 		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
 
-		// Don't email the person creating the comment, unless that's desired behavior
-		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'comment' ) ) {
-			$key = array_search( $comment->comment_author_email, $respondents );
+		// Don't email the person creating the reply, unless that's desired behavior
+		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
+			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' ), $respondents );
 			if ( false !== $key ) {
 				unset( $respondents[$key] );
 			}
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_comment_notify_subject', $subject, $comment_id, $thread->ID, 'respondent' );
+		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'respondent' );
 
-		$message = stripslashes( $comment->comment_content );
-		if ( $attachment_ids = get_comment_meta( $comment->comment_ID, 'attachment_ids', true ) ) {
+		$message = stripslashes( $reply->post_content );
+		if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
 			$message .= "\n";
 			foreach ( $attachment_ids as $attachment_id ) {
 				$message .= "\n" . wp_get_attachment_url( $attachment_id );
 			}
 		}
 
-		$message = apply_filters( 'supportflow_emails_comment_notify_message', $message, $comment_id, $thread->ID, 'respondent' );
+		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
 
 		foreach ( $respondents as $respondent_email ) {
 			self::mail( $respondent_email, $subject, $message );
