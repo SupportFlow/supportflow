@@ -624,6 +624,7 @@ class SupportFlow {
 			'post_status' => $args['status'],
 			'post_type'   => $this->reply_type,
 			'order'       => $args['order'],
+			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
 		$thread_replies = get_posts( $post_args );
@@ -637,14 +638,17 @@ class SupportFlow {
 	 * Convert 'any' reply approved requests to the proper SQL
 	 */
 	public function filter_reply_clauses( $clauses, $query ) {
-
-		$old_reply_approved = "( post_status = '0' OR post_status = '1' )";
-		if ( in_array( $query->query_vars['status'], array( 'public', 'private' ) ) ) {
-			$new_reply_approved = "post_status = '{$query->query_vars['status']}' ";
+		if ( in_array( $query->query_vars['post_status'], array( 'public', 'private' ) ) ) {
+			$new_post_status = "post_status = '{$query->query_vars['post_status']}' ";
 		} else {
-			$new_reply_approved = "post_status IN ( 'private', 'public' )";
+			$new_post_status = "post_status IN ( 'private', 'public' )";
 		}
-		$clauses['where'] = str_replace( $old_reply_approved, $new_reply_approved, $clauses['where'] );
+
+		if ( preg_match( "~post_status = '[^']+'~", $clauses['where'] ) ) {
+			$clauses['where'] = preg_replace( "~post_status = '[^']+'~", $new_post_status, $clauses['where'] );
+		} else {
+			$clauses['where'] .= " AND ($new_post_status)";
+		}
 
 		return $clauses;
 	}
@@ -702,7 +706,7 @@ class SupportFlow {
 		}
 
 		$reply = array(
-			'post_content' => ( $reply_text ),
+			'post_content' => esc_sql( $reply_text ),
 			'post_parent'  => (int) $thread_id,
 			'post_date'    => esc_sql( $details['time'] ),
 			'post_status'  => esc_sql( $details['post_status'] ),
