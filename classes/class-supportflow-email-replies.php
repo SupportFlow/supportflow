@@ -85,6 +85,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$email->structure = imap_fetchstructure( $imap_connection, $i );
 			$email->body      = $this->get_body_from_connection( $imap_connection, $i );
 
+			if ( 0 === strcasecmp( $connection_details['username'], $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host ) ) {
+				continue;
+			}
+
 			// @todo Confirm this a message we want to process
 			$ret = $this->process_email( $imap_connection, $email, $i, $connection_details['username'], $connection_details['account_id'] );
 			// If it was successful, move the email to the archive
