@@ -62,14 +62,14 @@ class SupportFlow_Permissions extends SupportFlow {
 		// Setup the default caps for SupportFlow
 		$this->_caps = apply_filters(
 			'supportflow_caps', array(
-				'close_others_threads'      => 'sf_close_others_threads',
-				'open_others_threads'       => 'sf_open_others_threads',
-				'reopen_others_threads'     => 'sf_reopen_others_threads',
-				'comment_on_others_threads' => 'sf_comment_on_others_threads',
-				'close_threads'             => 'sf_close_threads',
-				'open_threads'              => 'sf_open_threads',
-				'reopen_threads'            => 'sf_reopen_threads',
-				'comment_on_threads'        => 'sf_comment_on_threads',
+				'close_others_threads'    => 'sf_close_others_threads',
+				'open_others_threads'     => 'sf_open_others_threads',
+				'reopen_others_threads'   => 'sf_reopen_others_threads',
+				'reply_on_others_threads' => 'sf_reply_on_others_threads',
+				'close_threads'           => 'sf_close_threads',
+				'open_threads'            => 'sf_open_threads',
+				'reopen_threads'          => 'sf_reopen_threads',
+				'reply_on_threads'        => 'sf_reply_on_threads',
 			)
 		);
 
@@ -79,12 +79,12 @@ class SupportFlow_Permissions extends SupportFlow {
 				'administrator' => $this->get_caps(), // Apply all caps
 				'editor'        => $this->get_caps(), // Apply all caps
 				'author'        => array(
-					'close_threads'      => $this->get_cap( 'close_threads' ),
-					'open_threads'       => $this->get_cap( 'open_threads' ),
-					'comment_on_threads' => $this->get_cap( 'comment_on_threads' ),
+					'close_threads'    => $this->get_cap( 'close_threads' ),
+					'open_threads'     => $this->get_cap( 'open_threads' ),
+					'reply_on_threads' => $this->get_cap( 'reply_on_threads' ),
 				),
 				'contributor'   => array(
-					'comment_on_threads' => $this->get_cap( 'comment_on_threads' ),
+					'reply_on_threads' => $this->get_cap( 'reply_on_threads' ),
 				),
 			)
 		);

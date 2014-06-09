@@ -72,27 +72,27 @@ class SupportFlow_JSON_API extends SupportFlow {
 				$response['status']    = 'ok';
 				$response['thread_id'] = $thread_id;
 				break;
-			case 'add-thread-comment':
-				$thread_id    = (int) $_REQUEST['thread_id'];
-				$message      = wp_filter_nohtml_kses( $_REQUEST['message'] );
-				$comment_args = array();
-				if ( ! empty( $_REQUEST['comment_author_email'] ) && is_email( $_REQUEST['comment_author_email'] ) ) {
-					$comment_args['comment_author_email'] = sanitize_email( $_REQUEST['comment_author_email'] );
-					if ( ! empty( $_REQUEST['comment_author'] ) ) {
-						$comment_args['comment_author'] = sanitize_text_field( $_REQUEST['comment_author'] );
+			case 'add-thread-reply':
+				$thread_id  = (int) $_REQUEST['thread_id'];
+				$message    = wp_filter_nohtml_kses( $_REQUEST['message'] );
+				$reply_args = array();
+				if ( ! empty( $_REQUEST['reply_author_email'] ) && is_email( $_REQUEST['reply_author_email'] ) ) {
+					$reply_args['reply_author_email'] = sanitize_email( $_REQUEST['reply_author_email'] );
+					if ( ! empty( $_REQUEST['reply_author'] ) ) {
+						$reply_args['reply_author'] = sanitize_text_field( $_REQUEST['reply_author'] );
 					}
 				} else {
-					$comment_args['comment_author_email'] = $current_user->user_email;
-					$comment_args['comment_author']       = $current_user->display_name;
-					$comment_args['user_id']              = $current_user->ID;
+					$reply_args['reply_author_email'] = $current_user->user_email;
+					$reply_args['reply_author']       = $current_user->display_name;
+					$reply_args['user_id']            = $current_user->ID;
 				}
-				$comment_id = SupportFlow()->add_thread_comment( $thread_id, $message );
-				if ( is_wp_error( $comment_id ) ) {
-					$response['message'] = $comment_id->get_error_message();
+				$reply_id = SupportFlow()->add_thread_reply( $thread_id, $message );
+				if ( is_wp_error( $reply_id ) ) {
+					$response['message'] = $reply_id->get_error_message();
 				} else {
-					$response['status']     = 'ok';
-					$response['thread_id']  = $thread_id;
-					$response['comment_id'] = $comment_id;
+					$response['status']    = 'ok';
+					$response['thread_id'] = $thread_id;
+					$response['reply_id']  = $reply_id;
 				}
 				break;
 			default:
