@@ -33,16 +33,11 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			if ( empty( $email_account ) ) {
 				continue;
 			}
-			$imap_account = array(
-				'host'     => $email_account['imap_host'],
-				'port'     => $email_account['imap_port'],
-				'ssl'      => $email_account['imap_ssl'],
-				'username' => $email_account['username'],
-				'password' => $email_account['password'],
-				'inbox'    => 'INBOX',
-				'archive'  => 'ARCHIVE',
+			$imap_account = array_merge( $email_account, array(
+				'inbox'      => 'INBOX',
+				'archive'    => 'ARCHIVE',
 				'account_id' => $id,
-			);
+			) );
 
 			$this->download_and_process_email_replies( $imap_account );
 		}
@@ -54,9 +49,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	public function download_and_process_email_replies( $connection_details ) {
 		imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
 
-		$ssl = $connection_details['ssl'] ? '/ssl' : '';
+		$ssl = $connection_details['imap_ssl'] ? '/ssl' : '';
 
-		$mailbox     = "{{$connection_details['host']}:{$connection_details['port']}{$ssl}}";
+		$mailbox     = "{{$connection_details['imap_host']}:{$connection_details['imap_port']}{$ssl}}";
 		$inbox       = "{$mailbox}{$connection_details['inbox']}";
 		$archive_box = "{$mailbox}{$connection_details['archive']}";
 
