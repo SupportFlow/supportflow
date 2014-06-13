@@ -101,8 +101,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		require_once ABSPATH . 'wp-admin/includes/admin.php';
 
 		$new_attachment_ids = array();
-
 		$k = 0;
+
 		if ( isset( $email->structure->parts ) ) {
 			foreach ( $email->structure->parts as $email_part ) {
 
