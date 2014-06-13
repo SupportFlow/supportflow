@@ -88,7 +88,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
-		self::mail( $subject, $message, $agent_emails, $smtp_account );
+		self::mail( $subject, $message, $agent_emails, '', $smtp_account );
 	}
 
 	/**
@@ -136,24 +136,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
 
-		self::mail( $subject, $message, $respondents, $smtp_account, $cc, $bcc );
-	}
-
-	/**
-	 * Send an email from SupportFlow
-	 */
-	public function mail( $subject, $message, $to, $smtp_account = null, $cc = array(), $bcc = array(), $from_email = null, $from_name = null ) {
-
-		$from_email = apply_filters( 'supportflow_mail_from_email', $from_email );
-		$from_name  = apply_filters( 'supportflow_mail_from_name', $from_name );
-
 		$headers = '';
-
-		if ( ! empty( $from_email ) && ! empty( $from_name ) ) {
-			$headers .= "From: $from_name <$from_email>\r\n";
-		} elseif ( ! empty( $from_email ) && empty( $from_name ) ) {
-			$headers .= "From: $from_email\r\n";
-		}
 
 		if ( is_array( $cc ) && ! empty( $cc ) ) {
 			$headers .= "Cc: " . implode( ', ', $cc ) . "\r\n";
@@ -166,6 +149,14 @@ class SupportFlow_Emails extends SupportFlow {
 		} elseif ( is_string( $bcc ) && ! empty( $cc ) ) {
 			$headers .= "Bcc: $bcc\r\n";
 		}
+
+		self::mail( $subject, $message, $respondents, $headers, $smtp_account );
+	}
+
+	/**
+	 * Send an email from SupportFlow
+	 */
+	public function mail( $subject, $message, $to, $headers = '', $smtp_account = null ) {
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
