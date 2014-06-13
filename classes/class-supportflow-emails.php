@@ -40,13 +40,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$email_accounts   = get_option( 'sf_email_accounts' );
 		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
-		$smtp_account     = array(
-			'host'     => $email_accounts[$email_account_id]['smtp_host'],
-			'port'     => $email_accounts[$email_account_id]['smtp_port'],
-			'ssl'      => $email_accounts[$email_account_id]['smtp_ssl'],
-			'username' => $email_accounts[$email_account_id]['username'],
-			'password' => $email_accounts[$email_account_id]['password'],
-		);
+		$smtp_account     = $email_accounts[$email_account_id];
 
 		if ( empty( $agent_ids ) ) {
 			return;
@@ -106,13 +100,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$email_accounts   = get_option( 'sf_email_accounts' );
 		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
-		$smtp_account     = array(
-			'host'     => $email_accounts[$email_account_id]['smtp_host'],
-			'port'     => $email_accounts[$email_account_id]['smtp_port'],
-			'ssl'      => $email_accounts[$email_account_id]['smtp_ssl'],
-			'username' => $email_accounts[$email_account_id]['username'],
-			'password' => $email_accounts[$email_account_id]['password'],
-		);
+		$smtp_account     = $email_accounts[$email_account_id];
 
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
@@ -173,9 +161,9 @@ class SupportFlow_Emails extends SupportFlow {
 
 	public function action_set_smtp_settings( $phpmailer ) {
 		$phpmailer->IsSMTP();
-		$phpmailer->Host       = $this->smtp_account['host'];
-		$phpmailer->Port       = (int) $this->smtp_account['port'];
-		$phpmailer->SMTPSecure = $this->smtp_account['ssl'] ? 'ssl' : '';
+		$phpmailer->Host       = $this->smtp_account['smtp_host'];
+		$phpmailer->Port       = (int) $this->smtp_account['smtp_port'];
+		$phpmailer->SMTPSecure = $this->smtp_account['smtp_ssl'] ? 'smtp_ssl' : '';
 		$phpmailer->Username   = $this->smtp_account['username'];
 		$phpmailer->Password   = $this->smtp_account['password'];
 		$phpmailer->SMTPAuth   = true;
