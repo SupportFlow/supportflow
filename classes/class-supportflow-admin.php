@@ -533,9 +533,9 @@ class SupportFlow_Admin extends SupportFlow {
 		?>
 		<p class="description"> <?php _e( "Please add all the E-Mail ID's seperated by comma.", 'supportflow' ) ?></p>
 		<h4 class="inline"><?php _e( "CC: ", 'supportflow' ) ?></h4>
-		<input type="text" id="cc" name="cc" style="width:100%" />
+		<input type="text" id="cc" name="cc" />
 		<h4 class="inline"> <?php _e( "BCC: ", 'supportflow' ) ?></h4>
-		<input type="text" id="bcc" name="bcc" style="width:100%" />
+		<input type="text" id="bcc" name="bcc" />
 	<?php
 	}
 

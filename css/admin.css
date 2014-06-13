@@ -91,6 +91,11 @@
 	font-size: 1.2em;
 }
 
+#supportflow-cc-bcc.postbox input {
+	width:     100%;
+	font-size: 1.2em;
+}
+
 #supportflow-replies.postbox #thread-reply-box {
 	width: 100%;
 }
