@@ -26,8 +26,6 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 
 	function retrieve_email_replies() {
-		require_once ABSPATH . 'wp-admin/includes/admin.php';
-
 		$email_accounts = get_option( 'sf_email_accounts' );
 		foreach ( $email_accounts as $id => $email_account ) {
 			if ( empty( $email_account ) ) {
@@ -100,6 +98,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	 * Given an email object, maybe create a new ticket
 	 */
 	public function process_email( $imap_connection, $email, $i, $to, $email_account_id ) {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
 
 		$new_attachment_ids = array();
 
