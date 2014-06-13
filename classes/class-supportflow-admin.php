@@ -625,7 +625,7 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '<div class="thread-reply">';
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
-				$post_content = preg_replace( '!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1">$1</a>', $post_content );
+				$post_content = make_clickable( $post_content );
 				echo $post_content;
 				$attachment_args = array(
 					'post_parent' => $reply->ID,
@@ -661,7 +661,7 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '<div class="thread-reply">';
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
-				$post_content = preg_replace( '!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i', '<a href="$1">$1</a>', $post_content );
+				$post_content = make_clickable( $post_content );
 				echo $post_content;
 				$attachment_args = array(
 					'post_parent' => $reply->ID,
