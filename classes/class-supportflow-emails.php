@@ -88,7 +88,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
-		self::mail( $subject, $message, $agent_emails, '', $smtp_account );
+		self::mail( $agent_emails, $subject, $message, '', $smtp_account );
 	}
 
 	/**
@@ -150,13 +150,13 @@ class SupportFlow_Emails extends SupportFlow {
 			$headers .= "Bcc: $bcc\r\n";
 		}
 
-		self::mail( $subject, $message, $respondents, $headers, $smtp_account );
+		self::mail( $respondents, $subject, $message, $headers, $smtp_account );
 	}
 
 	/**
 	 * Send an email from SupportFlow
 	 */
-	public function mail( $subject, $message, $to, $headers = '', $smtp_account = null ) {
+	public function mail( $to, $subject, $message, $headers = '', $smtp_account = null ) {
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
