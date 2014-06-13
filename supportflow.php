@@ -706,15 +706,14 @@ class SupportFlow {
 		}
 
 		$reply = array(
-			'post_content' => esc_sql( $reply_text ),
+			'post_content' => $reply_text,
 			'post_parent'  => (int) $thread_id,
-			'post_date'    => esc_sql( $details['time'] ),
-			'post_status'  => esc_sql( $details['post_status'] ),
-			'post_type'    => esc_sql( $this->reply_type ),
+			'post_date'    => $details['time'],
+			'post_status'  => $details['post_status'],
+			'post_type'    => $this->reply_type,
 			'post_title'   => 'supportflow reply',
 			'user_id'      => (int) $details['user_id'],
 		);
-
 
 		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
