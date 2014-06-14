@@ -465,8 +465,9 @@ class SupportFlow_Admin extends SupportFlow {
 			echo '<div class="misc-pub-section">';
 			echo '<label for="post_email_account">' . __( 'Account', 'supportflow' ) . ':</label>';
 			echo '<select id="post_email_account" name="post_email_account">';
+			$user_permissions = get_user_meta( get_current_user_id(), 'sf_permissions', true )['email_accounts'];
 			foreach ( $email_accounts as $id => $email_account ) {
-				if ( empty( $email_account ) ) {
+				if ( empty( $email_account ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
 					continue;
 				}
 				echo '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';

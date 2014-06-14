@@ -89,6 +89,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 		add_action( 'wp_ajax_get_user_permissions', array( $this, 'action_wp_ajax_get_user_permissions' ) );
 		add_action( 'wp_ajax_set_user_permission', array( $this, 'action_wp_ajax_set_user_permission' ) );
 	}
@@ -105,6 +106,10 @@ class SupportFlow_Permissions extends SupportFlow {
 			array( $this, 'permissions_page' )
 		);
 
+	}
+
+	public function action_admin_init() {
+		add_filter( 'user_has_cap', array( $this, 'limit_user_permissions' ), 10, 3 );
 	}
 
 	public function permissions_page() {
@@ -212,7 +217,6 @@ class SupportFlow_Permissions extends SupportFlow {
 		exit;
 	}
 
-
 	public function get_user_permissions( $user_id ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
 		$email_accounts   = get_option( 'sf_email_accounts' );
@@ -310,6 +314,70 @@ class SupportFlow_Permissions extends SupportFlow {
 				unset( $permission[$privilege_type][$key] );
 				update_user_meta( $user_id, 'sf_permissions', $permission );
 
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/*
+	 * Limited under-privileged user acces to only allowed E-Mail accounts
+	 */
+	function limit_user_permissions( $allcaps, $cap, $args ) {
+		if (
+			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post',	'manage_categories' ) ) ||
+			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] )
+		) {
+			return $allcaps;
+		}
+
+		if ( 'manage_categories' == $args[0] ) {
+			$allcaps["manage_categories"] = false;
+		}
+
+		if ( 'edit_post' == $args[0] ) {
+			if ( $this->is_user_allowed_post( $args[1], $args[2] ) ) {
+				$allcaps["edit_others_posts"] = true;
+				$allcaps["edit_posts"]        = true;
+			} else {
+				$allcaps["edit_others_posts"] = false;
+				$allcaps["edit_posts"]        = false;
+			}
+		}
+
+		if ( 'delete_post' == $args[0] && $this->is_user_allowed_post( $args[1], $args[2] ) ) {
+			$allcaps["delete_others_posts"] = true;
+		} else {
+			$allcaps["delete_others_posts"] = false;
+		}
+
+		if ( 'edit_posts' == $args[0] ) {
+			if ( ! empty( get_user_meta( $args[1], 'sf_permissions', true )['email_accounts'] ) ) {
+				$allcaps["edit_posts"] = true;
+			} else {
+				$allcaps["edit_posts"] = false;
+			}
+		}
+
+		return $allcaps;
+	}
+
+	/*
+	 * Check if user has access to a particular post
+	 */
+	public function is_user_allowed_post( $user_id, $post_id ) {
+		$user_permissions   = get_user_meta( $user_id, 'sf_permissions', true );
+		$post_email_account = get_post_meta( $post_id, 'email_account', true );
+		$post_tags          = wp_get_post_terms( $post_id, 'sf_tags' );
+
+		if ( in_array( $post_email_account, $user_permissions['email_accounts'] ) ) {
+			return true;
+		}
+
+		foreach ( $post_tags as $post_tag ) {
+			$post_tag_slug = $post_tag->slug;
+			if ( in_array( $post_tag_slug, $user_permissions['tags'] ) ) {
 				return true;
 			}
 		}
