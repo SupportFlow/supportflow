@@ -269,7 +269,10 @@ class SupportFlow_Admin extends SupportFlow {
 				$title_attr  = esc_attr__( 'Reopen Thread', 'supportflow' );
 				$action_text = esc_html__( 'Reopen', 'supportflow' );
 			}
-			$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
+
+			if ( current_user_can( 'edit_post', $post->ID ) ) {
+				$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
+			}
 		}
 
 		// Actions we don't want
@@ -382,10 +385,14 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_die( __( "Doin' something phishy, huh?", 'supportflow' ) );
 		}
 
-		$post_status = sanitize_key( $_GET['post_status'] );
-		$thread_id   = (int) $_GET['thread_id'];
+		$thread_id = (int) $_GET['thread_id'];
 
-		$new_thread = array(
+		if ( ! current_user_can( 'edit_post', $thread_id ) ) {
+			wp_die( __( 'You are not allowed to edit this item.' ) );
+		}
+
+		$post_status = sanitize_key( $_GET['post_status'] );
+		$new_thread  = array(
 			'ID'          => $thread_id,
 			'post_status' => $post_status,
 		);
