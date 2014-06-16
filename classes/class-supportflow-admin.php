@@ -63,9 +63,11 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js', array( 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
-
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
+			wp_enqueue_script( 'supportflow-predefined-replies', SupportFlow()->plugin_url . 'js/predefined-replies.js', array( 'jquery' ) );
+			$message = __( 'Are you sure want to proceed? It will replace your existing content.', 'supportflow' );
+			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFPredefinedReplies', array( 'message' => $message ) );
 		}
 	}
 
@@ -473,13 +475,42 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
+		$predefined_replies = get_posts( array( 'post_type' => 'sf_predefs' ) );
+		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			if ( ! empty( $predefined_reply->post_title ) ) {
+				$content = $predefined_reply->post_title;
+			} else {
+				$content = $predefined_reply->post_content;
+			}
+
+			// Limit size to 25 characters
+			if ( strlen( $content ) > 25 ) {
+				$title = substr( $content, 0, 25 - 3 ) . '...';
+			} else {
+				$title = $content;
+			}
+
+			if ( 0 != strlen( $content ) ) {
+				$pre_defs[] = array( 'title' => $title, 'content' => $content );
+			}
+		}
+
 		$placeholders = array(
 			__( "What's burning?", 'supportflow' ),
 			__( 'What do you need to get off your chest?', 'supportflow' ),
 		);
 
 		$rand = array_rand( $placeholders );
-		echo '<h4>' . __( 'Conversation', 'supportflow' ) . '</h4>';
+		echo '<div style="float:left"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
+		echo '<div style="float: right" >';
+		echo '<select id="predefs"  class="pre-defs">';
+		foreach ( $pre_defs as $pre_def ) {
+			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
+		}
+		echo '</select></div>';
+
 		echo '<div id="thread-reply-box">';
 
 		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
