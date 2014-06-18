@@ -185,6 +185,18 @@ class SupportFlow_Admin extends SupportFlow {
 		);
 		$agent_dropdown_args = apply_filters( 'supportflow_admin_agent_dropdown_args', $agent_dropdown_args );
 		wp_dropdown_users( $agent_dropdown_args );
+
+		// Filter to specify tag
+		$tax_slug = SupportFlow()->tags_tax;
+		$terms    = get_terms( 'sf_tags', array( 'hide_empty' => false ) );
+
+		echo "<select name='$tax_slug' id='$tax_slug' class='postform'>";
+		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
+		foreach ( $terms as $term ) {
+			$selected = selected( isset( $_REQUEST[$tax_slug] ) && ( $_REQUEST[$tax_slug] == $term->slug ), true, false );
+			echo "<option value='" . esc_attr( $term->slug ) . "'$selected>" . esc_html( $term->name ) . '</option>';
+		}
+		echo "</select>";
 	}
 
 	/**
