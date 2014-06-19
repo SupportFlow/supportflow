@@ -328,19 +328,30 @@ class SupportFlow_Permissions extends SupportFlow {
 		global $pagenow, $post_type;
 
 		if (
+			// Return if required capability is not one of them
 			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
+
+			// Return if user is admin
 			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] ) ||
+
+			// Return if posts are not supportflow threads
 			SupportFlow()->post_type != $post_type
 		) {
 			return $allcaps;
 		}
 
+		// Get all supportflow permissions granted to the current user
 		$user_permissions = get_user_meta( $args[1], 'sf_permissions', true );
 
+		// This capability is requested if user is viewing/modifying existing ticket
 		if ( 'edit_post' == $args[0] ) {
+
+			// Allow if user have access to the tag/E-Mail account used by the thread
 			if ( $this->is_user_allowed_post( $args[1], $args[2] ) ) {
 				$allcaps["edit_others_posts"] = true;
 				$allcaps["edit_posts"]        = true;
+
+			// Allow if user is creating new thread with permitted E-Mail account
 			} elseif (
 				'post.php' == $pagenow &&
 				isset ( $_REQUEST['action'], $_REQUEST['post_email_account'] ) &&
@@ -349,23 +360,33 @@ class SupportFlow_Permissions extends SupportFlow {
 			) {
 				$allcaps["edit_others_posts"] = true;
 				$allcaps["edit_posts"]        = true;
+
+			// Disallow user access to thread in other cases
 			} else {
 				$allcaps["edit_others_posts"] = false;
 				$allcaps["edit_posts"]        = false;
 			}
 		}
 
+		// Allow deleting thread if user have access to the tag/E-Mail account used by the thread
 		if ( 'delete_post' == $args[0] && $this->is_user_allowed_post( $args[1], $args[2] ) ) {
 			$allcaps["delete_others_posts"] = true;
 		} else {
 			$allcaps["delete_others_posts"] = false;
 		}
 
+		// This capability is requested if user is creating new thread or listing all threads
 		if ( 'edit_posts' == $args[0] ) {
+
+			// List All threads if user have access to atleast one E-Mail account or tag
 			if ( 'post-new.php' != $pagenow && ( ! empty( $user_permissions['email_accounts'] ) || ! empty( $user_permissions['tags'] ) ) ) {
 				$allcaps["edit_posts"] = true;
+
+			// Allow creating new thread if user have access to atleast one E-Mail account
 			} elseif ( 'post-new.php' == $pagenow && ! empty( $user_permissions['email_accounts'] ) ) {
 				$allcaps["edit_posts"] = true;
+
+			// Disallow in other cases
 			} else {
 				$allcaps["edit_posts"] = false;
 			}
