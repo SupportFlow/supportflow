@@ -325,15 +325,28 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Limited under-privileged user acces to only allowed E-Mail accounts
 	 */
 	function limit_user_permissions( $allcaps, $cap, $args ) {
+		global $pagenow, $post_type;
+
 		if (
 			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
-			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] )
+			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] ) ||
+			SupportFlow()->post_type != $post_type
 		) {
 			return $allcaps;
 		}
 
+		$user_permissions = get_user_meta( $args[1], 'sf_permissions', true );
+
 		if ( 'edit_post' == $args[0] ) {
 			if ( $this->is_user_allowed_post( $args[1], $args[2] ) ) {
+				$allcaps["edit_others_posts"] = true;
+				$allcaps["edit_posts"]        = true;
+			} elseif (
+				'post.php' == $pagenow &&
+				isset ( $_REQUEST['action'], $_REQUEST['post_email_account'] ) &&
+				'editpost' == $_REQUEST['action'] &&
+				in_array( $_REQUEST['post_email_account'], $user_permissions['email_accounts'] )
+			) {
 				$allcaps["edit_others_posts"] = true;
 				$allcaps["edit_posts"]        = true;
 			} else {
@@ -349,7 +362,9 @@ class SupportFlow_Permissions extends SupportFlow {
 		}
 
 		if ( 'edit_posts' == $args[0] ) {
-			if ( ! empty( get_user_meta( $args[1], 'sf_permissions', true )['email_accounts'] ) ) {
+			if ( 'post-new.php' != $pagenow && ( ! empty( $user_permissions['email_accounts'] ) || ! empty( $user_permissions['tags'] ) ) ) {
+				$allcaps["edit_posts"] = true;
+			} elseif ( 'post-new.php' == $pagenow && ! empty( $user_permissions['email_accounts'] ) ) {
 				$allcaps["edit_posts"] = true;
 			} else {
 				$allcaps["edit_posts"] = false;
