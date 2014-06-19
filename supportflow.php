@@ -292,6 +292,13 @@ class SupportFlow {
 	 */
 	public function action_init_register_taxonomies() {
 
+		$capabilities = array(
+			'manage_terms' => 'manage_options',
+			'edit_terms'   => 'manage_options',
+			'delete_terms' => 'manage_options',
+			'assign_terms' => 'manage_options',
+		);
+
 		$args_respondents_tax = array(
 			'label'             => __( 'Respondents', 'supportflow' ),
 			'labels'            => array(
@@ -303,6 +310,7 @@ class SupportFlow {
 			'public'            => true,
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
+			'capabilities'      => $capabilities,
 		);
 
 		$args_tags_tax = array(
@@ -316,6 +324,7 @@ class SupportFlow {
 			'public'            => true,
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
+			'capabilities'      => $capabilities,
 		);
 
 		register_taxonomy( $this->respondents_tax, $this->post_type, $args_respondents_tax );

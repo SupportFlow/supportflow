@@ -326,14 +326,10 @@ class SupportFlow_Permissions extends SupportFlow {
 	 */
 	function limit_user_permissions( $allcaps, $cap, $args ) {
 		if (
-			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post',	'manage_categories' ) ) ||
+			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
 			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] )
 		) {
 			return $allcaps;
-		}
-
-		if ( 'manage_categories' == $args[0] ) {
-			$allcaps["manage_categories"] = false;
 		}
 
 		if ( 'edit_post' == $args[0] ) {
