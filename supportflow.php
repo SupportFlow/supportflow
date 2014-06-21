@@ -301,7 +301,7 @@ class SupportFlow {
 					'all_items'          => __( 'All predefined replies', 'supportflow' ),
 					'add_new'            => __( 'New predefined reply', 'supportflow' ),
 					'add_new_item'       => __( 'New predefined reply', 'supportflow' ),
-					'edit_item'          => __( 'Edit Predefined reply', 'supportflow' ),
+					'edit_item'          => __( 'Edit predefined reply', 'supportflow' ),
 					'new_item'           => __( 'New Predefined Reply', 'supportflow' ),
 					'view_item'          => __( 'View predefined reply', 'supportflow' ),
 					'search_items'       => __( 'Search predefined replies', 'supportflow' ),
@@ -326,8 +326,8 @@ class SupportFlow {
 		$post_type                = $this->post_type;
 		$predefinded_replies_type = $this->predefinded_replies_type;
 
-		add_submenu_page( "edit.php?post_type=$post_type", 'All Predefined replies', 'All Predefined Replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
-		add_submenu_page( "edit.php?post_type=$post_type", 'New Predefined reply', 'New Predefined Reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", 'All predefined replies', 'All predefined replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
 
 	}
 
