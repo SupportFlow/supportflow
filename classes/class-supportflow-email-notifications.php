@@ -134,7 +134,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 	}
 
-	public function get_notifications_settings( $user_id = null ) {
+	public function get_notifications_settings( $user_id = null, $allowed_only = false ) {
 		// Get settings for current user if user not specified
 		if ( 0 == $user_id || ! is_int( $user_id ) ) {
 			$users = get_users();
@@ -180,7 +180,10 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 			// Return exiting notifications settings of user
 			foreach ( $user_permissions['email_accounts'] as $id ) {
-				if ( empty( $email_accounts[$id] ) ) {
+				if (
+					( empty( $email_accounts[$id] ) ) ||
+					( ! in_array( $id, $email_notifications['email_accounts'] ) && $allowed_only )
+				) {
 					continue;
 				}
 				$email_account           = $email_accounts[$id];
@@ -195,6 +198,9 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 			}
 
 			foreach ( $user_permissions['tags'] as $slug ) {
+				if ( ! in_array( $slug, $email_notifications['tags'] ) && $allowed_only ) {
+					continue;
+				}
 				$tag                     = get_term_by( 'slug', $slug, 'sf_tags' );
 				$notification_settings[] = array(
 					'user_id'        => $user->ID,
