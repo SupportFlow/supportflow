@@ -498,7 +498,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$rand = array_rand( $placeholders );
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
 		echo '<div class="alignright">';
-		echo '<select id="predefs"  class="pre-defs">';
+		echo '<select id="predefs"  class="predefined_replies_dropdown">';
 		foreach ( $pre_defs as $pre_def ) {
 			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
 		}
