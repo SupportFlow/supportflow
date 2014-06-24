@@ -120,7 +120,6 @@ class SupportFlow_Permissions extends SupportFlow {
 		<h3 style="display: inline">User: </h3>
 		<select id="change_user">
 			<option data-user-id=0>All</option>
-			;
 			<?php
 			foreach ( get_users() as $user ) {
 				if ( ! $user->has_cap( 'manage_options' ) ) {
