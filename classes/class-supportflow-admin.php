@@ -190,7 +190,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$tax_slug = SupportFlow()->tags_tax;
 		$terms    = get_terms( 'sf_tags', array( 'hide_empty' => false ) );
 
-		echo "<select name='$tax_slug' id='$tax_slug' class='postform'>";
+		echo "<select name='" . esc_attr($tax_slug) . "' id='" . esc_attr($tax_slug) . "' class='postform'>";
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
 		foreach ( $terms as $term ) {
 			$selected = selected( isset( $_REQUEST[$tax_slug] ) && ( $_REQUEST[$tax_slug] == $term->slug ), true, false );
