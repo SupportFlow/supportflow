@@ -167,6 +167,9 @@ class SupportFlow_Permissions extends SupportFlow {
 					var privilege_type = permission_identifier.privilege_type;
 					var privilege_id = permission_identifier.privilege_id;
 
+					checkbox_label.html('<?php _e( 'Changing status, please wait.', 'supportflow' ) ?>');
+					checkbox.prop('disabled', true);
+
 					jQuery.ajax(ajaxurl, {
 						type    : 'post',
 						data    : {
@@ -178,14 +181,7 @@ class SupportFlow_Permissions extends SupportFlow {
 							_set_user_permission_nonce: '<?php echo wp_create_nonce() ?>',
 						},
 						success : function (content) {
-							if (1 == content) {
-								var allowed = checkbox.prop('checked');
-								if (true == allowed) {
-									checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
-								} else {
-									checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
-								}
-							} else {
+							if (1 != content) {
 								checkbox.prop('checked', !checkbox.prop('checked'));
 								alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 							}
@@ -193,6 +189,15 @@ class SupportFlow_Permissions extends SupportFlow {
 						error   : function () {
 							checkbox.prop('checked', !checkbox.prop('checked'));
 							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
+						},
+						complete: function() {
+							var allowed = checkbox.prop('checked');
+							if (true == allowed) {
+								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
+							} else {
+								checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
+							}
+							checkbox.prop('disabled', false);
 						},
 					});
 				});
