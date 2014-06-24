@@ -478,11 +478,15 @@ class SupportFlow_Admin extends SupportFlow {
 		foreach ( $predefined_replies as $predefined_reply ) {
 			$content = $predefined_reply->post_content;
 
-			// Limit size to 25 characters
-			if ( strlen( $content ) > 75 ) {
-				$title = substr( $content, 0, 75 - 3 ) . '...';
-			} else {
-				$title = $content;
+			if ( ! empty( $predefined_reply->post_title ) ) {
+ 				$title = $predefined_reply->post_title;
+ 			} else {
+ 				$title = $predefined_reply->post_content;
+ 			}
+
+			// Limit size to 75 characters
+			if ( strlen( $title ) > 75 ) {
+				$title = substr( $title, 0, 75 - 3 ) . '...';
 			}
 
 			if ( 0 != strlen( $content ) ) {
