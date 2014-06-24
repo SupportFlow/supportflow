@@ -476,11 +476,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
-			if ( ! empty( $predefined_reply->post_title ) ) {
-				$content = $predefined_reply->post_title;
-			} else {
-				$content = $predefined_reply->post_content;
-			}
+			$content = $predefined_reply->post_content;
 
 			// Limit size to 25 characters
 			if ( strlen( $content ) > 25 ) {
