@@ -12,6 +12,10 @@
 	color: #BC0B0B;
 }
 
+.inline {
+    display: inline;
+}
+
 #poststuff {
 	padding-top: 0;
 }

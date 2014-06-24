@@ -117,7 +117,7 @@ class SupportFlow_Permissions extends SupportFlow {
 		<div class="wrap">
 		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
 
-		<h3 style="display: inline">User: </h3>
+		<h3 class="inline">User: </h3>
 		<select id="change_user">
 			<option data-user-id=0>All</option>
 			<?php
