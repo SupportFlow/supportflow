@@ -266,6 +266,46 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		return false;
 	}
 
+	/**
+	 * Get user id of all the users that will receive e-mail notifications for a thread reply
+	 * @param type $thread_id
+	 * @return type array
+	 */
+	public function get_notified_user( $thread_id ) {
+		$tags                         = wp_get_post_terms( $thread_id, 'sf_tags', array( 'fields' => 'slugs' ) );
+		$email_account                = get_post_meta( $thread_id, 'email_account', true );
+		$email_notifications_override = get_post_meta( $thread_id, 'email_notifications_override', true );
+
+		$notifications_settings = $this->get_notifications_settings( null, true );
+
+		$allowed_users = array();
+		foreach ( $notifications_settings as $notifications_setting ) {
+			if ( in_array( $notifications_setting['user_id'], $allowed_users ) ) {
+				continue;
+			}
+			if ( 'tags' == $notifications_setting['privilege_type'] ) {
+				$user_notified = in_array( $notifications_setting['privilege_id'], $tags );
+			} elseif ( 'email_accounts' == $notifications_setting['privilege_type'] ) {
+				$user_notified = $email_account == $notifications_setting['privilege_id'];
+			}
+
+			if ( $user_notified ) {
+				$allowed_users[] = $notifications_setting['user_id'];
+			}
+		}
+
+		foreach ( $email_notifications_override as $user_id => $status ) {
+			if ( 'disable' == $status && in_array( $user_id, $allowed_users ) ) {
+				unset( $allowed_users[array_search( $user_id, $allowed_users )] );
+			}
+			if ( 'enable' == $status && ! in_array( $user_id, $allowed_users ) ) {
+				$allowed_users[] = $user_id;
+			}
+
+		}
+
+		return $allowed_users;
+	}
 
 }
 

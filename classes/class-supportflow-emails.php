@@ -36,7 +36,8 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$thread = SupportFlow()->get_thread( $reply->post_parent );
 		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', array( $thread->post_author ), $thread, 'reply' );
+		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( get_the_ID() );
+		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $thread, 'reply' );
 
 		$email_accounts   = get_option( 'sf_email_accounts' );
 		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
@@ -55,7 +56,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// Don't email the person adding the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
-			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' ), $agent_emails );
+			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' , true ), $agent_emails );
 			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
 			}
