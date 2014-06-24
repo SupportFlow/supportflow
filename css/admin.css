@@ -12,16 +12,18 @@
 	color: #BC0B0B;
 }
 
-.inline {
-    display: inline;
-}
-
 #poststuff {
 	padding-top: 0;
 }
 
 #side-sortables {
 	margin-top: 34px;
+}
+
+#change_user_label {
+    display:     inline;
+    font-weight: bold;
+    font-size:   16px;
 }
 
 #supportflow-subject.postbox,

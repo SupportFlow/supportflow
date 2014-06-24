@@ -19,14 +19,14 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 		parent::__construct( array( 'screen' => 'sf_user_permissions_table' ) );
 
 		$this->_data = array();
-		foreach ( $user_permissions as $user_permission ) {
+		foreach ( $user_permissions as $id=>$user_permission ) {
 			$identfier = json_encode( array(
 				'user_id'        => $user_permission['user_id'],
 				'privilege_type' => $user_permission['privilege_type'],
 				'privilege_id'   => $user_permission['privilege_id'],
 			) );
-			$status    = "<input type='checkbox' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
-			$status .= " <span class='privilege_status'> " . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</span>";
+			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
+			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label";
 			$this->_data[] = array(
 				'status'    => $status,
 				'privilege' => esc_html( $user_permission['privilege'] ),
@@ -117,8 +117,8 @@ class SupportFlow_Permissions extends SupportFlow {
 		<div class="wrap">
 		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
 
-		<h3 class="inline"><?php _e( 'User', 'supportflow' ) ?>: </h3>
-		<select id="change_user">
+		<label for="change_user" id="change_user_label"><?php _e( 'User', 'supportflow' ) ?>: </label>
+		<select name="change_user" id="change_user">
 			<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
 			<?php
 			foreach ( get_users() as $user ) {
@@ -159,6 +159,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 				jQuery(document).on('change', '.toggle_privilege', function () {
 					var checkbox = jQuery(this);
+					var checkbox_label = checkbox.siblings('.privilege_status');
 					var permission_identifier = checkbox.data('permission-identifier');
 
 					var allowed = checkbox.prop('checked');
@@ -180,9 +181,9 @@ class SupportFlow_Permissions extends SupportFlow {
 							if (1 == content) {
 								var allowed = checkbox.prop('checked');
 								if (true == allowed) {
-									checkbox.siblings('.privilege_status').html('<?php _e( 'Allowed', 'supportflow' ) ?>');
+									checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
 								} else {
-									checkbox.siblings('.privilege_status').html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
+									checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
 								}
 							} else {
 								checkbox.prop('checked', !checkbox.prop('checked'));
