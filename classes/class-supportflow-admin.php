@@ -479,8 +479,8 @@ class SupportFlow_Admin extends SupportFlow {
 			$content = $predefined_reply->post_content;
 
 			// Limit size to 25 characters
-			if ( strlen( $content ) > 25 ) {
-				$title = substr( $content, 0, 25 - 3 ) . '...';
+			if ( strlen( $content ) > 75 ) {
+				$title = substr( $content, 0, 75 - 3 ) . '...';
 			} else {
 				$title = $content;
 			}
