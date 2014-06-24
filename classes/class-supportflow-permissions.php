@@ -26,7 +26,7 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 				'privilege_id'   => $user_permission['privilege_id'],
 			) );
 			$status    = "<input type='checkbox' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
-			$status .= " <span class='privilege_status'> " . ( $user_permission['allowed'] ? 'Allowed' : 'Not allowed' ) . "</span>";
+			$status .= " <span class='privilege_status'> " . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</span>";
 			$this->_data[] = array(
 				'status'    => $status,
 				'privilege' => esc_html( $user_permission['privilege'] ),
@@ -117,9 +117,9 @@ class SupportFlow_Permissions extends SupportFlow {
 		<div class="wrap">
 		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
 
-		<h3 class="inline">User: </h3>
+		<h3 class="inline"><?php _e( 'User', 'supportflow' ) ?>: </h3>
 		<select id="change_user">
-			<option data-user-id=0>All</option>
+			<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
 			<?php
 			foreach ( get_users() as $user ) {
 				if ( ! $user->has_cap( 'manage_options' ) ) {
@@ -180,18 +180,18 @@ class SupportFlow_Permissions extends SupportFlow {
 							if (1 == content) {
 								var allowed = checkbox.prop('checked');
 								if (true == allowed) {
-									checkbox.siblings('.privilege_status').html('Allowed');
+									checkbox.siblings('.privilege_status').html('<?php _e( 'Allowed', 'supportflow' ) ?>');
 								} else {
-									checkbox.siblings('.privilege_status').html('Not allowed');
+									checkbox.siblings('.privilege_status').html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
 								}
 							} else {
 								checkbox.prop('checked', !checkbox.prop('checked'));
-								alert('Failed changing state. Old state is reverted');
+								alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 							}
 						},
 						error   : function () {
 							checkbox.prop('checked', !checkbox.prop('checked'));
-							alert('Failed changing state. Old state is reverted');
+							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 						},
 					});
 				});
