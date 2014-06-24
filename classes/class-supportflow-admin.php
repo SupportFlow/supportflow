@@ -65,9 +65,6 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
-			wp_enqueue_script( 'supportflow-predefined-replies', SupportFlow()->plugin_url . 'js/predefined-replies.js', array( 'jquery' ) );
-			$message = __( 'Are you sure want to proceed? It will replace your existing content.', 'supportflow' );
-			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFPredefinedReplies', array( 'message' => $message ) );
 		}
 	}
 
