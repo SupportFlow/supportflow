@@ -815,7 +815,7 @@ function SupportFlow() {
 
 add_filter( 'cron_schedules', function ( $schedules ) {
 	$schedules['five_minutes'] = array(
-		'interval' => 300,
+		'interval' => 5 * MINUTE_IN_SECONDS,
 		'display'  => __( 'Five Minutes', 'supportflow' )
 	);
 
