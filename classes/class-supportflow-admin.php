@@ -61,60 +61,18 @@ class SupportFlow_Admin extends SupportFlow {
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-thread_attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'wp-plupload', 'jquery' ) );
+			wp_enqueue_media();
+
+			wp_enqueue_script( 'supportflow-thread-attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
+
+			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
+			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
+				'frame_title'  => __( 'Select files', 'supportflow' ),
+				'button_title' => __( 'Insert as attachment', 'supportflow' ),
+			) );
 		}
-		wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
-		wp_localize_script( 'supportflow-thread_attachments', 'SFThreadAttachments', array(
-			'uploading'        => __( 'Uploading: ', 'supportflow' ),
-			'failed_uploading' => __( 'Failed uploading: ', 'supportflow' ),
-			'uploaded'         => __( 'Uploaded: ', 'supportflow' )
-		) );
-	}
-
-	/**
-	 * Sets up Plupload settings so we can upload media
-	 */
-	private function add_plupload_settings( $js_var_name, $plupload_args = array() ) {
-
-		global $wp_scripts;
-
-		$plupload_default_settings = array(
-			'runtimes'            => 'html5,silverlight,flash,html4',
-			'file_data_name'      => 'async-upload',
-			'multiple_queues'     => true,
-			'max_file_size'       => wp_max_upload_size(),
-			'url'                 => admin_url( 'admin-ajax.php' ),
-			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
-			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
-			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*' ) ),
-			'multipart'           => true,
-			'urlstream_upload'    => true,
-			'browse_button'       => '',
-			'container'           => '',
-			'drop_element'        => '',
-			'multipart_params'    => array(
-				'_ajax_nonce' => '',
-				'action'      => '',
-			),
-		);
-
-		$plupload_args = array_replace( $plupload_default_settings, $plupload_args );
-		echo "<script type='text/javascript'>var $js_var_name = " . json_encode( $plupload_args ) . ";</script>";
-	}
-
-	public function action_wp_ajax_thread_attachment_upload() {
-		check_ajax_referer( 'thread_attachment_upload' );
-		$attachment_id  = media_handle_upload( 'async-upload', 0 );
-		$attachment_url = wp_get_attachment_url( $attachment_id );
-
-		echo json_encode( array(
-			'id'  => $attachment_id,
-			'url' => $attachment_url,
-		) );
-
-		exit;
 	}
 
 	/**
