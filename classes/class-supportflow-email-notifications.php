@@ -77,6 +77,9 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 	}
 
+	/**
+	 * Loads the page to change E-Mail notfication settings
+	 */
 	public function notification_setting_page() {
 		?>
 		<div class="wrap">
@@ -140,6 +143,12 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 	}
 
+	/**
+	 * Get E-Mail notification setting of a user(s) in an array
+	 * @param integer $user_id
+	 * @param boolean $allowed_only
+	 * @return array
+	 */
 	public function get_notifications_settings( $user_id = null, $allowed_only = false ) {
 		// Get settings for current user if user not specified
 		if ( 0 == $user_id || ! is_int( $user_id ) ) {
@@ -222,6 +231,9 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		return $notification_settings;
 	}
 
+	/**
+	 * AJAX request to change user E-Mail notification settings
+	 */
 	public function action_wp_ajax_set_email_notfication() {
 		check_ajax_referer( - 1, '_set_email_notfication_nonce' );
 
@@ -241,7 +253,14 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		exit;
 	}
 
-
+	/**
+	 * Change E-Mail notification of a user for particular tag/E-Mail account
+	 * @param string $privilege_type
+	 * @param int $privilege_id
+	 * @param boolean $allowed
+	 * @param int $user_id
+	 * @return boolean
+	 */
 	public function set_notfication_settings( $privilege_type, $privilege_id, $allowed, $user_id = null ) {
 		// Get settings for current user if user not specified
 		if ( ! is_int( $user_id ) || 0 == $user_id ) {
