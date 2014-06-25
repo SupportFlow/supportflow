@@ -105,8 +105,8 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 					checkbox.prop('disabled', true);
 
 					jQuery.ajax(ajaxurl, {
-						type   : 'post',
-						data   : {
+						type    : 'post',
+						data    : {
 							action                      : 'set_email_notfication',
 							privilege_type              : privilege_type,
 							privilege_id                : privilege_id,
@@ -123,7 +123,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 							checkbox.prop('checked', !checkbox.prop('checked'));
 							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 						},
-						complete: function() {
+						complete: function () {
 							var allowed = checkbox.prop('checked');
 							if (true == allowed) {
 								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
