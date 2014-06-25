@@ -19,7 +19,7 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 		parent::__construct( array( 'screen' => 'sf_user_permissions_table' ) );
 
 		$this->_data = array();
-		foreach ( $user_permissions as $id=>$user_permission ) {
+		foreach ( $user_permissions as $id => $user_permission ) {
 			$identfier = json_encode( array(
 				'user_id'        => $user_permission['user_id'],
 				'privilege_type' => $user_permission['privilege_type'],
@@ -190,7 +190,7 @@ class SupportFlow_Permissions extends SupportFlow {
 							checkbox.prop('checked', !checkbox.prop('checked'));
 							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 						},
-						complete: function() {
+						complete: function () {
 							var allowed = checkbox.prop('checked');
 							if (true == allowed) {
 								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
