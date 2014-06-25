@@ -345,7 +345,7 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 
-		if ( isset( $_GET['email_account'] ) ) {
+		if ( isset( $_GET['email_account'] ) && ! empty( $_GET['email_account'] ) ) {
 			$query->set( 'meta_key', 'email_account' );
 			$query->set( 'meta_value', (int) $_GET['email_account'] );
 		}
