@@ -3,15 +3,7 @@ jQuery(document).ready(function ($) {
 	attachment_uploader = {
 		// Initialization
 		init    : function () {
-			// Setup variables
-			if (undefined == attachment_uploader.events_registered)
-				attachment_uploader.events_registered = false;
-
-			// Register event handlers. Avoid doing it when the widget re-initializes because that would cause multiple modals to open when the button is clicked, etc
-			if (!attachment_uploader.events_registered) {
-				$(document).on('click', '#reply-attachment-browse-button', {}, attachment_uploader.uploader);
-				attachment_uploader.events_registered = true;
-			}
+			$(document).on('click', '#reply-attachment-browse-button', {}, attachment_uploader.uploader);
 		},
 
 		// Call this from the upload button to initiate the upload frame.
