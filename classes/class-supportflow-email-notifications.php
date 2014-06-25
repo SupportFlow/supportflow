@@ -94,11 +94,15 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 				jQuery(document).on('change', '.toggle_privilege', function () {
 					var checkbox = jQuery(this);
+					var checkbox_label = checkbox.siblings('.privilege_status');
 					var email_notfication_identifier = checkbox.data('email-notfication-identifier');
 
 					var allowed = checkbox.prop('checked');
 					var privilege_type = email_notfication_identifier.privilege_type;
 					var privilege_id = email_notfication_identifier.privilege_id;
+
+					checkbox_label.html('Changing status, please wait.');
+					checkbox.prop('disabled', true);
 
 					jQuery.ajax(ajaxurl, {
 						type   : 'post',
@@ -109,22 +113,24 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 							allowed                     : allowed,
 							_set_email_notfication_nonce: '<?php echo wp_create_nonce() ?>',
 						},
-						success: function (content) {
-							if (1 == content) {
-								var allowed = checkbox.prop('checked');
-								if (true == allowed) {
-									checkbox.siblings('.privilege_status').html('Allowed');
-								} else {
-									checkbox.siblings('.privilege_status').html('Not allowed');
-								}
-							} else {
+						success : function (content) {
+							if (1 != content) {
 								checkbox.prop('checked', !checkbox.prop('checked'));
 								alert('Failed changing state. Old state is reverted');
 							}
 						},
-						error  : function () {
+						error   : function () {
 							checkbox.prop('checked', !checkbox.prop('checked'));
 							alert('Failed changing state. Old state is reverted');
+						},
+						complete: function() {
+							var allowed = checkbox.prop('checked');
+							if (true == allowed) {
+								checkbox_label.html('Allowed');
+							} else {
+								checkbox_label.html('Not Allowed');
+							}
+							checkbox.prop('disabled', false);
 						},
 					});
 				});
@@ -312,4 +318,4 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 }
 
-SupportFlow()->extend->email_notifications = new SupportFlow_Email_Notifications();  
+SupportFlow()->extend->email_notifications = new SupportFlow_Email_Notifications();
