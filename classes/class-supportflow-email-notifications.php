@@ -19,13 +19,13 @@ class SupportFlow_Email_Notifications_Table extends WP_List_Table {
 		parent::__construct( array( 'screen' => 'sf_user_email_notifications_table' ) );
 
 		$this->_data = array();
-		foreach ( $notification_settings as $notification_setting ) {
+		foreach ( $notification_settings as $id => $notification_setting ) {
 			$identfier = json_encode( array(
 				'privilege_type' => $notification_setting['privilege_type'],
 				'privilege_id'   => $notification_setting['privilege_id'],
 			) );
-			$status    = "<input type='checkbox' class='toggle_privilege' data-email-notfication-identifier='" . $identfier . "' " . checked( $notification_setting['allowed'], true, false ) . '>';
-			$status .= " <span class='privilege_status'> " . ( $notification_setting['allowed'] ? 'Allowed' : 'Not allowed' ) . "</span>";
+			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-email-notfication-identifier='" . $identfier . "' " . checked( $notification_setting['allowed'], true, false ) . '>';
+			$status .= " <label for='permission_$id' class='privilege_status'> " . ( $notification_setting['allowed'] ? 'Allowed' : 'Not allowed' ) . "</label>";
 			$this->_data[] = array(
 				'status'    => $status,
 				'privilege' => esc_html( $notification_setting['privilege'] ),
@@ -212,6 +212,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 				);
 			}
 		}
+
 		return $notification_settings;
 	}
 
@@ -268,7 +269,9 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 	/**
 	 * Get user id of all the users that will receive e-mail notifications for a thread reply
+	 *
 	 * @param type $thread_id
+	 *
 	 * @return type array
 	 */
 	public function get_notified_user( $thread_id ) {
@@ -309,4 +312,4 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 }
 
-SupportFlow()->extend->email_notifications = new SupportFlow_Email_Notifications();
+SupportFlow()->extend->email_notifications = new SupportFlow_Email_Notifications();  
