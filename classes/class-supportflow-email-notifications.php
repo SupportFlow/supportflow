@@ -83,7 +83,8 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 	public function notification_setting_page() {
 		?>
 		<div class="wrap">
-		<h2><?php _e( 'E-Mail Notifications', 'supportflow' ) ?></h2><br />
+		<h2><?php _e( 'E-Mail Notifications', 'supportflow' ) ?></h2>
+		<p><?php _e( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual threads.', 'supportflow' ) ?></p>
 
 		<div id="email_notification_table">
 			<?php
