@@ -193,6 +193,10 @@
 	margin-top:  5px;
 }
 
+#supportflow-replies.postbox .predefined_replies_dropdown {
+	width: 200px;
+}
+
 .metabox-holder .postbox-container .empty-container {
 	border: none;
 }

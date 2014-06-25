@@ -63,7 +63,6 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js', array( 'wp-plupload', 'jquery' ) );
 			self::add_default_plupload_settings();
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
-
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 		}
@@ -506,13 +505,42 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
+		$predefined_replies = get_posts( array( 'post_type' => 'sf_predefs' ) );
+		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			$content = $predefined_reply->post_content;
+
+			if ( ! empty( $predefined_reply->post_title ) ) {
+ 				$title = $predefined_reply->post_title;
+ 			} else {
+ 				$title = $predefined_reply->post_content;
+ 			}
+
+			// Limit size to 75 characters
+			if ( strlen( $title ) > 75 ) {
+				$title = substr( $title, 0, 75 - 3 ) . '...';
+			}
+
+			if ( 0 != strlen( $content ) ) {
+				$pre_defs[] = array( 'title' => $title, 'content' => $content );
+			}
+		}
+
 		$placeholders = array(
 			__( "What's burning?", 'supportflow' ),
 			__( 'What do you need to get off your chest?', 'supportflow' ),
 		);
 
 		$rand = array_rand( $placeholders );
-		echo '<h4>' . __( 'Conversation', 'supportflow' ) . '</h4>';
+		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
+		echo '<div class="alignright">';
+		echo '<select id="predefs"  class="predefined_replies_dropdown">';
+		foreach ( $pre_defs as $pre_def ) {
+			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
+		}
+		echo '</select></div>';
+
 		echo '<div id="thread-reply-box">';
 
 		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";

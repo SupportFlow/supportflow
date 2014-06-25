@@ -160,10 +160,12 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type       = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
-		$this->respondents_tax = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
-		$this->reply_type      = apply_filters( 'supportflow_thread_reply_type', 'sf_thread' );
-		$this->tags_tax        = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
+		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
+		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
+		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
+		$this->comment_type             = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
+		$this->reply_type               = apply_filters( 'supportflow_thread_reply_type', 'sf_thread' );
 
 		$this->email_term_prefix = 'sf-';
 
@@ -215,6 +217,7 @@ class SupportFlow {
 		require_once( $this->plugin_dir . 'classes/class-supportflow-email-replies.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-permissions.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-email-accounts.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-predefined-replies.php' );
 
 		/** Extensions ********************************************************/
 
@@ -247,6 +250,7 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
+
 
 		add_filter( 'wp_insert_post_empty_content', array( $this, 'filter_wp_insert_post_empty_content' ), 10, 2 );
 
