@@ -25,7 +25,7 @@ class SupportFlow_Email_Notifications_Table extends WP_List_Table {
 				'privilege_id'   => $notification_setting['privilege_id'],
 			) );
 			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-email-notfication-identifier='" . $identfier . "' " . checked( $notification_setting['allowed'], true, false ) . '>';
-			$status .= " <label for='permission_$id' class='privilege_status'> " . ( $notification_setting['allowed'] ? 'Allowed' : 'Not allowed' ) . "</label>";
+			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $notification_setting['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label>";
 			$this->_data[] = array(
 				'status'    => $status,
 				'privilege' => esc_html( $notification_setting['privilege'] ),
@@ -101,7 +101,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 					var privilege_type = email_notfication_identifier.privilege_type;
 					var privilege_id = email_notfication_identifier.privilege_id;
 
-					checkbox_label.html('Changing status, please wait.');
+					checkbox_label.html('<?php _e( 'Changing status, please wait.', 'supportflow' ) ?>');
 					checkbox.prop('disabled', true);
 
 					jQuery.ajax(ajaxurl, {
@@ -116,19 +116,19 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 						success : function (content) {
 							if (1 != content) {
 								checkbox.prop('checked', !checkbox.prop('checked'));
-								alert('Failed changing state. Old state is reverted');
+								alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 							}
 						},
 						error   : function () {
 							checkbox.prop('checked', !checkbox.prop('checked'));
-							alert('Failed changing state. Old state is reverted');
+							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
 						},
 						complete: function() {
 							var allowed = checkbox.prop('checked');
 							if (true == allowed) {
-								checkbox_label.html('Allowed');
+								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
 							} else {
-								checkbox_label.html('Not Allowed');
+								checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
 							}
 							checkbox.prop('disabled', false);
 						},
