@@ -1,25 +1,35 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
 
-	var sf_thread_attachment_uploader = new plupload.Uploader(sf_thread_attachment_plupload_settings);
-	sf_thread_attachment_uploader.init();
+	attachment_uploader = {
+		// Initialization
+		init    : function () {
+			$(document).on('click', '#reply-attachment-browse-button', {}, attachment_uploader.uploader);
+		},
 
-	sf_thread_attachment_uploader.bind('FilesAdded', function (uploader, files) {
-		plupload.each(files, function (file) {
-			jQuery('#replies-attachments-list').append('<li id="reply-attachment-' + file.id + '">' + SFThreadAttachments.uploading + file.name + '</li>');
-		});
+		// Call this from the upload button to initiate the upload frame.
+		uploader: function (event) {
+			var frame = wp.media({
+				title   : SFThreadAttachments.frame_title,
+				multiple: true,
+				button  : { text: SFThreadAttachments.button_title },
+			});
 
-		uploader.refresh();
-		uploader.start();
-	});
+			// Handle results from media manager.
+			frame.on('close', function () {
+				var attachments = frame.state().get('selection').toJSON();
+				jQuery.each(attachments, function () {
+					jQuery('#replies-attachments-list').append('<li>' + '<a target="_blank" href="' + this.url + '">' + this.filename + '</a></li>');
+					jQuery('#reply-attachments').val(jQuery('#reply-attachments').val() + this.id + ',');
+				});
+			});
 
-	sf_thread_attachment_uploader.bind('FileUploaded', function (uploader, file, response) {
-		if (null == response.response || 0 == response.response) {
-			jQuery('#reply-attachment-' + file.id).html('<li>' + SFThreadAttachments.failed_uploading + file.name + '</li>');
-		} else {
-			var attachment = jQuery.parseJSON(response.response);
-			jQuery('#reply-attachment-' + file.id).html('<li>' + SFThreadAttachments.uploaded + '<a target="_blank" href="' + attachment.url + '">' + file.name + '</a></li>');
-			jQuery('#reply-attachments').val(jQuery('#reply-attachments').val() + attachment.id + ',');
-		}
-	});
+			frame.open();
+			return false;
+		},
+
+
+	};
+
+	attachment_uploader.init();
 
 });

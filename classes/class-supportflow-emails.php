@@ -164,7 +164,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$phpmailer->IsSMTP();
 		$phpmailer->Host       = $this->smtp_account['smtp_host'];
 		$phpmailer->Port       = (int) $this->smtp_account['smtp_port'];
-		$phpmailer->SMTPSecure = $this->smtp_account['smtp_ssl'] ? 'smtp_ssl' : '';
+		$phpmailer->SMTPSecure = $this->smtp_account['smtp_ssl'] ? 'ssl' : '';
 		$phpmailer->Username   = $this->smtp_account['username'];
 		$phpmailer->Password   = $this->smtp_account['password'];
 		$phpmailer->SMTPAuth   = true;
