@@ -218,6 +218,7 @@ class SupportFlow {
 		require_once( $this->plugin_dir . 'classes/class-supportflow-permissions.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-email-accounts.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-predefined-replies.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-email-notifications.php' );
 
 		/** Extensions ********************************************************/
 

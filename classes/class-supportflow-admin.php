@@ -490,6 +490,37 @@ class SupportFlow_Admin extends SupportFlow {
 		wp_dropdown_users( $args );
 		echo '</div>';
 
+		// E-Mail notifications override
+		echo '<div class="misc-pub-section">';
+		echo '<label for="post_email_notifications_override">' . __( 'E-Mail Notification', 'supportflow' ) . ':</label>';
+		echo '<select name="post_email_notifications_override" id="post_email_notifications_override" class="">';
+
+		if ( 'post-new.php' == $pagenow ) {
+			echo '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
+			echo '<option value="enable">' . __( 'Enabled', 'supportflow' ) . '</option>';
+			echo '<option value="disable">' . __( 'Disabled', 'supportflow' ) . '</option>';
+
+		} elseif ( 'post.php' == $pagenow ) {
+			$email_notifications_override = get_post_meta( get_the_ID(), 'email_notifications_override', true );
+			$current_user_id              = get_current_user_id();
+			$selected                     = 0;
+
+			if ( isset( $email_notifications_override[$current_user_id] ) ) {
+				$override_status = $email_notifications_override[$current_user_id];
+				if ( 'enable' == $override_status ) {
+					$selected = 1;
+				} elseif ( 'disable' == $override_status ) {
+					$selected = 2;
+				}
+			}
+
+			echo '<option value="default"' . selected( $selected, 0 ) . '>' . __( 'Default', 'supportflow' ) . '</option>';
+			echo '<option value="enable"' . selected( $selected, 1 ) . '>' . __( 'Enabled', 'supportflow' ) . '</option>';
+			echo '<option value="disable"' . selected( $selected, 2 ) . '>' . __( 'Disabled', 'supportflow' ) . '</option>';
+		}
+		echo '</select>';
+		echo '</div>';
+
 		echo '</div>'; // end div#misc-publishing-actions
 
 
@@ -829,6 +860,12 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( isset( $_POST['post_email_account'] ) && ! empty( $_POST['post_email_account'] ) ) {
 			$email_account = (int) $_POST['post_email_account'];
 			update_post_meta( $thread_id, 'email_account', $email_account );
+		}
+
+		if ( isset( $_POST['post_email_notifications_override'] ) && in_array( $_POST['post_email_notifications_override'], array( 'default', 'enable', 'disable' ) ) ) {
+			$email_notifications_override                        = get_post_meta( $thread_id, 'email_notifications_override', true );
+			$email_notifications_override[get_current_user_id()] = $_POST['post_email_notifications_override'];
+			update_post_meta( $thread_id, 'email_notifications_override', $email_notifications_override );
 		}
 
 		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
