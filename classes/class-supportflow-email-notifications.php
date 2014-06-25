@@ -72,12 +72,12 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 			__( 'E-Mail Notifications', 'supportflow' ),
 			'read',
 			$this->slug,
-			array( $this, 'tag_setting_page' )
+			array( $this, 'notification_setting_page' )
 		);
 
 	}
 
-	public function tag_setting_page() {
+	public function notification_setting_page() {
 		?>
 		<div class="wrap">
 		<h2><?php _e( 'E-Mail Notifications', 'supportflow' ) ?></h2><br />
