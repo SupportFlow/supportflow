@@ -4,6 +4,61 @@
  *
  * @since    0.1
  */
+
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+/**
+ * Table to show existing E-Mail accounts with a option to remove existing
+ */
+class SupportFlow_User_Permissions_Table extends WP_List_Table {
+	protected $_data;
+
+	function __construct( $user_permissions ) {
+		parent::__construct( array( 'screen' => 'sf_user_permissions_table' ) );
+
+		$this->_data = array();
+		foreach ( $user_permissions as $id => $user_permission ) {
+			$identfier = json_encode( array(
+				'user_id'        => $user_permission['user_id'],
+				'privilege_type' => $user_permission['privilege_type'],
+				'privilege_id'   => $user_permission['privilege_id'],
+			) );
+			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
+			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label";
+			$this->_data[] = array(
+				'status'    => $status,
+				'privilege' => esc_html( $user_permission['privilege'] ),
+				'type'      => $user_permission['type'],
+				'user'      => esc_html( $user_permission['user'] ),
+			);
+		}
+	}
+
+	function column_default( $item, $column_name ) {
+		return $item[$column_name];
+	}
+
+	function get_columns() {
+		return array(
+			'status'    => __( 'Status', 'supportflow' ),
+			'privilege' => __( 'Privilege', 'supportflow' ),
+			'type'      => __( 'Type', 'supportflow' ),
+			'user'      => __( 'User', 'supportflow' ),
+		);
+	}
+
+	function prepare_items() {
+		$columns               = $this->get_columns();
+		$data                  = $this->_data;
+		$hidden                = array();
+		$sortable              = array();
+		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->items           = $data;
+	}
+}
+
 class SupportFlow_Permissions extends SupportFlow {
 
 	/**
@@ -33,6 +88,338 @@ class SupportFlow_Permissions extends SupportFlow {
 	 */
 	public function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
+		add_action( 'wp_ajax_get_user_permissions', array( $this, 'action_wp_ajax_get_user_permissions' ) );
+		add_action( 'wp_ajax_set_user_permission', array( $this, 'action_wp_ajax_set_user_permission' ) );
+	}
+
+	public function action_admin_menu() {
+		$this->slug = 'sf_permissions';
+
+		add_submenu_page(
+			'edit.php?post_type=' . SupportFlow()->post_type,
+			__( 'Permissions', 'supportflow' ),
+			__( 'Permissions', 'supportflow' ),
+			'manage_options',
+			$this->slug,
+			array( $this, 'permissions_page' )
+		);
+
+	}
+
+	public function action_admin_init() {
+		add_filter( 'user_has_cap', array( $this, 'limit_user_permissions' ), 10, 3 );
+	}
+
+	public function permissions_page() {
+		?>
+		<div class="wrap">
+		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
+
+		<label for="change_user" id="change_user_label"><?php _e( 'User', 'supportflow' ) ?>: </label>
+		<select name="change_user" id="change_user">
+			<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
+			<?php
+			foreach ( get_users() as $user ) {
+				if ( ! $user->has_cap( 'manage_options' ) ) {
+					$user_id       = $user->data->ID;
+					$user_nicename = esc_html( $user->data->user_nicename );
+					$user_email    = esc_html( $user->data->user_email );
+					echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
+				}
+			}
+			?>
+		</select>
+
+		<div id="user_permissions_table">
+			<?php
+			$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( 0 ) );
+			$user_permissions_table->prepare_items();
+			$user_permissions_table->display();
+			?>
+		</div>
+		<script type="text/javascript">
+			jQuery(document).ready(function () {
+				jQuery('#change_user').change(function () {
+					var user_id = jQuery('#change_user option:selected').data('user-id');
+
+					jQuery.ajax(ajaxurl, {
+						type   : 'post',
+						data   : {
+							action                     : 'get_user_permissions',
+							user_id                    : user_id,
+							_get_user_permissions_nonce: '<?php echo wp_create_nonce() ?>',
+						},
+						success: function (content) {
+							jQuery('#user_permissions_table').html(content);
+						},
+					});
+				});
+
+				jQuery(document).on('change', '.toggle_privilege', function () {
+					var checkbox = jQuery(this);
+					var checkbox_label = checkbox.siblings('.privilege_status');
+					var permission_identifier = checkbox.data('permission-identifier');
+
+					var allowed = checkbox.prop('checked');
+					var user_id = permission_identifier.user_id;
+					var privilege_type = permission_identifier.privilege_type;
+					var privilege_id = permission_identifier.privilege_id;
+
+					checkbox_label.html('<?php _e( 'Changing status, please wait.', 'supportflow' ) ?>');
+					checkbox.prop('disabled', true);
+
+					jQuery.ajax(ajaxurl, {
+						type    : 'post',
+						data    : {
+							action                    : 'set_user_permission',
+							user_id                   : user_id,
+							privilege_type            : privilege_type,
+							privilege_id              : privilege_id,
+							allowed                   : allowed,
+							_set_user_permission_nonce: '<?php echo wp_create_nonce() ?>',
+						},
+						success : function (content) {
+							if (1 != content) {
+								checkbox.prop('checked', !checkbox.prop('checked'));
+								alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
+							}
+						},
+						error   : function () {
+							checkbox.prop('checked', !checkbox.prop('checked'));
+							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
+						},
+						complete: function () {
+							var allowed = checkbox.prop('checked');
+							if (true == allowed) {
+								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
+							} else {
+								checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
+							}
+							checkbox.prop('disabled', false);
+						},
+					});
+				});
+			});
+		</script>
+	<?php
+
+	}
+
+	public function action_wp_ajax_get_user_permissions() {
+		check_ajax_referer( - 1, '_get_user_permissions_nonce' );
+
+		if ( ! isset( $_POST['user_id'] ) ) {
+			exit;
+		}
+		$user_id = (int) $_POST['user_id'];
+
+		$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( $user_id ) );
+		$user_permissions_table->prepare_items();
+		$user_permissions_table->display();
+
+		exit;
+	}
+
+	public function get_user_permissions( $user_id ) {
+		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
+		$email_accounts   = get_option( 'sf_email_accounts' );
+		$permissions      = array();
+		$user_permissions = array();
+
+		if ( 0 == $user_id ) {
+			$users = get_users();
+		} else {
+			$users = array( get_userdata( $user_id ) );
+		}
+
+		foreach ( $users as $user ) {
+			if ( ! $user->has_cap( 'manage_options' ) ) {
+				$permission = get_user_meta( $user->ID, 'sf_permissions', true );
+				if ( ! is_array( $permission ) || empty( $permission ) || ! is_array( $permission['tags'] ) || ! is_array( $permission['email_accounts'] ) ) {
+					$permission = array( 'tags' => array(), 'email_accounts' => array() );
+				}
+
+				$permissions[$user->ID] = $permission;
+			}
+		}
+
+		foreach ( $permissions as $user_id => $permission ) {
+			$user_data = get_userdata( $user_id );
+
+			foreach ( $email_accounts as $id => $email_account ) {
+				if ( empty( $email_account ) ) {
+					continue;
+				}
+				$user_permissions[] = array(
+					'user_id'        => $user_id,
+					'user'           => $user_data->data->user_nicename . ' (' . $user_data->data->user_email . ')',
+					'privilege_type' => 'email_accounts',
+					'type'           => 'E-Mail Account',
+					'privilege_id'   => $id,
+					'privilege'      => $email_account['username'] . ' (' . $email_account['imap_host'] . ')',
+					'allowed'        => in_array( $id, $permission['email_accounts'] ),
+				);
+			}
+			foreach ( $tags as $tag ) {
+				$user_permissions[] = array(
+					'user_id'        => $user_id,
+					'user'           => $user_data->data->user_nicename . ' (' . $user_data->data->user_email . ')',
+					'privilege_type' => 'tags',
+					'type'           => 'Tag',
+					'privilege_id'   => $tag->slug,
+					'privilege'      => $tag->name . ' (' . $tag->slug . ')',
+					'allowed'        => in_array( $tag->slug, $permission['tags'] ),
+				);
+			}
+		}
+
+		return $user_permissions;
+	}
+
+	public function action_wp_ajax_set_user_permission() {
+		check_ajax_referer( - 1, '_set_user_permission_nonce' );
+
+		if ( ! isset( $_POST['user_id'] )
+			|| ! isset( $_POST['privilege_type'] )
+			|| ! isset( $_POST['privilege_id'] )
+			|| ! isset( $_POST['allowed'] )
+			|| ! in_array( $_POST['privilege_type'], array( 'email_accounts', 'tags' ) )
+		) {
+			exit;
+		}
+
+		$user_id        = (int) $_POST['user_id'];
+		$privilege_type = $_POST['privilege_type'];
+		$privilege_id   = $_POST['privilege_id'];
+		$allowed        = 'true' == $_POST['allowed'] ? true : false;
+
+		echo $this->set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed );
+		exit;
+	}
+
+
+	public function set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed ) {
+		$permission = get_user_meta( $user_id, 'sf_permissions', true );
+
+		if ( ! is_array( $permission ) || ! isset( $permission['tags'] ) || ! isset( $permission['email_accounts'] ) ) {
+			$permission = array( 'tags' => array(), 'email_accounts' => array() );
+		}
+
+		if ( true == $allowed ) {
+			if ( ! in_array( $privilege_id, $permission[$privilege_type] ) ) {
+				$permission[$privilege_type][] = (string) $privilege_id;
+				update_user_meta( $user_id, 'sf_permissions', $permission );
+
+				return true;
+			}
+		} else {
+			if ( false !== ( $key = array_search( $privilege_id, $permission[$privilege_type] ) ) ) {
+				unset( $permission[$privilege_type][$key] );
+				update_user_meta( $user_id, 'sf_permissions', $permission );
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/*
+	 * Limited under-privileged user acces to only allowed E-Mail accounts
+	 */
+	function limit_user_permissions( $allcaps, $cap, $args ) {
+		global $pagenow, $post_type;
+
+		if (
+			// Return if required capability is not one of them
+			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
+
+			// Return if user is admin
+			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] ) ||
+
+			// Return if posts are not supportflow threads
+			SupportFlow()->post_type != $post_type
+		) {
+			return $allcaps;
+		}
+
+		// Get all supportflow permissions granted to the current user
+		$user_permissions = get_user_meta( $args[1], 'sf_permissions', true );
+
+		// This capability is requested if user is viewing/modifying existing ticket
+		if ( 'edit_post' == $args[0] ) {
+
+			// Allow if user have access to the tag/E-Mail account used by the thread
+			if ( $this->is_user_allowed_post( $args[1], $args[2] ) ) {
+				$allcaps["edit_others_posts"] = true;
+				$allcaps["edit_posts"]        = true;
+
+			// Allow if user is creating new thread with permitted E-Mail account
+			} elseif (
+				'post.php' == $pagenow &&
+				isset ( $_REQUEST['action'], $_REQUEST['post_email_account'] ) &&
+				'editpost' == $_REQUEST['action'] &&
+				in_array( $_REQUEST['post_email_account'], $user_permissions['email_accounts'] )
+			) {
+				$allcaps["edit_others_posts"] = true;
+				$allcaps["edit_posts"]        = true;
+
+			// Disallow user access to thread in other cases
+			} else {
+				$allcaps["edit_others_posts"] = false;
+				$allcaps["edit_posts"]        = false;
+			}
+		}
+
+		// Allow deleting thread if user have access to the tag/E-Mail account used by the thread
+		if ( 'delete_post' == $args[0] && $this->is_user_allowed_post( $args[1], $args[2] ) ) {
+			$allcaps["delete_others_posts"] = true;
+		} else {
+			$allcaps["delete_others_posts"] = false;
+		}
+
+		// This capability is requested if user is creating new thread or listing all threads
+		if ( 'edit_posts' == $args[0] ) {
+
+			// List All threads if user have access to atleast one E-Mail account or tag
+			if ( 'post-new.php' != $pagenow && ( ! empty( $user_permissions['email_accounts'] ) || ! empty( $user_permissions['tags'] ) ) ) {
+				$allcaps["edit_posts"] = true;
+
+			// Allow creating new thread if user have access to atleast one E-Mail account
+			} elseif ( 'post-new.php' == $pagenow && ! empty( $user_permissions['email_accounts'] ) ) {
+				$allcaps["edit_posts"] = true;
+
+			// Disallow in other cases
+			} else {
+				$allcaps["edit_posts"] = false;
+			}
+		}
+
+		return $allcaps;
+	}
+
+	/*
+	 * Check if user has access to a particular post
+	 */
+	public function is_user_allowed_post( $user_id, $post_id ) {
+		$user_permissions   = get_user_meta( $user_id, 'sf_permissions', true );
+		$post_email_account = get_post_meta( $post_id, 'email_account', true );
+		$post_tags          = wp_get_post_terms( $post_id, 'sf_tags' );
+
+		if ( in_array( $post_email_account, $user_permissions['email_accounts'] ) ) {
+			return true;
+		}
+
+		foreach ( $post_tags as $post_tag ) {
+			$post_tag_slug = $post_tag->slug;
+			if ( in_array( $post_tag_slug, $user_permissions['tags'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

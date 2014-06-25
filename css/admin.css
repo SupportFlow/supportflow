@@ -20,6 +20,12 @@
 	margin-top: 34px;
 }
 
+#change_user_label {
+    display:     inline;
+    font-weight: bold;
+    font-size:   16px;
+}
+
 #supportflow-subject.postbox,
 #supportflow-respondents.postbox {
 	border:     none;
@@ -88,6 +94,11 @@
 #supportflow-respondents.postbox input {
 	width:     100%;
 	padding:   8px;
+	font-size: 1.2em;
+}
+
+#supportflow-cc-bcc.postbox input {
+	width:     100%;
 	font-size: 1.2em;
 }
 

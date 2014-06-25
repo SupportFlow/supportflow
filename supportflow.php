@@ -292,6 +292,13 @@ class SupportFlow {
 	 */
 	public function action_init_register_taxonomies() {
 
+		$capabilities = array(
+			'manage_terms' => 'manage_options',
+			'edit_terms'   => 'manage_options',
+			'delete_terms' => 'manage_options',
+			'assign_terms' => 'manage_options',
+		);
+
 		$args_respondents_tax = array(
 			'label'             => __( 'Respondents', 'supportflow' ),
 			'labels'            => array(
@@ -303,6 +310,7 @@ class SupportFlow {
 			'public'            => true,
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
+			'capabilities'      => $capabilities,
 		);
 
 		$args_tags_tax = array(
@@ -316,6 +324,7 @@ class SupportFlow {
 			'public'            => true,
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
+			'capabilities'      => $capabilities,
 		);
 
 		register_taxonomy( $this->respondents_tax, $this->post_type, $args_respondents_tax );
@@ -392,14 +401,16 @@ class SupportFlow {
 		$post_statuses = $this->post_statuses;
 
 		$defaults = array(
-			'subject'          => '',
-			'message'          => '',
-			'date'             => '',
-			'respondent_id'    => 0, // If the requester has a WordPress account (ID or username)
-			'respondent_name'  => '', // Otherwise supply a name
-			'respondent_email' => '', // And an e-mail address
-			'status'           => key( $post_statuses ),
-			'assignee'         => - 1, // WordPress user ID or username of ticket assignee/owner
+			'subject'            => '',
+			'message'            => '',
+			'date'               => '',
+			'respondent_id'      => 0, // If the requester has a WordPress account (ID or username)
+			'respondent_email'   => array(), // And an e-mail address
+			'reply_author'       => '',
+			'reply_author_email' => '',
+			'status'             => key( $post_statuses ),
+			'assignee'           => - 1, // WordPress user ID or username of ticket assignee/owner
+			'email_account'      => 0,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -416,8 +427,7 @@ class SupportFlow {
 			$args['status'] = $defaults['status'];
 		}
 		$thread['post_status'] = $args['status'];
-
-		$thread_id = wp_insert_post( $thread, true );
+		$thread_id             = wp_insert_post( $thread );
 
 		if ( is_wp_error( $thread_id ) ) {
 			return $thread_id;
@@ -428,11 +438,15 @@ class SupportFlow {
 			$this->update_thread_respondents( $thread_id, $args['respondent_email'] );
 		}
 
+		if ( ! empty( $args['email_account'] ) ) {
+			update_post_meta( $thread_id, 'email_account', $args['email_account'] );
+		}
+
 		// If there was a message, add it to the thread
 		if ( ! empty( $args['message'] ) && ! empty( $args['respondent_email'] ) ) {
 			$reply_details = array(
-				'reply_author'       => $args['respondent_name'],
-				'reply_author_email' => $args['respondent_email'],
+				'reply_author'       => $args['reply_author'],
+				'reply_author_email' => $args['reply_author_email'],
 				'user_id'            => $args['respondent_id'],
 			);
 			$this->add_thread_reply( $thread_id, $args['message'], $reply_details );
@@ -619,6 +633,7 @@ class SupportFlow {
 			'post_status' => $args['status'],
 			'post_type'   => $this->reply_type,
 			'order'       => $args['order'],
+			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
 		$thread_replies = get_posts( $post_args );
@@ -632,14 +647,17 @@ class SupportFlow {
 	 * Convert 'any' reply approved requests to the proper SQL
 	 */
 	public function filter_reply_clauses( $clauses, $query ) {
-
-		$old_reply_approved = "( post_status = '0' OR post_status = '1' )";
-		if ( in_array( $query->query_vars['status'], array( 'public', 'private' ) ) ) {
-			$new_reply_approved = "post_status = '{$query->query_vars['status']}' ";
+		if ( in_array( $query->query_vars['post_status'], array( 'public', 'private' ) ) ) {
+			$new_post_status = "post_status = '{$query->query_vars['post_status']}' ";
 		} else {
-			$new_reply_approved = "post_status IN ( 'private', 'public' )";
+			$new_post_status = "post_status IN ( 'private', 'public' )";
 		}
-		$clauses['where'] = str_replace( $old_reply_approved, $new_reply_approved, $clauses['where'] );
+
+		if ( preg_match( "~post_status = '[^']+'~", $clauses['where'] ) ) {
+			$clauses['where'] = preg_replace( "~post_status = '[^']+'~", $new_post_status, $clauses['where'] );
+		} else {
+			$clauses['where'] .= " AND ($new_post_status)";
+		}
 
 		return $clauses;
 	}
@@ -674,6 +692,8 @@ class SupportFlow {
 			'reply_author_email' => '',
 			'user_id'            => '',
 			'post_status'        => 'public',
+			'cc'                 => array(),
+			'bcc'                => array(),
 		);
 
 		// @todo This actually probably shouldn't default to current user, so
@@ -695,23 +715,24 @@ class SupportFlow {
 		}
 
 		$reply = array(
-			'post_content' => esc_sql( $reply_text ),
+			'post_content' => $reply_text,
 			'post_parent'  => (int) $thread_id,
-			'post_date'    => esc_sql( $details['time'] ),
-			'post_status'  => esc_sql( $details['post_status'] ),
-			'post_type'    => esc_sql( $this->reply_type ),
+			'post_date'    => $details['time'],
+			'post_status'  => $details['post_status'],
+			'post_type'    => $this->reply_type,
 			'post_title'   => 'supportflow reply',
 			'user_id'      => (int) $details['user_id'],
 		);
-
 
 		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		$reply_id = wp_insert_post( $reply, true );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		// If there are attachment IDs store them as meta
-		if ( ! empty( $attachment_ids ) ) {
-			add_post_meta( $reply_id, 'attachment_ids', $attachment_ids, true );
+		if ( is_array( $attachment_ids ) ) {
+			foreach ( $attachment_ids as $attachment_id ) {
+				wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $reply_id ) );
+			}
 		}
 
 		add_post_meta( $reply_id, 'reply_author', esc_sql( $details['reply_author'] ) );
@@ -721,8 +742,7 @@ class SupportFlow {
 		// Adding a thread reply updates the post modified time for the thread
 		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql' ) ), array( 'ID' => $thread_id ) );
 		clean_post_cache( $thread_id );
-
-		do_action( 'supportflow_thread_reply_added', $reply_id );
+		do_action( 'supportflow_thread_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 
 		return $reply_id;
 	}
@@ -762,6 +782,19 @@ class SupportFlow {
 		return SupportFlow()->extend->permissions->get_cap( $cap );
 	}
 
+	/**
+	 * Convert multiple comma seperated E-Mail ID's into a array
+	 * @return array
+	 */
+	public function extract_email_ids( $string ) {
+		$emails = str_replace( ' ', '', $string );
+		$emails = explode( ',', $emails );
+		$emails = array_filter( $emails, function ( $email ) {
+			return sanitize_email( $email ) == $email && '' != $email;
+		} );
+
+		return $emails;
+	}
 }
 
 /**
@@ -778,5 +811,22 @@ class SupportFlow {
 function SupportFlow() {
 	return SupportFlow::instance();
 }
+
+add_filter( 'cron_schedules', function ( $schedules ) {
+	$schedules['five_minutes'] = array(
+		'interval' => 300,
+		'display'  => __( 'Five Minutes', 'supportflow' )
+	);
+
+	return $schedules;
+} );
+
+register_activation_hook( __FILE__, function () {
+	wp_schedule_event( time(), 'five_minutes', 'sf_cron_retrieve_email_replies' );
+} );
+
+register_deactivation_hook( __FILE__, function () {
+	wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
+} );
 
 add_action( 'plugins_loaded', 'SupportFlow' );

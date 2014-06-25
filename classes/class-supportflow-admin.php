@@ -6,6 +6,7 @@
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
+		add_action( 'wp_ajax_thread_attachment_upload', array( $this, 'action_wp_ajax_thread_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
@@ -60,52 +61,61 @@ class SupportFlow_Admin extends SupportFlow {
 
 		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-plupload', SupportFlow()->plugin_url . 'js/plupload.js', array( 'wp-plupload', 'jquery' ) );
-			self::add_default_plupload_settings();
+			wp_enqueue_script( 'supportflow-thread_attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'wp-plupload', 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
+
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
+			wp_localize_script( 'supportflow-thread_attachments', 'SFThreadAttachments', array(
+				'uploading'        => __( 'Uploading: ', 'supportflow' ),
+				'failed_uploading' => __( 'Failed uploading: ', 'supportflow' ),
+				'uploaded'         => __( 'Uploaded: ', 'supportflow' )
+			) );
 		}
 	}
 
 	/**
-	 * Sets up some default Plupload settings so we can upload media
+	 * Sets up Plupload settings so we can upload media
 	 */
-	private static function add_default_plupload_settings() {
+	private function add_plupload_settings( $js_var_name, $plupload_args = array() ) {
+
 		global $wp_scripts;
 
-		$defaults = array(
+		$plupload_default_settings = array(
 			'runtimes'            => 'html5,silverlight,flash,html4',
 			'file_data_name'      => 'async-upload',
 			'multiple_queues'     => true,
-			'url'                 => add_query_arg( 'post_id', get_the_id(), admin_url( 'admin-ajax.php', 'relative' ) ),
+			'max_file_size'       => wp_max_upload_size(),
+			'url'                 => admin_url( 'admin-ajax.php' ),
 			'flash_swf_url'       => includes_url( 'js/plupload/plupload.flash.swf' ),
 			'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
 			'filters'             => array( array( 'title' => __( 'Allowed Files' ), 'extensions' => '*' ) ),
 			'multipart'           => true,
 			'urlstream_upload'    => true,
+			'browse_button'       => '',
+			'container'           => '',
+			'drop_element'        => '',
 			'multipart_params'    => array(
-				'action'   => 'upload-attachment',
-				'_wpnonce' => wp_create_nonce( 'media-form' )
-			)
+				'_ajax_nonce' => '',
+				'action'      => '',
+			),
 		);
 
-		$settings = array(
-			'defaults' => $defaults,
-			'browser'  => array(
-				'mobile'    => wp_is_mobile(),
-				'supported' => _device_can_upload(),
-			)
-		);
+		$plupload_args = array_replace( $plupload_default_settings, $plupload_args );
+		echo "<script type='text/javascript'>var $js_var_name = " . json_encode( $plupload_args ) . ";</script>";
+	}
 
-		$script = 'var _wpPluploadSettings = ' . json_encode( $settings ) . ';';
-		$data   = $wp_scripts->get_data( 'wp-plupload', 'data' );
+	public function action_wp_ajax_thread_attachment_upload() {
+		check_ajax_referer( 'thread_attachment_upload' );
+		$attachment_id  = media_handle_upload( 'async-upload', 0 );
+		$attachment_url = wp_get_attachment_url( $attachment_id );
 
-		if ( ! empty( $data ) ) {
-			$script = "$data\n$script";
-		}
+		echo json_encode( array(
+			'id'  => $attachment_id,
+			'url' => $attachment_url,
+		) );
 
-		$wp_scripts->add_data( 'wp-plupload', 'data', $script );
+		exit;
 	}
 
 	/**
@@ -259,7 +269,10 @@ class SupportFlow_Admin extends SupportFlow {
 				$title_attr  = esc_attr__( 'Reopen Thread', 'supportflow' );
 				$action_text = esc_html__( 'Reopen', 'supportflow' );
 			}
-			$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
+
+			if ( current_user_can( 'edit_post', $post->ID ) ) {
+				$row_actions['change_status'] = '<a href="' . esc_url( $action_link ) . '" title="' . $title_attr . '">' . $action_text . '</a>';
+			}
 		}
 
 		// Actions we don't want
@@ -372,10 +385,14 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_die( __( "Doin' something phishy, huh?", 'supportflow' ) );
 		}
 
-		$post_status = sanitize_key( $_GET['post_status'] );
-		$thread_id   = (int) $_GET['thread_id'];
+		$thread_id = (int) $_GET['thread_id'];
 
-		$new_thread = array(
+		if ( ! current_user_can( 'edit_post', $thread_id ) ) {
+			wp_die( __( 'You are not allowed to edit this item.' ) );
+		}
+
+		$post_status = sanitize_key( $_GET['post_status'] );
+		$new_thread  = array(
 			'ID'          => $thread_id,
 			'post_status' => $post_status,
 		);
@@ -405,6 +422,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
 	}
 
@@ -425,7 +443,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			echo '<div class="misc-pub-section created-on">';
 			echo '<label for="created_on">' . __( 'Opened', 'supportflow' ) . ':</label>';
-			echo '<span class="the-date">' . get_the_date() . ' ' . get_the_time() . '</span>';
+			echo '<span class="the-date"> ' . get_the_date() . ' ' . get_the_time() . '</span>';
 			echo '<div clas="last-activity" title="' . get_the_modified_date( 'l, M j, Y ' ) . get_the_modified_time() . '">' . __( 'Last Activity', 'SupportFlow' ) . ': <strong>' . $last_activity . '</strong></div>';
 			echo '</div>';
 		}
@@ -440,6 +458,23 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 		echo '</select>';
 		echo '</div>';
+
+		// Post E-Mail account drop down
+		if ( 'post-new.php' == $pagenow ) {
+			$email_accounts = get_option( 'sf_email_accounts' );
+			echo '<div class="misc-pub-section">';
+			echo '<label for="post_email_account">' . __( 'Account', 'supportflow' ) . ':</label>';
+			echo '<select id="post_email_account" name="post_email_account">';
+			$user_permissions = get_user_meta( get_current_user_id(), 'sf_permissions', true )['email_accounts'];
+			foreach ( $email_accounts as $id => $email_account ) {
+				if ( empty( $email_account ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
+					continue;
+				}
+				echo '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';
+			}
+			echo '</select>';
+			echo '</div>';
+		}
 
 		// Agent assignment dropdown
 		$post_author = get_post( get_the_ID() )->post_author;
@@ -492,10 +527,24 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$respondents        = SupportFlow()->get_thread_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
 		$respondents_string = implode( ', ', $respondents );
-		$placeholder        = __( 'Who are you starting a conversation with?', 'supportflow' );
+		$respondents_string .= empty( $respondents_string ) ? '' : ', ';
+		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
 		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
+	}
+
+	/**
+	 * Add a form element where you can choose cc and bcc receiver of reply
+	 */
+	public function meta_box_cc_bcc() {
+		?>
+		<p class="description"> <?php _e( "Please add all the E-Mail ID's seperated by comma.", 'supportflow' ) ?></p>
+		<h4 class="inline"><?php _e( "CC: ", 'supportflow' ) ?></h4>
+		<input type="text" id="cc" name="cc" />
+		<h4 class="inline"> <?php _e( "BCC: ", 'supportflow' ) ?></h4>
+		<input type="text" id="bcc" name="bcc" />
+	<?php
 	}
 
 	/**
@@ -542,13 +591,14 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</select></div>';
 
 		echo '<div id="thread-reply-box">';
-
 		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
 		echo '<div id="replies-attachments-wrap">';
-		echo '<div id="upload-messages">' . __( 'Drop a file in the message to attach it', 'supportflow' ) . '</div>';
+		echo '<div class="drag-drop-buttons">';
+		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Select Files', 'supportflow' ) ) . '" class="button" />';
+		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
 		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" />';
@@ -581,12 +631,19 @@ class SupportFlow_Admin extends SupportFlow {
 			foreach ( $private_replies as $reply ) {
 				echo '<li>';
 				echo '<div class="thread-reply">';
-				echo wpautop( stripslashes( $reply->post_content ) );
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+				$post_content = wpautop( stripslashes( $reply->post_content ) );
+				// Make link clickable
+				$post_content = make_clickable( $post_content );
+				echo $post_content;
+				$attachment_args = array(
+					'post_parent' => $reply->ID,
+					'post_type'   => 'attachment'
+				);
+				if ( $attachments = get_posts( $attachment_args ) ) {
 					echo '<ul class="thread-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
+					foreach ( $attachments as $attachment ) {
+						$attachment_link = wp_get_attachment_url( $attachment->ID );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -604,18 +661,25 @@ class SupportFlow_Admin extends SupportFlow {
 			echo '<ul class="thread-replies">';
 			foreach ( $replies as $reply ) {
 				$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_author_email = get_post_meta( $reply->ID, 'reply_author', true );
+				$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
 				echo '<li>';
 				echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
 				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
 				echo '</div>';
 				echo '<div class="thread-reply">';
-				echo wpautop( stripslashes( $reply->post_content ) );
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'attachment_ids', true ) ) {
+				$post_content = wpautop( stripslashes( $reply->post_content ) );
+				// Make link clickable
+				$post_content = make_clickable( $post_content );
+				echo $post_content;
+				$attachment_args = array(
+					'post_parent' => $reply->ID,
+					'post_type'   => 'attachment'
+				);
+				if ( $attachments = get_posts( $attachment_args ) ) {
 					echo '<ul class="thread-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
+					foreach ( $attachments as $attachment ) {
+						$attachment_link = wp_get_attachment_url( $attachment->ID );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -762,6 +826,11 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
+		if ( isset( $_POST['post_email_account'] ) && ! empty( $_POST['post_email_account'] ) ) {
+			$email_account = (int) $_POST['post_email_account'];
+			update_post_meta( $thread_id, 'email_account', $email_account );
+		}
+
 		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
 			$reply      = wp_filter_nohtml_kses( $_POST['reply'] );
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
@@ -770,9 +839,14 @@ class SupportFlow_Admin extends SupportFlow {
 			} else {
 				$attachment_ids = '';
 			}
+			$cc  = ( ! empty( $_POST['cc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['cc'] ) : '';
+			$bcc = ( ! empty( $_POST['bcc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['bcc'] ) : '';
+
 			$reply_args = array(
 				'post_status'    => $visibility,
 				'attachment_ids' => $attachment_ids,
+				'cc'             => $cc,
+				'bcc'            => $bcc,
 			);
 			SupportFlow()->add_thread_reply( $thread_id, $reply, $reply_args );
 		}
