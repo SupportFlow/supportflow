@@ -75,7 +75,8 @@ class SupportFlow_Admin extends SupportFlow {
 				'button_title' => __( 'Insert as attachment', 'supportflow' ),
 			) );
 			wp_localize_script( 'supportflow-threads', 'SFThreads', array(
-
+			    'no_title_msg'      => __( 'You must need to specify the subject of the thread', 'supportpress' ),
+			    'no_respondent_msg' => __( 'You must need to add atleast one thread respondent', 'supportpress' ),
 			) );
 		}
 	}
