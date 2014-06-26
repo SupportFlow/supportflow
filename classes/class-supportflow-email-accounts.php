@@ -326,7 +326,8 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			if ( $imap_stream = imap_open( $mailbox, $username, $password, 0, 0 ) ) {
 				imap_close( $imap_stream );
 			} else {
-				$error = imap_errors()[0];
+				$error = imap_errors();
+				$error = $error[0];
 				if ( (string) strpos( $error, 'Host not found' ) != '' ) {
 					return self::IMAP_HOST_NOT_FOUND;
 				} elseif ( (string) strpos( $error, 'Timed out' ) != '' ) {
