@@ -800,8 +800,6 @@ class SupportFlow_Admin extends SupportFlow {
 	/**
 	 * When a thread is saved or updated, make sure we save the respondent
 	 * and new reply data
-	 *
-	 * @todo nonce and cap checks
 	 */
 	public function action_save_post( $thread_id ) {
 
