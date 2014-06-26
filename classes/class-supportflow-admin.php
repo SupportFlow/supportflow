@@ -329,8 +329,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 	/**
 	 * Handle $_GET actions in the admin
-	 *
-	 * @todo need a caps check too to make sure this user can edit the thread
 	 */
 	function handle_action_change_status() {
 
