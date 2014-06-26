@@ -252,9 +252,6 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 
-
-		add_filter( 'wp_insert_post_empty_content', array( $this, 'filter_wp_insert_post_empty_content' ), 10, 2 );
-
 		do_action_ref_array( 'supportflow_after_setup_actions', array( &$this ) );
 	}
 
@@ -454,22 +451,6 @@ class SupportFlow {
 		}
 
 		return $thread_id;
-	}
-
-	/**
-	 * Threads must have subjects
-	 */
-	public function filter_wp_insert_post_empty_content( $maybe_empty, $postarr ) {
-
-		if ( $this->post_type != $postarr['post_type'] ) {
-			return $maybe_empty;
-		}
-
-		if ( empty( $postarr['post_title'] ) ) {
-			return true;
-		}
-
-		return $maybe_empty;
 	}
 
 	/**
