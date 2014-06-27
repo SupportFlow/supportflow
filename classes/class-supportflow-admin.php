@@ -811,7 +811,7 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['post_email_account'] ) && ! empty( $_POST['post_email_account'] ) ) {
+		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account']  ) ) {
 			$email_account = (int) $_POST['post_email_account'];
 			update_post_meta( $thread_id, 'email_account', $email_account );
 		}
