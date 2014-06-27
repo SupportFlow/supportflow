@@ -36,7 +36,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$thread = SupportFlow()->get_thread( $reply->post_parent );
 		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( get_the_ID() );
+		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $thread->ID );
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $thread, 'reply' );
 
 		$email_accounts   = get_option( 'sf_email_accounts' );
