@@ -436,7 +436,7 @@ class SupportFlow {
 			$this->update_thread_respondents( $thread_id, $args['respondent_email'] );
 		}
 
-		if ( ! empty( $args['email_account'] ) ) {
+		if ( is_numeric( $args['email_account'] ) ) {
 			update_post_meta( $thread_id, 'email_account', $args['email_account'] );
 		}
 
