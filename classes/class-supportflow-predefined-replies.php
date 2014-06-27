@@ -12,8 +12,23 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init_register_predefined_replies' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu_predefined_replies' ) );
+		add_action( 'admin_head', array( $this, 'action_admin_head' ) );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'action_admin_enqueue_scripts' ) );
+	}
+
+
+	public function action_admin_head() {
+		global $menu, $pagenow, $post_type;
+
+		//
+		if ( 'post.php' == $pagenow && SupportFlow()->predefinded_replies_type == $post_type ) {
+			foreach ( $menu as $key => $single_menu ) {
+				if ( 'edit.php?post_type=' . SupportFlow()->post_type == $single_menu[2] ) {
+					$menu[$key][4] .= ' wp-has-current-submenu wp-menu-open open-if-no-js ';
+				}
+			}
+		}
 	}
 
 	/**
