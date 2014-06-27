@@ -141,7 +141,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 				case self::SUCCESS:
 					echo '<h3>' . __( 'Account added successfully', 'supportflow' ) . '</h3>';
-					unset( $_POST['imap_host'], $_POST['imap_port'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['username'], $_POST['password'] );
+					unset( $_POST['imap_host'], $_POST['action'], $_POST['imap_port'], $_POST['imap_ssl'], $_POST['smtp_host'], $_POST['smtp_port'], $_POST['smtp_ssl'], $_POST['username'], $_POST['password'] );
 					break;
 				case self::ACCOUNT_EXISTS:
 					echo '<h3>' . __( 'There is an account already exists with same host name and user name. Please create a new account with different settings.', 'supportflow' ) . '</h3>';
@@ -191,8 +191,16 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 */
 	public function insert_add_new_account_form() {
 		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
-		$imap_ssl_enabled = ( isset( $_POST['imap_ssl'], $_POST['action'] ) && $_POST['imap_ssl'] == 'on' ) || ! isset( $_POST['action'] );
-		$smtp_ssl_enabled = ( isset( $_POST['smtp_ssl'], $_POST['action'] ) && $_POST['smtp_ssl'] == 'on' ) || ! isset( $_POST['action'] );
+
+		$imap_ssl_enabled =
+			! isset( $_POST['action'] )
+			|| 'add' != $_POST['action']
+			|| ( isset( $_POST['imap_ssl'] ) && 'on' == $_POST['imap_ssl'] );
+
+		$smtp_ssl_enabled =
+			! isset( $_POST['action'] )
+			|| 'add' != $_POST['action']
+			|| ( isset( $_POST['smtp_ssl'] ) && 'on' == $_POST['smtp_ssl'] );
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
@@ -308,10 +316,10 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$email_accounts = & $this->email_accounts;
 		$imap_host      = sanitize_text_field( $imap_host );
 		$imap_port      = intval( $imap_port );
-		$imap_ssl       = boolval( $imap_ssl );
+		$imap_ssl       = (boolean) $imap_ssl;
 		$smtp_host      = sanitize_text_field( $smtp_host );
 		$smtp_port      = intval( $smtp_port );
-		$smtp_ssl       = boolval( $smtp_ssl );
+		$smtp_ssl       = (boolean) $smtp_ssl;
 		$username       = sanitize_text_field( $username );
 		$password       = sanitize_text_field( $password );
 
