@@ -69,7 +69,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
-				'frame_title'  => __( 'Select files', 'supportflow' ),
+				'frame_title'  => __( 'Attach files', 'supportflow' ),
 				'button_title' => __( 'Insert as attachment', 'supportflow' ),
 			) );
 		}
@@ -584,7 +584,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div id="message-tools">';
 		echo '<div id="replies-attachments-wrap">';
 		echo '<div class="drag-drop-buttons">';
-		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Select Files', 'supportflow' ) ) . '" class="button" />';
+		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Attach files', 'supportflow' ) ) . '" class="button" />';
 		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
