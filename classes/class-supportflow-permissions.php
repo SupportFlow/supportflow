@@ -115,22 +115,28 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function permissions_page() {
 		?>
 		<div class="wrap">
-		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
+		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2>
 
-		<label for="change_user" id="change_user_label"><?php _e( 'User', 'supportflow' ) ?>: </label>
-		<select name="change_user" id="change_user">
-			<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
-			<?php
-			foreach ( get_users() as $user ) {
-				if ( ! $user->has_cap( 'manage_options' ) ) {
-					$user_id       = $user->data->ID;
-					$user_nicename = esc_html( $user->data->user_nicename );
-					$user_email    = esc_html( $user->data->user_email );
-					echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
-				}
-			}
-			?>
-		</select>
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row"><label for="change_user"><?php _e( 'User', 'supportflow' ) ?></label></th>
+				<td>
+					<select name="change_user" id="change_user">
+						<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
+						<?php
+						foreach ( get_users() as $user ) {
+							if ( ! $user->has_cap( 'manage_options' ) ) {
+								$user_id       = $user->data->ID;
+								$user_nicename = esc_html( $user->data->user_nicename );
+								$user_email    = esc_html( $user->data->user_email );
+								echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
+							}
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+		</table>
 
 		<div id="user_permissions_table">
 			<?php
