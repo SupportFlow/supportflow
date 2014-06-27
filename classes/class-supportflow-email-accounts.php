@@ -308,10 +308,10 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$email_accounts = & $this->email_accounts;
 		$imap_host      = sanitize_text_field( $imap_host );
 		$imap_port      = intval( $imap_port );
-		$imap_ssl       = boolval( $imap_ssl );
+		$imap_ssl       = (boolean) $imap_ssl;
 		$smtp_host      = sanitize_text_field( $smtp_host );
 		$smtp_port      = intval( $smtp_port );
-		$smtp_ssl       = boolval( $smtp_ssl );
+		$smtp_ssl       = (boolean) $smtp_ssl;
 		$username       = sanitize_text_field( $username );
 		$password       = sanitize_text_field( $password );
 
