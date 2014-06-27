@@ -305,6 +305,10 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		$email_account                = get_post_meta( $thread_id, 'email_account', true );
 		$email_notifications_override = get_post_meta( $thread_id, 'email_notifications_override', true );
 
+		if ( ! is_array( $email_notifications_override ) ) {
+			$email_notifications_override = array();
+		}
+
 		$notifications_settings = $this->get_notifications_settings( null, true );
 
 		$allowed_users = array();
