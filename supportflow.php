@@ -189,6 +189,10 @@ class SupportFlow {
 					'label'        => __( 'Pending', 'supportflow' ),
 					'label_count'  => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
 				),
+				'sf_spam' => array(
+					'label'       => __( 'Spam', 'supportflow' ),
+					'label_count' => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'supportflow' ),
+				),
 				'sf_closed'  => array(
 					'show_tickets' => false,
 					'label'        => __( 'Closed', 'supportflow' ),
