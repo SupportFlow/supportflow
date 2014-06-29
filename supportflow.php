@@ -174,20 +174,24 @@ class SupportFlow {
 		$this->post_statuses = apply_filters(
 			'supportflow_thread_post_statuses', array(
 				'sf_new'     => array(
-					'label'       => __( 'New', 'supportflow' ),
-					'label_count' => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportflow' ),
+					'show_threads' => true,
+					'label'        => __( 'New', 'supportflow' ),
+					'label_count'  => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_open'    => array(
-					'label'       => __( 'Open', 'supportflow' ),
-					'label_count' => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportflow' ),
+					'show_threads' => true,
+					'label'        => __( 'Open', 'supportflow' ),
+					'label_count'  => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_pending' => array(
-					'label'       => __( 'Pending', 'supportflow' ),
-					'label_count' => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
+					'show_threads' => true,
+					'label'        => __( 'Pending', 'supportflow' ),
+					'label_count'  => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_closed'  => array(
-					'label'       => __( 'Closed', 'supportflow' ),
-					'label_count' => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportflow' ),
+					'show_threads' => false,
+					'label'        => __( 'Closed', 'supportflow' ),
+					'label_count'  => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportflow' ),
 				),
 			)
 		);

@@ -268,8 +268,13 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		$statuses     = SupportFlow()->post_statuses;
-		$status_slugs = array_keys( $statuses );
-		$last_status  = array_pop( $status_slugs );
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_threads'] ) {
+				$status_slugs[] = $status;
+			}
+		}
 
 		// Order posts by post_modified if there's no orderby set
 		if ( ! $query->get( 'orderby' ) ) {
