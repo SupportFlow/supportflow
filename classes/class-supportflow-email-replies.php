@@ -212,6 +212,21 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			SupportFlow()->add_ticket_reply( $ticket_id, $message, $reply_args );
 
 		} else {
+			if ( method_exists( 'Akismet', 'http_post' ) ) {
+				$akismet_request = array(
+					'blog'                 => get_site_url(),
+					'user_ip'              => '127.0.0.1',
+					'comment_content'      => $message,
+					'comment_author'       => $reply_author,
+					'comment_author_email' => $reply_author_email,
+				);
+				$akismet_request = http_build_query( $akismet_request );
+
+				$akismet_response = Akismet::http_post( $akismet_request, 'comment-check' );
+				$is_spam          = isset( $akismet_response[1] ) && 'true' == trim( $akismet_response[1] );
+
+			}
+
 			// If this wasn't in reply to an existing message, create a new ticket
 			$new_ticket_args = array(
 				'subject'            => $subject,
@@ -221,6 +236,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'respondent_email'   => $respondents,
 				'email_account'      => $email_account_id,
 			);
+
+			if ( isset( $is_spam ) && $is_spam ) {
+				$new_ticket_args['status'] = 'sf_spam';
+			}
 
 			$ticket_id = SupportFlow()->create_ticket( $new_ticket_args );
 		}
