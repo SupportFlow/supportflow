@@ -695,7 +695,7 @@ class SupportFlow_Admin extends SupportFlow {
 		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
 		}
-		submit_button( $submit_text, 'primary', 'save', false );
+		submit_button( $submit_text, 'primary save-button', 'save', false );
 		echo '</div>';
 		echo '</div>';
 
