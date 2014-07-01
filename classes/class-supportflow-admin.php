@@ -414,8 +414,11 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Get post authors
 		$post_author_id    = get_post( get_the_ID() )->post_author;
-		$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
-
+		if ( 0 > $post_author_id ) {
+			$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
+		} else {
+			$post_author_label = __( '-- Unassigned --', 'supportflow' );
+		}
 		$args                  = array(
 			'show_option_none' => __( '-- Unassigned --', 'supportflow' ),
 			'selected'         => $post_author_id,
