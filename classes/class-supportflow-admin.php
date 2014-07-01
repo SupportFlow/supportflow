@@ -494,7 +494,7 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 		echo '<div id="major-publishing-actions">';
 		echo '<div id="publishing-action">';
-		submit_button( $submit_text, 'primary', 'save', false );
+		submit_button( $submit_text, 'save-button primary', 'save', false );
 		echo '</div>';
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -604,7 +604,7 @@ class SupportFlow_Admin extends SupportFlow {
 		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
 		}
-		submit_button( $submit_text, 'primary', 'save', false );
+		submit_button( $submit_text, 'primary save-button', 'save', false );
 		echo '</div>';
 		echo '</div>';
 
