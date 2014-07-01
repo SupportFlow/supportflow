@@ -498,6 +498,23 @@ class SupportFlow_Admin extends SupportFlow {
 		<div id="minor-publishing">
 			<div id="misc-publishing-actions">
 
+				<?php if ( 'post-new.php' == $pagenow ) : ?>
+					<div class="misc-pub-section meta-item">
+						<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
+						<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
+						<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
+							<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+						</a>
+						<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_id ?>" type="hidden" />
+
+						<div class="meta-item-toggle-content hide-if-js">
+							<?php echo $email_account_dropdown ?>
+							<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
+							<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+						</div>
+					</div>
+				<?php endif; ?>
+
 				<!--Thread opening date/time-->
 				<?php if ( 'post.php' == $pagenow ) : ?>
 					<div class="misc-pub-section meta-item">
@@ -546,23 +563,6 @@ class SupportFlow_Admin extends SupportFlow {
 						<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
 					</div>
 				</div>
-
-				<?php if ( 'post-new.php' == $pagenow ) : ?>
-					<div class="misc-pub-section meta-item">
-						<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
-						<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
-						<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-							<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
-						</a>
-						<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_id ?>" type="hidden" />
-
-						<div class="meta-item-toggle-content hide-if-js">
-							<?php echo $email_account_dropdown ?>
-							<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-							<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
-						</div>
-					</div>
-				<?php endif; ?>
 
 				<div class="misc-pub-section meta-item">
 					<label class="meta-item-toggle-button"><?php _e( 'Notifications', 'supportflow' ) ?>:</label>
