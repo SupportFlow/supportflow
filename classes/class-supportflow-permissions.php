@@ -270,7 +270,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts();
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true);
 		$permissions      = array();
 		$user_permissions = array();
 
@@ -291,9 +291,6 @@ class SupportFlow_Permissions extends SupportFlow {
 			$user_data = get_userdata( $user_id );
 
 			foreach ( $email_accounts as $id => $email_account ) {
-				if ( empty( $email_account ) ) {
-					continue;
-				}
 				$allowed = in_array( $id, $permission['email_accounts'] );
 				if ( ( $allowed && ! $return_allowed ) || ( ! $allowed && ! $return_disallowed ) ) {
 					continue;

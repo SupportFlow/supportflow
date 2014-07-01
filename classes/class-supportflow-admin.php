@@ -429,7 +429,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Get post E-Mail account
-		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts();
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 
 		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
 		$user_permissions = $user_permissions['email_accounts'];

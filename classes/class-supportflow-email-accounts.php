@@ -69,6 +69,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
  */
 class SupportFlow_Email_Accounts extends SupportFlow {
 	var $email_accounts;
+	var $existing_email_accounts;
 
 	const SUCCESS                  = 0;
 	const ACCOUNT_EXISTS           = 1;
@@ -85,6 +86,14 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		// Get existing E-Mail accounts from database
 		$email_accounts = & $this->email_accounts;
 		$email_accounts = get_option( 'sf_email_accounts', array() );
+
+		$existing_email_accounts = & $this->existing_email_accounts;
+		$existing_email_accounts = array();
+		foreach ($email_accounts as $uid => $email_account) {
+			if ( ! empty( $email_account ) ) {
+				$existing_email_accounts[ $uid ] = $email_account;
+			}
+		}
 	}
 
 	function action_admin_menu() {
@@ -105,8 +114,12 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	/*
 	 * Return an array containing E-Mail accounts
 	 */
-	function get_email_accounts() {
-		return $this->email_accounts;
+	function get_email_accounts( $existing_only = false ) {
+		if ( $existing_only ) {
+			return $this->existing_email_accounts;
+		} else {
+			return $this->email_accounts;
+		}
 	}
 
 	/*

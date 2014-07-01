@@ -172,7 +172,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 		// Load all tags and E-Mail accounts
 		$tags                  = get_terms( 'sf_tags', 'hide_empty=0' );
-		$email_accounts        = SupportFlow()->extend->email_accounts->get_email_accounts();
+		$email_accounts        = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$notification_settings = array();
 
 		// User is admin (has complete access to all tags, E-Mail account)
