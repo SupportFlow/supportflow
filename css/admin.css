@@ -20,6 +20,16 @@
 	margin-top: 34px;
 }
 
+#change_user_label {
+    display:     inline;
+    font-weight: bold;
+    font-size:   16px;
+}
+
+#supportflow-details .meta-item-label {
+	font-weight: 600;
+}
+
 #supportflow-subject.postbox,
 #supportflow-respondents.postbox {
 	border:     none;
