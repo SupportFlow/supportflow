@@ -112,6 +112,18 @@ class SupportFlow_Permissions extends SupportFlow {
 		add_filter( 'user_has_cap', array( $this, 'limit_user_permissions' ), 10, 3 );
 	}
 
+	/*
+	 * Return an array containing all the tags and E-Mail accounts user have access to
+	 */
+	public function get_user_permissions_data( $user_id ) {
+		$user_permissions = get_user_meta( $user_id, 'sf_permissions', true );
+		if ( ! is_array( $user_permissions ) ) {
+			$user_permissions = array( 'tags' => array(), 'email_accounts' => array() );
+		}
+
+		return $user_permissions;
+	}
+
 	public function permissions_page() {
 		?>
 		<div class="wrap">
