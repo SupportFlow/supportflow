@@ -652,7 +652,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		<div id="major-publishing-actions">
 			<div id="publishing-action">
-				<?php submit_button( $submit_text, 'primary', 'save', false ); ?>
+				<?php submit_button( $submit_text, 'save-button primary', 'save', false ); ?>
 			</div>
 			<div class="clear"></div>
 		</div>
