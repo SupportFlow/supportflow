@@ -375,6 +375,20 @@ class SupportFlow_Permissions extends SupportFlow {
 	function limit_user_permissions( $allcaps, $cap, $args ) {
 		global $pagenow, $post_type;
 
+		// Check if atleast one E-Mail account exists before showing thread creation page
+		if (
+			'post-new.php' == $pagenow &&
+			SupportFlow()->post_type == $post_type
+		) {
+			$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
+			if ( empty( $email_accounts ) ) {
+				$link = "edit.php?post_type=$post_type&page=sf_accounts";
+				$msg  = 'Please add atleast one E-Mail account before creating a thread.';
+
+				wp_die( "<a href='$link'>" . __( $msg, 'supportflow' ) . "</a>" );
+			}
+		}
+
 		if (
 			// Return if required capability is not one of them
 			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
