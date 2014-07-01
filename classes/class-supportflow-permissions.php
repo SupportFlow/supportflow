@@ -282,11 +282,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 		foreach ( $users as $user ) {
 			if ( ! $user->has_cap( 'manage_options' ) ) {
-				$permission = get_user_meta( $user->ID, 'sf_permissions', true );
-				if ( ! is_array( $permission ) || empty( $permission ) || ! is_array( $permission['tags'] ) || ! is_array( $permission['email_accounts'] ) ) {
-					$permission = array( 'tags' => array(), 'email_accounts' => array() );
-				}
-
+				$permission = $this->get_user_permissions_data( $user->ID );
 				$permissions[$user->ID] = $permission;
 			}
 		}
@@ -355,11 +351,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 
 	public function set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed ) {
-		$permission = get_user_meta( $user_id, 'sf_permissions', true );
-
-		if ( ! is_array( $permission ) || ! isset( $permission['tags'] ) || ! isset( $permission['email_accounts'] ) ) {
-			$permission = array( 'tags' => array(), 'email_accounts' => array() );
-		}
+		$permission = $this->get_user_permissions_data( $user_id );
 
 		if ( true == $allowed ) {
 			if ( ! in_array( $privilege_id, $permission[$privilege_type] ) ) {
@@ -400,7 +392,7 @@ class SupportFlow_Permissions extends SupportFlow {
 		}
 
 		// Get all supportflow permissions granted to the current user
-		$user_permissions = get_user_meta( $args[1], 'sf_permissions', true );
+		$user_permissions = $this->get_user_permissions_data( $args[1] );
 
 		// This capability is requested if user is viewing/modifying existing ticket
 		if ( 'edit_post' == $args[0] ) {
@@ -458,7 +450,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Check if user has access to a particular post
 	 */
 	public function is_user_allowed_post( $user_id, $post_id ) {
-		$user_permissions   = get_user_meta( $user_id, 'sf_permissions', true );
+		$user_permissions   = $this->get_user_permissions_data( $user_id );
 		$post_email_account = get_post_meta( $post_id, 'email_account', true );
 		$post_tags          = wp_get_post_terms( $post_id, 'sf_tags' );
 

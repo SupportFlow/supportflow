@@ -431,10 +431,7 @@ class SupportFlow_Admin extends SupportFlow {
 		// Get post E-Mail account
 		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts();
 
-		$user_permissions = get_user_meta( get_current_user_id(), 'sf_permissions', true );
-		if ( ! is_array( $user_permissions ) ) {
-			$user_permissions = array( 'tags' => array(), 'email_accounts' => array() );
-		}
+		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
 		$user_permissions = $user_permissions['email_accounts'];
 
 		$email_account_dropdown = '<select class="meta-item-dropdown">';
