@@ -106,6 +106,13 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	}
 
 	/*
+	 * Return an array containing E-Mail accounts
+	 */
+	function get_email_accounts() {
+		return $this->email_accounts;
+	}
+
+	/*
 	 * Loads the setting page to add/remove E-Mail accounts
 	 */
 	function settings_page() {
