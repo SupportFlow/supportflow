@@ -208,11 +208,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 
 
 			// Get tag/E-Mail account for which user already receive notifications
-			$email_notifications = get_user_meta( $user->ID, 'sf_email_notifications', true );
-			if ( ! is_array( $email_notifications ) || empty( $email_notifications ) || ! is_array( $email_notifications['tags'] ) || ! is_array( $email_notifications['email_accounts'] ) ) {
-				$email_notifications = array( 'tags' => array(), 'email_accounts' => array() );
-			}
-
+			$email_notifications = $this->get_email_notifications( $user->ID );
 
 			// Return exiting notifications settings of user
 			foreach ( $user_permissions['email_accounts'] as $id ) {
@@ -289,10 +285,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		}
 
 		// Get tag/E-Mail account for which user already receive notifications
-		$email_notifications = get_user_meta( $user_id, 'sf_email_notifications', true );
-		if ( ! is_array( $email_notifications ) || empty( $email_notifications ) || ! is_array( $email_notifications['tags'] ) || ! is_array( $email_notifications['email_accounts'] ) ) {
-			$email_notifications = array( 'tags' => array(), 'email_accounts' => array() );
-		}
+		$email_notifications = $this->get_email_notifications( $user_id );
 
 		if ( true == $allowed ) {
 			if ( ! in_array( $privilege_id, $email_notifications[$privilege_type] ) ) {
