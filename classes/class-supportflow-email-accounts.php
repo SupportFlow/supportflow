@@ -84,10 +84,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 		// Get existing E-Mail accounts from database
 		$email_accounts = & $this->email_accounts;
-		$email_accounts = get_option( 'sf_email_accounts' );
-		if ( ! is_array( $email_accounts ) ) {
-			$email_accounts = array();
-		}
+		$email_accounts = get_option( 'sf_email_accounts', array() );
 	}
 
 	function action_admin_menu() {

@@ -39,7 +39,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $thread->ID );
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $thread, 'reply' );
 
-		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts();
 		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
 		$smtp_account     = $email_accounts[$email_account_id];
 
@@ -100,7 +100,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$thread      = SupportFlow()->get_thread( $reply->post_parent );
 		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
 
-		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts();
 		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
 		$smtp_account     = $email_accounts[$email_account_id];
 

@@ -26,7 +26,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 
 	function retrieve_email_replies() {
-		$email_accounts = get_option( 'sf_email_accounts' );
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts();
 		foreach ( $email_accounts as $id => $email_account ) {
 			if ( empty( $email_account ) ) {
 				continue;

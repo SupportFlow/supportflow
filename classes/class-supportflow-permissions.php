@@ -258,7 +258,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
-		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts();
 		$permissions      = array();
 		$user_permissions = array();
 

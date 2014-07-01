@@ -172,7 +172,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Filter to specify E-Mail account
-		$email_accounts = get_option( 'sf_email_accounts' );
 
 		echo "<select name='email_account' id='email_account' class='postform'>";
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
@@ -430,10 +429,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Get post E-Mail account
-		$email_accounts = get_option( 'sf_email_accounts' );
-		if ( empty( $email_accounts ) ) {
-			$email_accounts = array();
-		}
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts();
 
 		$user_permissions = get_user_meta( get_current_user_id(), 'sf_permissions', true );
 		if ( ! is_array( $user_permissions ) ) {
