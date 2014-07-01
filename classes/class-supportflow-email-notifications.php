@@ -78,6 +78,18 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 	}
 
 	/**
+	 * Return an array containing tag/E-Mail account user opted to receive E-Mail notifications.
+	 */
+	public function get_email_notifications( $user_id ) {
+		$email_notifications = get_user_meta( $user_id, 'sf_email_notifications', true );
+		if ( ! is_array( $email_notifications ) || empty( $email_notifications ) || ! is_array( $email_notifications['tags'] ) || ! is_array( $email_notifications['email_accounts'] ) ) {
+			$email_notifications = array( 'tags' => array(), 'email_accounts' => array() );
+		}
+
+		return $email_notifications;
+	}
+
+	/**
 	 * Loads the page to change E-Mail notfication settings
 	 */
 	public function notification_setting_page() {
