@@ -406,4 +406,4 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	}
 }
 
-SupportFlow()->extend->settings = new SupportFlow_Email_Accounts();
+SupportFlow()->extend->email_accounts = new SupportFlow_Email_Accounts();
