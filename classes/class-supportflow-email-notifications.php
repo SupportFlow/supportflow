@@ -184,6 +184,17 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 				if ( ! is_array( $user_permissions ) || empty( $user_permissions ) || ! is_array( $user_permissions['tags'] ) || ! is_array( $user_permissions['email_accounts'] ) ) {
 					$user_permissions = array( 'tags' => array(), 'email_accounts' => array() );
 				}
+
+				foreach ( $user_permissions['tags'] as $id => $tag ) {
+					if ( ! in_array( $tag, $tags ) ) {
+						unset ( $user_permissions['tags'][ $id ] );
+					}
+				}
+				foreach ( $user_permissions['email_accounts'] as $id => $email_account ) {
+					if ( ! in_array( $email_account, $email_accounts ) ) {
+						unset ( $user_permissions['email_accounts'][ $id ] );
+					}
+				}
 			}
 
 
