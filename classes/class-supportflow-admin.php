@@ -637,7 +637,9 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '</div>';
 				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
 				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date(), get_the_time() );
-				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
+				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
@@ -672,8 +674,9 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 				echo '</div>';
 				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date(), get_the_time() );
-				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
-				echo '</li>';
+				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';				echo '</li>';
 			}
 			echo '</ul>';
 		}
