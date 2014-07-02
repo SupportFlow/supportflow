@@ -56,7 +56,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// Don't email the person adding the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
-			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email' , true ), $agent_emails );
+			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email', true ), $agent_emails );
 			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
 			}
@@ -65,13 +65,14 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'agent' );
 
-		$message = stripslashes( $reply->post_content );
-		if ( $attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
-			$message .= "\n";
-			foreach ( $attachments as $attachment ) {
-				$message .= "\n" . wp_get_attachment_url( $attachment->ID );
+		$attachments = array();
+		if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+			foreach ( $thread_attachments as $attachment ) {
+				$attachments[] = get_attached_file( $attachment->ID );
 			}
 		}
+
+		$message = stripslashes( $reply->post_content );
 		// Ticket details that are relevant to the agent
 		$message .= "\n\n-------";
 		// Thread status
@@ -83,7 +84,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
 
-		self::mail( $agent_emails, $subject, $message, '', $smtp_account );
+		self::mail( $agent_emails, $subject, $message, '', $attachments, $smtp_account );
 	}
 
 	/**
@@ -115,14 +116,14 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'respondent' );
 
-		$message = stripslashes( $reply->post_content );
-		if ( $attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
-			$message .= "\n";
-			foreach ( $attachments as $attachment ) {
-				$message .= "\n" . wp_get_attachment_url( $attachment->ID );
+		$attachments = array();
+		if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+			foreach ( $thread_attachments as $attachment ) {
+				$attachments[] = get_attached_file( $attachment->ID );
 			}
 		}
 
+		$message = stripslashes( $reply->post_content );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
 
 		$headers = '';
@@ -139,20 +140,20 @@ class SupportFlow_Emails extends SupportFlow {
 			$headers .= "Bcc: $bcc\r\n";
 		}
 
-		self::mail( $respondents, $subject, $message, $headers, $smtp_account );
+		self::mail( $respondents, $subject, $message, $headers, $attachments, $smtp_account );
 	}
 
 	/**
 	 * Send an email from SupportFlow
 	 */
-	public function mail( $to, $subject, $message, $headers = '', $smtp_account = null ) {
+	public function mail( $to, $subject, $message, $headers = '', $attachments = array(), $smtp_account = null ) {
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
 			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
 
-		wp_mail( $to, $subject, $message, $headers );
+		wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = null;
