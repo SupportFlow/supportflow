@@ -70,6 +70,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			return false;
 		}
 
+		$emails        = imap_search( $imap_connection, 'ALL', SE_UID );
+		$archive_mails = array();
+
 		// Process each new email and put it in the archive mailbox when done
 		$success = 0;
 		for ( $i = 1; $i <= $email_count; $i ++ ) {
@@ -86,10 +89,16 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$ret = $this->process_email( $imap_connection, $email, $i, $connection_details['username'], $connection_details['account_id'] );
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
-				imap_mail_move( $imap_connection, $i, $connection_details['archive'] );
-				$success ++;
+				$archive_mails[] = $i;
 			}
 		}
+
+		foreach ( $archive_mails as $msg_number ) {
+			imap_mail_move( $imap_connection, $emails[$msg_number - 1], $connection_details['archive'], CP_UID );
+			$success ++;
+		}
+
+		imap_close( $imap_connection, CL_EXPUNGE );
 
 		return sprintf( __( 'Processed %d emails', 'supportflow' ), $success );
 	}

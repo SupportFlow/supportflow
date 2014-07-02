@@ -115,22 +115,38 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function permissions_page() {
 		?>
 		<div class="wrap">
-		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2><br />
+		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2>
 
-		<label for="change_user" id="change_user_label"><?php _e( 'User', 'supportflow' ) ?>: </label>
-		<select name="change_user" id="change_user">
-			<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
-			<?php
-			foreach ( get_users() as $user ) {
-				if ( ! $user->has_cap( 'manage_options' ) ) {
-					$user_id       = $user->data->ID;
-					$user_nicename = esc_html( $user->data->user_nicename );
-					$user_email    = esc_html( $user->data->user_email );
-					echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
-				}
-			}
-			?>
-		</select>
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row"><label for="change_user"><?php _e( 'User', 'supportflow' ) ?></label></th>
+				<td>
+					<select name="change_user" id="change_user" class="permission_filters">
+						<option data-user-id=0><?php _e( 'All', 'supportflow' ) ?></option>
+						<?php
+						foreach ( get_users() as $user ) {
+							if ( ! $user->has_cap( 'manage_options' ) ) {
+								$user_id       = $user->data->ID;
+								$user_nicename = esc_html( $user->data->user_nicename );
+								$user_email    = esc_html( $user->data->user_email );
+								echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
+							}
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="change_status"><?php _e( 'Status', 'supportflow' ) ?></label></th>
+				<td>
+					<select name="change_status" id="change_status" class="permission_filters">
+						<option data-status="any"><?php _e( 'Any', 'supportflow' ) ?></option>
+						<option data-status="allowed_only"><?php _e( 'Allowed only', 'supportflow' ) ?></option>
+						<option data-status="disallowed_only"><?php _e( 'Disallowed only', 'supportflow' ) ?></option>
+					</select>
+				</td>
+			</tr>
+		</table>
 
 		<div id="user_permissions_table">
 			<?php
@@ -141,14 +157,15 @@ class SupportFlow_Permissions extends SupportFlow {
 		</div>
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
-				jQuery('#change_user').change(function () {
+				jQuery('.permission_filters').change(function () {
 					var user_id = jQuery('#change_user option:selected').data('user-id');
-
+					var status = jQuery('#change_status option:selected').data('status');
 					jQuery.ajax(ajaxurl, {
 						type   : 'post',
 						data   : {
 							action                     : 'get_user_permissions',
 							user_id                    : user_id,
+							status                     : status,
 							_get_user_permissions_nonce: '<?php echo wp_create_nonce() ?>',
 						},
 						success: function (content) {
@@ -210,19 +227,36 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function action_wp_ajax_get_user_permissions() {
 		check_ajax_referer( - 1, '_get_user_permissions_nonce' );
 
-		if ( ! isset( $_POST['user_id'] ) ) {
+		if (
+			! isset( $_POST['user_id'], $_POST['status'] ) ||
+			! is_numeric( $_POST['user_id'] ) ||
+			! in_array( $_POST['status'], array( 'any', 'allowed_only', 'disallowed_only' ) )
+		) {
 			exit;
 		}
-		$user_id = (int) $_POST['user_id'];
 
-		$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( $user_id ) );
+		$user_id = (int) $_POST['user_id'];
+		$status  = $_POST['status'];
+
+		if ( 'allowed_only' == $status ) {
+			$get_allowed    = true;
+			$get_disallowed = false;
+		} elseif ( 'disallowed_only' == $status ) {
+			$get_allowed    = false;
+			$get_disallowed = true;
+		} else {
+			$get_allowed    = true;
+			$get_disallowed = true;
+		}
+
+		$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( $user_id, $get_allowed, $get_disallowed ) );
 		$user_permissions_table->prepare_items();
 		$user_permissions_table->display();
 
 		exit;
 	}
 
-	public function get_user_permissions( $user_id ) {
+	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
 		$email_accounts   = get_option( 'sf_email_accounts' );
 		$permissions      = array();
@@ -252,6 +286,10 @@ class SupportFlow_Permissions extends SupportFlow {
 				if ( empty( $email_account ) ) {
 					continue;
 				}
+				$allowed = in_array( $id, $permission['email_accounts'] );
+				if ( ( $allowed && ! $return_allowed ) || ( ! $allowed && ! $return_disallowed ) ) {
+					continue;
+				}
 				$user_permissions[] = array(
 					'user_id'        => $user_id,
 					'user'           => $user_data->data->user_nicename . ' (' . $user_data->data->user_email . ')',
@@ -259,10 +297,14 @@ class SupportFlow_Permissions extends SupportFlow {
 					'type'           => 'E-Mail Account',
 					'privilege_id'   => $id,
 					'privilege'      => $email_account['username'] . ' (' . $email_account['imap_host'] . ')',
-					'allowed'        => in_array( $id, $permission['email_accounts'] ),
+					'allowed'        => $allowed,
 				);
 			}
 			foreach ( $tags as $tag ) {
+				$allowed = in_array( $tag->slug, $permission['tags'] );
+				if ( ( $allowed && ! $return_allowed ) || ( ! $allowed && ! $return_disallowed ) ) {
+					continue;
+				}
 				$user_permissions[] = array(
 					'user_id'        => $user_id,
 					'user'           => $user_data->data->user_nicename . ' (' . $user_data->data->user_email . ')',
@@ -270,7 +312,7 @@ class SupportFlow_Permissions extends SupportFlow {
 					'type'           => 'Tag',
 					'privilege_id'   => $tag->slug,
 					'privilege'      => $tag->name . ' (' . $tag->slug . ')',
-					'allowed'        => in_array( $tag->slug, $permission['tags'] ),
+					'allowed'        => $allowed,
 				);
 			}
 		}

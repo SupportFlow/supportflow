@@ -65,12 +65,18 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_enqueue_script( 'supportflow-thread-attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
+			wp_enqueue_script( 'supportflow-threads', SupportFlow()->plugin_url . 'js/threads.js', array( 'jquery') );
+
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
 
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
 				'frame_title'  => __( 'Select files', 'supportflow' ),
 				'button_title' => __( 'Insert as attachment', 'supportflow' ),
+			) );
+			wp_localize_script( 'supportflow-threads', 'SFThreads', array(
+			    'no_title_msg'      => __( 'You must need to specify the subject of the thread', 'supportpress' ),
+			    'no_respondent_msg' => __( 'You must need to add atleast one thread respondent', 'supportpress' ),
 			) );
 		}
 	}
