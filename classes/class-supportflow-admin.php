@@ -71,7 +71,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
-				'frame_title'  => __( 'Select files', 'supportflow' ),
+				'frame_title'  => __( 'Attach files', 'supportflow' ),
 				'button_title' => __( 'Insert as attachment', 'supportflow' ),
 			) );
 			wp_localize_script( 'supportflow-threads', 'SFThreads', array(
@@ -590,7 +590,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<div id="message-tools">';
 		echo '<div id="replies-attachments-wrap">';
 		echo '<div class="drag-drop-buttons">';
-		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Select Files', 'supportflow' ) ) . '" class="button" />';
+		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Attach files', 'supportflow' ) ) . '" class="button" />';
 		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
@@ -643,7 +643,9 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '</div>';
 				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
 				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date(), get_the_time() );
-				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
+				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
@@ -678,8 +680,9 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 				echo '</div>';
 				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date(), get_the_time() );
-				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . '</span></div>';
-				echo '</li>';
+				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';				echo '</li>';
 			}
 			echo '</ul>';
 		}
