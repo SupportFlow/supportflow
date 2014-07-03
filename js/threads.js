@@ -14,9 +14,10 @@ jQuery(document).ready(function () {
 	jQuery('#supportflow-details .meta-item-toggle-button').click(function (event) {
 		jQuery(this).closest('.meta-item').children('.meta-item-toggle-content').toggle(250);
 		event.preventDefault();
-
+	});
+	    
 	// Require title and atleast respondent before saving a thread
-	jQuery('#save').click(function (event) {
+	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
 			alert(SFThreads.no_title_msg);
 			event.preventDefault();

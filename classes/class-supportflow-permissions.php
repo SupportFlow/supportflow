@@ -112,6 +112,18 @@ class SupportFlow_Permissions extends SupportFlow {
 		add_filter( 'user_has_cap', array( $this, 'limit_user_permissions' ), 10, 3 );
 	}
 
+	/*
+	 * Return an array containing all the tags and E-Mail accounts user have access to
+	 */
+	public function get_user_permissions_data( $user_id ) {
+		$user_permissions = get_user_meta( $user_id, 'sf_permissions', true );
+		if ( ! is_array( $user_permissions ) ) {
+			$user_permissions = array( 'tags' => array(), 'email_accounts' => array() );
+		}
+
+		return $user_permissions;
+	}
+
 	public function permissions_page() {
 		?>
 		<div class="wrap">
@@ -258,7 +270,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
-		$email_accounts   = get_option( 'sf_email_accounts' );
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true);
 		$permissions      = array();
 		$user_permissions = array();
 
@@ -270,11 +282,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 		foreach ( $users as $user ) {
 			if ( ! $user->has_cap( 'manage_options' ) ) {
-				$permission = get_user_meta( $user->ID, 'sf_permissions', true );
-				if ( ! is_array( $permission ) || empty( $permission ) || ! is_array( $permission['tags'] ) || ! is_array( $permission['email_accounts'] ) ) {
-					$permission = array( 'tags' => array(), 'email_accounts' => array() );
-				}
-
+				$permission = $this->get_user_permissions_data( $user->ID );
 				$permissions[$user->ID] = $permission;
 			}
 		}
@@ -283,9 +291,6 @@ class SupportFlow_Permissions extends SupportFlow {
 			$user_data = get_userdata( $user_id );
 
 			foreach ( $email_accounts as $id => $email_account ) {
-				if ( empty( $email_account ) ) {
-					continue;
-				}
 				$allowed = in_array( $id, $permission['email_accounts'] );
 				if ( ( $allowed && ! $return_allowed ) || ( ! $allowed && ! $return_disallowed ) ) {
 					continue;
@@ -343,11 +348,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 
 	public function set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed ) {
-		$permission = get_user_meta( $user_id, 'sf_permissions', true );
-
-		if ( ! is_array( $permission ) || ! isset( $permission['tags'] ) || ! isset( $permission['email_accounts'] ) ) {
-			$permission = array( 'tags' => array(), 'email_accounts' => array() );
-		}
+		$permission = $this->get_user_permissions_data( $user_id );
 
 		if ( true == $allowed ) {
 			if ( ! in_array( $privilege_id, $permission[$privilege_type] ) ) {
@@ -374,6 +375,20 @@ class SupportFlow_Permissions extends SupportFlow {
 	function limit_user_permissions( $allcaps, $cap, $args ) {
 		global $pagenow, $post_type;
 
+		// Check if atleast one E-Mail account exists before showing thread creation page
+		if (
+			'post-new.php' == $pagenow &&
+			SupportFlow()->post_type == $post_type
+		) {
+			$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
+			if ( empty( $email_accounts ) ) {
+				$link = "edit.php?post_type=$post_type&page=sf_accounts";
+				$msg  = 'Please add atleast one E-Mail account before creating a thread.';
+
+				wp_die( "<a href='$link'>" . __( $msg, 'supportflow' ) . "</a>" );
+			}
+		}
+
 		if (
 			// Return if required capability is not one of them
 			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
@@ -388,7 +403,7 @@ class SupportFlow_Permissions extends SupportFlow {
 		}
 
 		// Get all supportflow permissions granted to the current user
-		$user_permissions = get_user_meta( $args[1], 'sf_permissions', true );
+		$user_permissions = $this->get_user_permissions_data( $args[1] );
 
 		// This capability is requested if user is viewing/modifying existing ticket
 		if ( 'edit_post' == $args[0] ) {
@@ -446,7 +461,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Check if user has access to a particular post
 	 */
 	public function is_user_allowed_post( $user_id, $post_id ) {
-		$user_permissions   = get_user_meta( $user_id, 'sf_permissions', true );
+		$user_permissions   = $this->get_user_permissions_data( $user_id );
 		$post_email_account = get_post_meta( $post_id, 'email_account', true );
 		$post_tags          = wp_get_post_terms( $post_id, 'sf_tags' );
 

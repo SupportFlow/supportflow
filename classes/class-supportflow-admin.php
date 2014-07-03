@@ -172,7 +172,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Filter to specify E-Mail account
-		$email_accounts = get_option( 'sf_email_accounts' );
 
 		echo "<select name='email_account' id='email_account' class='postform'>";
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
@@ -415,8 +414,11 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Get post authors
 		$post_author_id    = get_post( get_the_ID() )->post_author;
-		$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
-
+		if ( 0 > $post_author_id ) {
+			$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
+		} else {
+			$post_author_label = __( '-- Unassigned --', 'supportflow' );
+		}
 		$args                  = array(
 			'show_option_none' => __( '-- Unassigned --', 'supportflow' ),
 			'selected'         => $post_author_id,
@@ -430,15 +432,9 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Get post E-Mail account
-		$email_accounts = get_option( 'sf_email_accounts' );
-		if ( empty( $email_accounts ) ) {
-			$email_accounts = array();
-		}
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 
-		$user_permissions = get_user_meta( get_current_user_id(), 'sf_permissions', true );
-		if ( ! is_array( $user_permissions ) ) {
-			$user_permissions = array( 'tags' => array(), 'email_accounts' => array() );
-		}
+		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
 		$user_permissions = $user_permissions['email_accounts'];
 
 		$email_account_dropdown = '<select class="meta-item-dropdown">';
@@ -695,7 +691,7 @@ class SupportFlow_Admin extends SupportFlow {
 		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
 		}
-		submit_button( $submit_text, 'primary', 'save', false );
+		submit_button( $submit_text, 'primary save-button', 'save', false );
 		echo '</div>';
 		echo '</div>';
 
