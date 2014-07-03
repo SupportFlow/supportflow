@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
 
 	// Require title and atleast respondent before saving a thread
-	jQuery('#save').click(function (event) {
+	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
 			alert(SFThreads.no_title_msg);
 			event.preventDefault();
