@@ -1,9 +1,9 @@
 jQuery(document).ready(function () {
 	jQuery('#supportflow-details .meta-item-ok-button').click(function (event) {
-		dropdown = jQuery(this).siblings('.meta-item-dropdown').children('option:selected');
-		meta_item = jQuery(this).closest('.meta-item');
-		form_input = meta_item.children('.meta-item-name');
-		label = meta_item.children('.meta-item-label');
+		var dropdown = jQuery(this).siblings('.meta-item-dropdown').children('option:selected');
+		var meta_item = jQuery(this).closest('.meta-item');
+		var form_input = meta_item.children('.meta-item-name');
+		var label = meta_item.children('.meta-item-label');
 
 		form_input.val(dropdown.val());
 		label.text(dropdown.text());
