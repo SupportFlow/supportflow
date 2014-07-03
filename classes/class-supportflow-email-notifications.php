@@ -193,15 +193,14 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 				// Allow user to show notifications settings of only tags/E-Mail account he is permitted
 			} else {
 				$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( $user->ID );
-
 				foreach ( $user_permissions['tags'] as $id => $tag ) {
 					if ( ! in_array( $tag, $tags ) ) {
 						unset ( $user_permissions['tags'][ $id ] );
 					}
 				}
-				foreach ( $user_permissions['email_accounts'] as $id => $email_account ) {
-					if ( ! in_array( $email_account, $email_accounts ) ) {
-						unset ( $user_permissions['email_accounts'][ $id ] );
+				foreach ( $user_permissions['email_accounts'] as $index => $email_account_id ) {
+					if ( ! isset( $email_accounts[ $email_account_id ] ) ) {
+						unset ( $user_permissions['email_accounts'][ $index ] );
 					}
 				}
 			}

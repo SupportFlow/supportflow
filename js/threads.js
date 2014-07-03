@@ -15,7 +15,7 @@ jQuery(document).ready(function () {
 		jQuery(this).closest('.meta-item').children('.meta-item-toggle-content').toggle(250);
 		event.preventDefault();
 	});
-	    
+
 	// Require title and atleast respondent before saving a thread
 	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
