@@ -453,6 +453,7 @@ class SupportFlow_Admin extends SupportFlow {
 		// Get E-Mail notification settings
 		$notification_id       = 0;
 		$notification_label    = 'Default';
+		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
 		$notification_dropdown = '';
 		$notification_dropdown .= '<select class="meta-item-dropdown">';
 
@@ -561,7 +562,7 @@ class SupportFlow_Admin extends SupportFlow {
 				</div>
 
 				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
+					<label class="meta-item-toggle-button" title="<?php _e( $notification_label_title, 'supportflow' ) ?>"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
 					<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
 					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
