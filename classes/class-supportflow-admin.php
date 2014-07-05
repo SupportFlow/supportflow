@@ -451,11 +451,11 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account_label = $email_accounts[ $email_account_id ]['username'];
 
 		// Get E-Mail notification settings
-		$notification_id       = 0;
-		$notification_label    = 'Default';
+		$notification_id          = 0;
+		$notification_label       = 'Default';
 		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
-		$notification_dropdown = '';
-		$notification_dropdown .= '<select class="meta-item-dropdown">';
+		$notification_dropdown    = '';
+		$notification_dropdown   .= '<select class="meta-item-dropdown">';
 
 		if ( 'post-new.php' == $pagenow ) {
 			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
