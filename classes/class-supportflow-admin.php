@@ -792,7 +792,7 @@ class SupportFlow_Admin extends SupportFlow {
 			'respondents' => __( 'Respondents', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
-			'sf_replies'  => '<span class="vers"><img alt="' . esc_attr__( 'Replies', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+			'sf_replies'  => '<span title="' . __( 'Reply count', 'supportflow' ) . '" class="comment-grey-bubble"></span>',
 			'created'     => __( 'Created', 'support' ),
 		);
 
