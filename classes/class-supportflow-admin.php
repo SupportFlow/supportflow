@@ -561,7 +561,7 @@ class SupportFlow_Admin extends SupportFlow {
 				</div>
 
 				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button"><?php _e( 'Notifications', 'supportflow' ) ?>:</label>
+					<label class="meta-item-toggle-button"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
 					<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
 					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
