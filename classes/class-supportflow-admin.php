@@ -71,8 +71,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
-				'frame_title'  => __( 'Attach files', 'supportflow' ),
-				'button_title' => __( 'Insert as attachment', 'supportflow' ),
+				'frame_title'       => __( 'Attach files', 'supportflow' ),
+				'button_title'      => __( 'Insert as attachment', 'supportflow' ),
 				'remove_attachment' => __( 'Remove', 'supportflow' ),
 				'sure_remove'       => __( 'Are you sure want to remove this attachment?', 'supportflow' ),
 			) );
