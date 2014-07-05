@@ -602,10 +602,10 @@ class SupportFlow {
 	public function get_replies( $args ) {
 
 		$default_args = array(
-			'status'  => 'public', // 'public', 'private', 'all'
-			'post_id' => '',
-			'search'  => '',
-			'order'   => 'DESC', // 'DESC', 'ASC',
+			'status'      => 'public', // 'public', 'private', 'all'
+			'post_id'     => '',
+			'search'      => '',
+			'order'       => 'DESC', // 'DESC', 'ASC',
 			'numberposts' => -1,
 		);
 
