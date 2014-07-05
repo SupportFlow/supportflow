@@ -458,8 +458,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		if ( 'post-new.php' == $pagenow ) {
 			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable">' . __( 'Enabled', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable">' . __( 'Disabled', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="enable">' . __( 'Subscribed', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="disable">' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
 		} elseif ( 'post.php' == $pagenow ) {
 			$email_notifications_override = get_post_meta( get_the_ID(), 'email_notifications_override', true );
 			$current_user_id              = get_current_user_id();
@@ -467,17 +467,17 @@ class SupportFlow_Admin extends SupportFlow {
 			if ( isset( $email_notifications_override[$current_user_id] ) ) {
 				$override_status = $email_notifications_override[$current_user_id];
 				if ( 'enable' == $override_status ) {
-					$notification_label = 'Enabled';
+					$notification_label = 'Subscribed';
 					$notification_id    = 1;
 				} elseif ( 'disable' == $override_status ) {
-					$notification_label = 'Disabled';
+					$notification_label = 'Unsubscribed';
 					$notification_id    = 2;
 				}
 			}
 
 			$notification_dropdown .= '<option value="default"' . selected( $notification_id, 0, false ) . '>' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable"' . selected( $notification_id, 1, false ) . '>' . __( 'Enabled', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable"' . selected( $notification_id, 2, false ) . '>' . __( 'Disabled', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="enable"' . selected( $notification_id, 1, false ) . '>' . __( 'Subscribed', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="disable"' . selected( $notification_id, 2, false ) . '>' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
 		}
 
 		$notification_dropdown .= '</select>';
