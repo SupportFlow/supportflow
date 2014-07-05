@@ -180,6 +180,8 @@
 
 #supportflow-replies.postbox ul.thread-replies li .reply-avatar {
 	float: left;
+	width: 100px;	
+        word-wrap: break-word;
 }
 
 #supportflow-replies.postbox ul.thread-replies li .reply-author {
