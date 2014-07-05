@@ -273,14 +273,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Order posts by post_modified if there's no orderby set
 		if ( ! $query->get( 'orderby' ) ) {
-			$sort_order          = array(
-				'orderby' => 'modified',
-			);
-			$sort_order['order'] = ( in_array( $query->get( 'post_status' ), array( 'trash', $last_status ) ) ) ? 'desc' : 'asc';
-			foreach ( $sort_order as $key => $value ) {
-				$query->set( $key, $value );
-				$_GET[$key] = $value;
-			}
+			$query->set( 'orderby', 'modified' );
+			$query->set( 'order', 'DESC' );
 		}
 
 		// Do our own custom search handling so we can search against reply text
