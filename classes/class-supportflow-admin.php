@@ -785,6 +785,7 @@ class SupportFlow_Admin extends SupportFlow {
 			'cb'          => $columns['cb'],
 			'updated'     => __( 'Updated', 'supportflow' ),
 			'title'       => __( 'Subject', 'supportflow' ),
+			'sf_excerpt'  => __( 'Excerpt', 'supportflow' ),
 			'respondents' => __( 'Respondents', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
@@ -829,6 +830,17 @@ class SupportFlow_Admin extends SupportFlow {
 			case 'updated':
 				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				break;
+			case 'sf_excerpt':
+				$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
+				if ( ! isset( $replies[0] ) ) {
+					break;
+				}
+				$first_reply = $replies[0]->post_content;
+				if ( strlen( $first_reply ) > 50 ) {
+					$first_reply = substr( $first_reply, 0, 50 );
+				}
+				echo $first_reply;
 				break;
 			case 'respondents':
 				$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
