@@ -831,6 +831,7 @@ class SupportFlow_Admin extends SupportFlow {
 			case 'respondents':
 				$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
 				if ( empty( $respondents ) ) {
+					echo '—';
 					break;
 				}
 				foreach ( $respondents as $key => $respondent_email ) {
