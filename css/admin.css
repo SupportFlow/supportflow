@@ -3,6 +3,11 @@
 	width:      1em;
 }
 
+.wp-list-table.fixed .column-status {
+	text-align: left;
+	width:      6em;
+}
+
 .wp-list-table.fixed .column-updated,
 .wp-list-table.fixed .column-created {
 	width: 10%;
