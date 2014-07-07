@@ -172,7 +172,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Filter to specify E-Mail account
-
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		echo "<select name='email_account' id='email_account' class='postform'>";
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
 		foreach ( $email_accounts as $id => $email_account ) {
@@ -792,7 +792,7 @@ class SupportFlow_Admin extends SupportFlow {
 			'respondents' => __( 'Respondents', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
-			'sf_replies'  => '<span class="vers"><img alt="' . esc_attr__( 'Replies', 'supportflow' ) . '" src="' . esc_url( admin_url( 'images/comment-grey-bubble.png' ) ) . '" /></span>',
+			'sf_replies'  => '<span title="' . __( 'Reply count', 'supportflow' ) . '" class="comment-grey-bubble"></span>',
 			'created'     => __( 'Created', 'support' ),
 		);
 
