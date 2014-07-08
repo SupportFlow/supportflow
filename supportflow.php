@@ -770,11 +770,16 @@ class SupportFlow {
 	 * Convert multiple comma seperated E-Mail ID's into a array
 	 * @return array
 	 */
-	public function extract_email_ids( $string ) {
+	public function extract_email_ids( $string, & $invalid_email_ids = array() ) {
 		$emails = str_replace( ' ', '', $string );
 		$emails = explode( ',', $emails );
-		$emails = array_filter( $emails, function ( $email ) {
-			return sanitize_email( $email ) == $email && '' != $email;
+		$emails = array_filter( $emails, function ( $email ) use ( & $invalid_email_ids ) {
+			$is_valid_email_id = sanitize_email( $email ) == $email && '' != $email;
+			if ( ! $is_valid_email_id && '' != $email ) {
+				$invalid_email_ids[] = $email;
+			}
+
+			return $is_valid_email_id;
 		} );
 
 		return $emails;
