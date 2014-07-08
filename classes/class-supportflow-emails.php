@@ -153,12 +153,14 @@ class SupportFlow_Emails extends SupportFlow {
 			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
 
-		wp_mail( $to, $subject, $message, $headers, $attachments );
+		$result = wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = null;
 			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
+
+		return $result;
 	}
 
 	public function action_set_smtp_settings( $phpmailer ) {
