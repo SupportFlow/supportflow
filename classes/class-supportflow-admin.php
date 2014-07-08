@@ -65,7 +65,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_enqueue_script( 'supportflow-thread-attachments', SupportFlow()->plugin_url . 'js/thread_attachments.js', array( 'jquery' ) );
 			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
-			wp_enqueue_script( 'supportflow-threads', SupportFlow()->plugin_url . 'js/threads.js', array( 'jquery') );
+			wp_enqueue_script( 'supportflow-threads', SupportFlow()->plugin_url . 'js/threads.js', array( 'jquery' ) );
 
 			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
 
@@ -75,8 +75,8 @@ class SupportFlow_Admin extends SupportFlow {
 				'button_title' => __( 'Insert as attachment', 'supportflow' ),
 			) );
 			wp_localize_script( 'supportflow-threads', 'SFThreads', array(
-			    'no_title_msg'      => __( 'You must need to specify the subject of the thread', 'supportpress' ),
-			    'no_respondent_msg' => __( 'You must need to add atleast one thread respondent', 'supportpress' ),
+				'no_title_msg'      => __( 'You must need to specify the subject of the thread', 'supportpress' ),
+				'no_respondent_msg' => __( 'You must need to add atleast one thread respondent', 'supportpress' ),
 			) );
 		}
 	}
@@ -165,7 +165,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo "<select name='" . esc_attr( $tax_slug ) . "' id='" . esc_attr( $tax_slug ) . "' class='postform'>";
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
 		foreach ( $terms as $term ) {
-			$selected = selected( isset( $_REQUEST[ $tax_slug ] ) && ( $_REQUEST[ $tax_slug ] == $term->slug ), true, false );
+			$selected = selected( isset( $_REQUEST[$tax_slug] ) && ( $_REQUEST[$tax_slug] == $term->slug ), true, false );
 			echo "<option value='" . esc_attr( $term->slug ) . "' $selected>" . esc_html( $term->name ) . '</option>';
 		}
 		echo "</select>";
@@ -273,14 +273,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Order posts by post_modified if there's no orderby set
 		if ( ! $query->get( 'orderby' ) ) {
-			$sort_order          = array(
-				'orderby' => 'modified',
-			);
-			$sort_order['order'] = ( in_array( $query->get( 'post_status' ), array( 'trash', $last_status ) ) ) ? 'desc' : 'asc';
-			foreach ( $sort_order as $key => $value ) {
-				$query->set( $key, $value );
-				$_GET[$key] = $value;
-			}
+			$query->set( 'orderby', 'modified' );
+			$query->set( 'order', 'DESC' );
 		}
 
 		// Do our own custom search handling so we can search against reply text
@@ -413,7 +407,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 		// Get post authors
-		$post_author_id    = get_post( get_the_ID() )->post_author;
+		$post_author_id = get_post( get_the_ID() )->post_author;
 		if ( 0 < $post_author_id ) {
 			$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
 		} else {
@@ -447,19 +441,20 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account_dropdown .= '</select>';
 
 		$email_account_keys  = array_keys( $email_accounts );
-		$email_account_id     = $email_account_keys[0];
-		$email_account_label = $email_accounts[ $email_account_id ]['username'];
+		$email_account_id    = $email_account_keys[0];
+		$email_account_label = $email_accounts[$email_account_id]['username'];
 
 		// Get E-Mail notification settings
-		$notification_id       = 0;
-		$notification_label    = 'Default';
-		$notification_dropdown = '';
-		$notification_dropdown .= '<select class="meta-item-dropdown">';
+		$notification_id          = 0;
+		$notification_label       = 'Default';
+		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
+		$notification_dropdown    = '';
+		$notification_dropdown   .= '<select class="meta-item-dropdown">';
 
 		if ( 'post-new.php' == $pagenow ) {
 			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable">' . __( 'Enabled', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable">' . __( 'Disabled', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="enable">' . __( 'Subscribed', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="disable">' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
 		} elseif ( 'post.php' == $pagenow ) {
 			$email_notifications_override = get_post_meta( get_the_ID(), 'email_notifications_override', true );
 			$current_user_id              = get_current_user_id();
@@ -467,17 +462,17 @@ class SupportFlow_Admin extends SupportFlow {
 			if ( isset( $email_notifications_override[$current_user_id] ) ) {
 				$override_status = $email_notifications_override[$current_user_id];
 				if ( 'enable' == $override_status ) {
-					$notification_label = 'Enabled';
+					$notification_label = 'Subscribed';
 					$notification_id    = 1;
 				} elseif ( 'disable' == $override_status ) {
-					$notification_label = 'Disabled';
+					$notification_label = 'Unsubscribed';
 					$notification_id    = 2;
 				}
 			}
 
 			$notification_dropdown .= '<option value="default"' . selected( $notification_id, 0, false ) . '>' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable"' . selected( $notification_id, 1, false ) . '>' . __( 'Enabled', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable"' . selected( $notification_id, 2, false ) . '>' . __( 'Disabled', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="enable"' . selected( $notification_id, 1, false ) . '>' . __( 'Subscribed', 'supportflow' ) . '</option>';
+			$notification_dropdown .= '<option value="disable"' . selected( $notification_id, 2, false ) . '>' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
 		}
 
 		$notification_dropdown .= '</select>';
@@ -561,7 +556,7 @@ class SupportFlow_Admin extends SupportFlow {
 				</div>
 
 				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button"><?php _e( 'Notifications', 'supportflow' ) ?>:</label>
+					<label class="meta-item-toggle-button" title="<?php _e( $notification_label_title, 'supportflow' ) ?>"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
 					<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
 					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
@@ -641,10 +636,10 @@ class SupportFlow_Admin extends SupportFlow {
 			$content = $predefined_reply->post_content;
 
 			if ( ! empty( $predefined_reply->post_title ) ) {
- 				$title = $predefined_reply->post_title;
- 			} else {
- 				$title = $predefined_reply->post_content;
- 			}
+				$title = $predefined_reply->post_title;
+			} else {
+				$title = $predefined_reply->post_content;
+			}
 
 			// Limit size to 75 characters
 			if ( strlen( $title ) > 75 ) {
@@ -730,8 +725,8 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '</div>';
 				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
 				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date(), get_the_time() );
-				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
-				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				$modified_gmt    = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
 			}
@@ -767,9 +762,10 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 				echo '</div>';
 				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date(), get_the_time() );
-				$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
-				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
-				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';				echo '</li>';
+				$modified_gmt    = get_post_modified_time( 'U', true, get_the_ID() );
+				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo '<div class="thread-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
+				echo '</li>';
 			}
 			echo '</ul>';
 		}
@@ -789,10 +785,12 @@ class SupportFlow_Admin extends SupportFlow {
 			'cb'          => $columns['cb'],
 			'updated'     => __( 'Updated', 'supportflow' ),
 			'title'       => __( 'Subject', 'supportflow' ),
+			'sf_excerpt'  => __( 'Excerpt', 'supportflow' ),
 			'respondents' => __( 'Respondents', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
 			'sf_replies'  => '<span title="' . __( 'Reply count', 'supportflow' ) . '" class="comment-grey-bubble"></span>',
+			'email'       => __( 'E-Mail account', 'supportflow' ),
 			'created'     => __( 'Created', 'support' ),
 		);
 
@@ -833,9 +831,21 @@ class SupportFlow_Admin extends SupportFlow {
 				$modified_gmt = get_post_modified_time( 'U', true, $thread_id );
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
+			case 'sf_excerpt':
+				$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
+				if ( ! isset( $replies[0] ) ) {
+					break;
+				}
+				$first_reply = $replies[0]->post_content;
+				if ( strlen( $first_reply ) > 50 ) {
+					$first_reply = substr( $first_reply, 0, 50 );
+				}
+				echo $first_reply;
+				break;
 			case 'respondents':
 				$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
 				if ( empty( $respondents ) ) {
+					echo '—';
 					break;
 				}
 				foreach ( $respondents as $key => $respondent_email ) {
@@ -857,6 +867,17 @@ class SupportFlow_Admin extends SupportFlow {
 				$status_name = get_post_status_object( $post_status )->label;
 				$filter_link = add_query_arg( $args, admin_url( 'edit.php' ) );
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
+				break;
+			case 'email':
+				$email_account_id       = get_post_meta( $thread_id, 'email_account', true );
+				$email_accounts         = SupportFlow()->extend->email_accounts->get_email_accounts();
+				$args                   = array(
+					'post_type'     => SupportFlow()->post_type,
+					'email_account' => $email_account_id,
+				);
+				$email_account_username = $email_accounts[$email_account_id]['username'];
+				$filter_link            = add_query_arg( $args, admin_url( 'edit.php' ) );
+				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $email_account_username ) . '</a>';
 				break;
 			case 'sf_replies':
 				$replies = SupportFlow()->get_thread_replies_count( $thread_id );
@@ -907,7 +928,7 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account']  ) ) {
+		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account'] ) ) {
 			$email_account = (int) $_POST['post_email_account'];
 			update_post_meta( $thread_id, 'email_account', $email_account );
 		}

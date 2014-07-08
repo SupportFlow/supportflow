@@ -1,6 +1,11 @@
 .wp-list-table.fixed .column-sf_replies {
 	text-align: left;
-	width:      4em;
+	width:      1em;
+}
+
+.wp-list-table.fixed .column-status {
+	text-align: left;
+	width:      6em;
 }
 
 .wp-list-table.fixed .column-updated,
