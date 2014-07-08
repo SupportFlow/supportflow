@@ -602,10 +602,11 @@ class SupportFlow {
 	public function get_replies( $args ) {
 
 		$default_args = array(
-			'status'  => 'public', // 'public', 'private', 'all'
-			'post_id' => '',
-			'search'  => '',
-			'order'   => 'DESC', // 'DESC', 'ASC',
+			'status'      => 'public', // 'public', 'private', 'all'
+			'post_id'     => '',
+			'search'      => '',
+			'order'       => 'DESC', // 'DESC', 'ASC',
+			'numberposts' => -1,
 		);
 
 		$args      = array_merge( $default_args, $args );
@@ -615,6 +616,7 @@ class SupportFlow {
 			'post_status' => $args['status'],
 			'post_type'   => $this->reply_type,
 			'order'       => $args['order'],
+			'numberposts' => $args['numberposts'],
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
