@@ -92,7 +92,7 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	function insert_css_code() {
 		?>
-		<style>
+		<style type="text/css">
 			.stat-box .toggle-content {
 				display: none;
 			}
