@@ -18,6 +18,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	public function action_admin_menu() {
 		$this->slug = 'sf_statistics';
 
+		// Creates a submenu in SupportFlow menu
 		add_submenu_page(
 			'edit.php?post_type=' . SupportFlow()->post_type,
 			__( 'Statistics', 'supportflow' ),
@@ -28,7 +29,11 @@ class SupportFlow_Statistics extends SupportFlow {
 		);
 	}
 
+	/**
+	 * Display whole statistics page
+	 */
 	public function statistics_page() {
+		// Add JS and CSS code required by page
 		$this->insert_css_code();
 		$this->insert_js_code()
 		?>
@@ -90,6 +95,9 @@ class SupportFlow_Statistics extends SupportFlow {
 	<?php
 	}
 
+	/*
+	 * Add CSS code required by statistics page
+	 */
 	function insert_css_code() {
 		?>
 		<style type="text/css">
@@ -100,10 +108,14 @@ class SupportFlow_Statistics extends SupportFlow {
 	<?php
 	}
 
+	/*
+	 * Add JS code required by statistics page
+	 */
 	function insert_js_code() {
 		?>
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
+				// Close all the different stat tables and toggle the status of clicked stat table
 				jQuery('.toggle-link').click(function (event) {
 					var current = jQuery(this).siblings('.toggle-content').css('display');
 					jQuery('.toggle-content').hide(500);
@@ -115,12 +127,14 @@ class SupportFlow_Statistics extends SupportFlow {
 					event.preventDefault();
 				});
 
+				// Set different type of statistics link title at page load
 				jQuery(jQuery('.toggle-content')).each(function () {
 					if ('none' == jQuery(this).css('display')) {
 						jQuery(this).siblings('.toggle-link').prop('title', 'Expand');
 					} else {
 						jQuery(this).siblings('.toggle-link').prop('title', 'Collapse');
 					}
+
 					jQuery('.toggle-content').first().show(500);
 				});
 			});
@@ -128,6 +142,10 @@ class SupportFlow_Statistics extends SupportFlow {
 	<?php
 	}
 
+	/*
+	 * Show overall stats table.
+	 * Currently shows today, yesterday and overall (whole life) ticket stats
+	 */
 	public function show_overall_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
 
@@ -160,6 +178,9 @@ class SupportFlow_Statistics extends SupportFlow {
 	}
 
 
+	/*
+	 * Show tickets status per tag
+	 */
 	public function show_tag_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
 
@@ -179,6 +200,9 @@ class SupportFlow_Statistics extends SupportFlow {
 	}
 
 
+	/*
+	 * Shows stats of ticket created in last 30 days
+	 */
 	public function show_30_days_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
 
@@ -205,6 +229,10 @@ class SupportFlow_Statistics extends SupportFlow {
 		$statistics_table->display();
 	}
 
+
+	/*
+	 * Shows stats of ticket created in last 12 months
+	 */
 	public function show_12_month_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
 
@@ -231,6 +259,9 @@ class SupportFlow_Statistics extends SupportFlow {
 	}
 
 
+	/*
+	 * Shows stats of ticket created in last 5 years
+	 */
 	public function show_5_year_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
 
@@ -255,6 +286,14 @@ class SupportFlow_Statistics extends SupportFlow {
 		$statistics_table->display();
 	}
 
+
+	/**
+	 * Stats of post created on a particular date
+	 * @param array $post_date Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
+	 * @param integer $link_date Date in format used in filtering by WP in all threads page. e.g. 19941205
+	 * @param string $link_value Value to show user of link in table
+	 * @return array Tickets stats created on a particular date. This array is directly usable in table
+	 */
 	function get_post_data_by_date( $post_date = null, $link_date = null, $link_value = null ) {
 
 		return array(
@@ -265,6 +304,14 @@ class SupportFlow_Statistics extends SupportFlow {
 		);
 	}
 
+
+	/**
+	 * Stats of post created of a particular tag
+	 * @param string $post_tag Slug of tag for which you want to get stats for
+	 * @param integer $link_tag Tag in format used in filtering by WP in all threads page.
+	 * @param string $link_value Value to show user of link in table
+	 * @return array Tickets stats created for a particular tag. This array is directly usable in table
+	 */
 	function get_post_data_by_tag( $post_tag = null, $link_tag = null, $link_value = null ) {
 
 		return array(
@@ -275,6 +322,13 @@ class SupportFlow_Statistics extends SupportFlow {
 		);
 	}
 
+
+	/**
+	 * Get count of post created on a particular date with particular post status.
+	 * @param string $post_status Post status you want to get count. Using `*` to get count of all post statuses
+	 * @param type $date Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
+	 * @return integer Count of posts
+	 */
 	public function get_posts_count_by_date( $post_status = '*', $date = null ) {
 		$args = array(
 			'post_type'      => SupportFlow()->post_type,
@@ -292,6 +346,13 @@ class SupportFlow_Statistics extends SupportFlow {
 		return (int) $wp_query->found_posts;
 	}
 
+
+	/**
+	 * Get count of post created of a particular tag with particular post status.
+	 * @param string $post_status Post status you want to get count. Using `*` to get count of all post statuses
+	 * @param type $tag Slug of tag you want to get count of
+	 * @return integer Count of posts
+	 */
 	public function get_posts_count_by_tag( $post_status = '*', $tag = null ) {
 		$args = array(
 			'post_type'      => SupportFlow()->post_type,
@@ -311,6 +372,13 @@ class SupportFlow_Statistics extends SupportFlow {
 	}
 
 
+	/**
+	 * Generate a link that shows matching tickets in all thread page
+	 * @param integer $link_date Date in format used in filtering by WP in all threads page. e.g. 19941205
+	 * @param string $post_status Post statuses that should be shown in all threads page
+	 * @param string $link_value Value of hyperlink that should be shown to user
+	 * @return string A hyperlink
+	 */
 	function get_post_link_by_date( $link_date = null, $post_status = null, $link_value = null ) {
 		$link = '<a href="edit.php?%s%s%s">%s</a>';
 
@@ -322,6 +390,14 @@ class SupportFlow_Statistics extends SupportFlow {
 		return sprintf( $link, $post_type, $post_status, $date, $value );
 	}
 
+
+	/**
+	 * Generate a link that shows matching tickets in all thread page
+	 * @param string $link_tag Slug of tag
+	 * @param string $post_status Post statuses that should be shown in all threads page
+	 * @param string $link_value Value of hyperlink that should be shown to user
+	 * @return string A hyperlink
+	 */
 	function get_post_link_by_tag( $link_tag = null, $post_status = null, $link_value = null ) {
 		$link = '<a href="edit.php?%s%s%s">%s</a>';
 
@@ -349,10 +425,18 @@ class SupportFlow_Statistics_Table extends WP_List_Table {
 		return $item[$column_name];
 	}
 
+	/**
+	 * Set columns that should be displayed in table
+	 * @param array $columns
+	 */
 	function set_columns( $columns ) {
 		$this->_column_headers = array( $columns, array(), array() );
 	}
 
+	/**
+	 * Set data that should be displayed in table
+	 * @param array $data
+	 */
 	function set_data( $data ) {
 		$this->items = $data;
 	}
