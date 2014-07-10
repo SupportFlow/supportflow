@@ -224,6 +224,7 @@ class SupportFlow {
 
 		require_once( $this->plugin_dir . 'classes/class-supportflow-ui-submissionform.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-ui-widget.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-statistics.php' );
 
 		/** Tools *************************************************************/
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
