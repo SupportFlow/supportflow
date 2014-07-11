@@ -144,6 +144,50 @@ class SupportFlow_Emails extends SupportFlow {
 	}
 
 	/**
+	 * E-Mail a supportflow conversation to users
+	 *
+	 * @param integer      $thread_id
+	 * @param array|string $to
+	 */
+	public function email_conversation( $thread_id, $to ) {
+
+		$thread         = SupportFlow()->get_thread( $thread_id );
+		$thread_replies = SupportFlow()->get_thread_replies( $thread_id );
+		$thread_owner   = $thread->post_author > 0 ? get_user_by( 'id', $thread->post_author )->data->user_nicename : __( 'Unassigned', 'supportflow' );
+
+		$attachments = array();
+		$msg         = '';
+		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID ) . ' ' . __( 'Conversation summery', 'supportflow' );
+
+		$msg .= '<b>' . __( 'Title', 'supportflow' ) . ':</b> ' . esc_html( $thread->post_title ) . '<br>';
+		$msg .= '<b>' . __( 'Status', 'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$thread->post_status]['label'] . '<br>';
+		$msg .= '<b>' . __( 'Owner', 'supportflow' ) . ':</b> ' . esc_html( $thread_owner ) . '<br>';
+		$msg .= '<b>' . __( 'Created on', 'supportflow' ) . ':</b> ' . $thread->post_date_gmt . ' GMT<br>';
+		$msg .= '<b>' . __( 'Last Updated on', 'supportflow' ) . ':</b> ' . $thread->post_modified_gmt . ' GMT<br>';
+		$msg .= '<br><br>';
+
+		foreach ( array_reverse( $thread_replies ) as $thread_reply ) {
+			$date_time    = $thread_reply->post_date_gmt . ' GMT';
+			$reply_author = get_post_meta( $thread_reply->ID, 'reply_author', true );
+			if ( empty( $reply_author ) ) {
+				$reply_author = get_post_meta( $thread_reply->ID, 'reply_author_email', true );
+			}
+
+			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
+			$msg .= '<br>';
+			$msg .= esc_html( $thread_reply->post_content );
+			$msg .= '<br><br>';
+
+			if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $thread_reply->ID ) ) ) {
+				foreach ( $thread_attachments as $attachment ) {
+					$attachments[] = get_attached_file( $attachment->ID );
+				}
+			}
+		}
+		self::mail( $to, $subject, $msg, 'Content-Type: text/html', $attachments );
+	}
+
+	/**
 	 * Send an email from SupportFlow
 	 */
 	public function mail( $to, $subject, $message, $headers = '', $attachments = array(), $smtp_account = null ) {
@@ -153,12 +197,14 @@ class SupportFlow_Emails extends SupportFlow {
 			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
 
-		wp_mail( $to, $subject, $message, $headers, $attachments );
+		$result = wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = null;
 			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
+
+		return $result;
 	}
 
 	public function action_set_smtp_settings( $phpmailer ) {

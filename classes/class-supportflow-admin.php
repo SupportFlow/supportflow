@@ -6,6 +6,7 @@
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
+		add_action( 'wp_ajax_sf_forward_conversation', array( $this, 'action_wp_ajax_sf_email_conversation' ) );
 		add_action( 'wp_ajax_thread_attachment_upload', array( $this, 'action_wp_ajax_thread_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
@@ -79,6 +80,49 @@ class SupportFlow_Admin extends SupportFlow {
 				'no_respondent_msg' => __( 'You must need to add atleast one thread respondent', 'supportpress' ),
 			) );
 		}
+
+		if ( 'post.php' == $pagenow ) {
+			wp_enqueue_script( 'supportflow-email-conversation', SupportFlow()->plugin_url . 'js/email_conversation.js', array( 'jquery' ) );
+			wp_localize_script( 'supportflow-email-conversation', 'SFEmailConversation', array(
+				'post_id'                   => get_the_ID(),
+				'sending_emails'            => __( 'Please wait while sending E-Mail(s)', 'supportpress' ),
+				'failed_sending'            => __( 'Failed sending E-Mails', 'supportpress' ),
+				'_email_conversation_nonce' => wp_create_nonce( 'sf_email_conversation' ),
+			) );
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function action_wp_ajax_sf_email_conversation() {
+		if ( false === check_ajax_referer( 'sf_email_conversation', '_email_conversation_nonce', false ) ) {
+			_e( 'Invalid request. Please try refreshing the page.', 'supportflow' );
+			die;
+		}
+
+		if ( ! isset( $_REQUEST['email_ids'] ) || ! isset( $_REQUEST['post_id'] ) ) {
+			_e( 'Invalid request. Please try refreshing the page.', 'supportflow' );
+			die;
+		}
+
+		$email_ids = SupportFlow()->extract_email_ids( $_REQUEST['email_ids'] );
+		$thread_id = (int) $_REQUEST['post_id'];
+
+		if ( ! current_user_can( 'edit_post', $thread_id ) ) {
+			_e( 'You are not allowed to edit this item.' );
+			die;
+		}
+
+		if ( empty( $email_ids ) ) {
+			_e( 'No valid E-Mail ID found', 'supportflow' );
+			die;
+		}
+
+		SupportFlow()->extend->emails->email_conversation( $thread_id, $email_ids );
+
+		_e( 'Successfully sented E-Mails', 'supportflow' );
+		exit;
 	}
 
 	/**
@@ -364,6 +408,8 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function action_add_meta_boxes() {
+		global $pagenow;
+
 		if ( ! $this->is_edit_screen() ) {
 			return;
 		}
@@ -378,6 +424,20 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
+
+		if ( 'post.php' == $pagenow ) {
+			add_meta_box( 'supportflow-forward_conversation', __( 'Forward this conversation', 'supportflow' ), array( $this, 'meta_box_email_conversation' ), SupportFlow()->post_type, 'side' );
+		}
+	}
+
+	public function meta_box_email_conversation() {
+		?>
+		<p class="description"><?php _e( "Please enter E-Mail address seperated by comma to whom you want to send this conversation.", 'supportflow' ) ?></p>
+		<br />
+		<input type="text" id="email_conversation_to" />
+		<?php submit_button( __( 'Send', 'supportflow' ), '', 'email_conversation_submit', false ); ?>
+		<p id="email_conversation_status"></p>
+	<?php
 	}
 
 	/**
