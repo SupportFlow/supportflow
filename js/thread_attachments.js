@@ -20,8 +20,8 @@ jQuery(document).ready(function ($) {
 				var attachments = frame.state().get('selection').toJSON();
 				jQuery.each(attachments, function () {
 					var attachment_download_link = '<a class="reply-attachment-link" target="_blank" href="' + _.escape(this.url) + '">' +  _.escape(this.filename) + '</a>';
-					var attachment_remove_link   = '<a class="reply-attachment-remove" href="#" data-attachment-id=' + this.id + ' >' + SFThreadAttachments.remove_attachment + '</a>';
-					jQuery('#replies-attachments-list').append('<li class="reply-attachment">' +  attachment_download_link + '&nbsp;' + attachment_remove_link + '</li>');
+					var attachment_remove_link   = '<a class="reply-attachment-remove delete" href="#" data-attachment-id=' + this.id + ' >' + SFThreadAttachments.remove_attachment + '</a>';
+					jQuery('#replies-attachments-list').append('<li id="media-items" class="reply-attachment">' +  attachment_download_link + '&nbsp;' + attachment_remove_link + '</li>');
 					jQuery('#reply-attachments').val(jQuery('#reply-attachments').val() + this.id + ',');
 				});
 			});
