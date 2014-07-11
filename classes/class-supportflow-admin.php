@@ -96,9 +96,13 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function action_wp_ajax_sf_email_conversation() {
-		check_ajax_referer( - 1, '_email_conversation_nonce' );
+		if ( false === check_ajax_referer( - 1, '_email_conversation_nonce', false ) ) {
+			_e( 'Invalid request. Please try refreshing the page.', 'supportflow' );
+			die;
+		}
 
 		if ( ! isset( $_REQUEST['email_ids'] ) || ! isset( $_REQUEST['post_id'] ) ) {
+			_e( 'Invalid request. Please try refreshing the page.', 'supportflow' );
 			die;
 		}
 
