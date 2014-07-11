@@ -162,6 +162,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 	public function filter_heartbeat_received( $response, $data ) {
 		if (
+			isset( $data['supportflow-autosave'] ) &&
 			is_array( $data['supportflow-autosave'] ) &&
 			isset( $data['supportflow-autosave']['ticket_id'] ) &&
 			current_user_can( 'edit_post', (int) $data['supportflow-autosave']['ticket_id'] )
@@ -177,6 +178,11 @@ class SupportFlow_Admin extends SupportFlow {
 
 			foreach ( $data['supportflow-autosave'] as $element_id => $element_value ) {
 				update_post_meta( $ticket_id, "_sf_autosave_$element_id", $element_value );
+			}
+
+			echo $data['supportflow-autosave']['post_title'];
+			if ( ! empty( $data['supportflow-autosave']['post_title'] ) ) {
+				wp_update_post( array( 'ID' => $ticket_id, 'post_title' => $data['supportflow-autosave']['post_title'] ) );
 			}
 		}
 
@@ -702,7 +708,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$placeholder = __( 'What is your conversation about?', 'supportflow' );
 		echo '<h4>' . __( 'Subject', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
+		echo '<input type="text" id="subject" name="post_title" class="sf_autosave" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Please describe what this ticket is about in several words', 'supportflow' ) . '</p>';
 
 	}
@@ -712,12 +718,16 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function meta_box_respondents() {
 
-		$respondents        = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
-		$respondents_string = implode( ', ', $respondents );
-		$respondents_string .= empty( $respondents_string ) ? '' : ', ';
 		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
+		if ( 'draft' == get_post_status( get_the_ID() ) ) {
+			$respondents_string = get_post_meta( get_the_ID(), '_sf_autosave_respondents', true );
+		} else {
+			$respondents        = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
+			$respondents_string = implode( ', ', $respondents );
+			$respondents_string .= empty( $respondents_string ) ? '' : ', ';
+		}
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
+		echo '<input type="text" id="respondents" name="respondents" class="sf_autosave" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
 	}
 
