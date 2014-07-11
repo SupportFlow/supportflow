@@ -171,6 +171,10 @@ class SupportFlow_Admin extends SupportFlow {
 			$ticket_id = (int) $data['supportflow-autosave']['ticket_id'];
 			unset( $data['supportflow-autosave']['ticket_id'] );
 
+			if ( 'auto-draft' == get_post_status( $ticket_id ) ) {
+				wp_update_post( array( 'ID' => $ticket_id, 'post_status' => 'draft' ) );
+			}
+
 			foreach ( $data['supportflow-autosave'] as $element_id => $element_value ) {
 				update_post_meta( $ticket_id, "_sf_autosave_$element_id", $element_value );
 			}
