@@ -87,7 +87,7 @@ class SupportFlow_Admin extends SupportFlow {
 				'post_id'                   => get_the_ID(),
 				'sending_emails'            => __( 'Please wait while sending E-Mail(s)', 'supportpress' ),
 				'failed_sending'            => __( 'Failed sending E-Mails', 'supportpress' ),
-				'_email_conversation_nonce' => wp_create_nonce(),
+				'_email_conversation_nonce' => wp_create_nonce( 'sf_email_conversation' ),
 			) );
 		}
 	}
@@ -96,7 +96,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function action_wp_ajax_sf_email_conversation() {
-		if ( false === check_ajax_referer( - 1, '_email_conversation_nonce', false ) ) {
+		if ( false === check_ajax_referer( 'sf_email_conversation', '_email_conversation_nonce', false ) ) {
 			_e( 'Invalid request. Please try refreshing the page.', 'supportflow' );
 			die;
 		}
