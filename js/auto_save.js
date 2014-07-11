@@ -7,7 +7,7 @@ jQuery(document).ready(function () {
 		autosave_data['ticket_id'] = SFAutoSave.ticket_id;
 
 		jQuery('.sf_autosave').each(function () {
-			element_key = jQuery(this).attr('id')
+			element_key = jQuery(this).attr('name');
 			element_value = jQuery(this).val();
 			autosave_data[element_key] = element_value
 		});
