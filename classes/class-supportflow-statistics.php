@@ -148,6 +148,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_overall_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -183,6 +184,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_tag_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_tag'    => __( 'Tag', 'supportflow' ),
@@ -205,6 +207,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_30_days_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -235,6 +238,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_12_month_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -264,6 +268,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_5_year_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
