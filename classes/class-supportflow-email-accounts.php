@@ -32,7 +32,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 				'table_smtp_host' => esc_html( $account['smtp_host'] ),
 				'table_smtp_port' => esc_html( $account['smtp_port'] ),
 				'table_smtp_ssl'  => esc_html( $account['smtp_ssl'] ? 'True' : 'False' ),
-				'table_action'    => "<a href='#' data-account-id='" . esc_attr( $account_id ) . "' class='delete_email_account'>Delete</a>",
+				'table_action'    => "<a href='#' data-account-id='" . esc_attr( $account_id ) . "' class='delete_email_account'>" . __( 'Delete', 'supportflow' ) . "</a>",
 			);
 		}
 	}
