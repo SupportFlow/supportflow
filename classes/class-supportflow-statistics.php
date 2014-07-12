@@ -35,7 +35,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	public function statistics_page() {
 		// Add JS and CSS code required by page
 		$this->insert_css_code();
-		$this->insert_js_code()
+		$this->insert_js_code();
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Statistics', 'supportflow' ) ?></h2>

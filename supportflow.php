@@ -265,7 +265,7 @@ class SupportFlow {
 	public function action_init_register_post_type() {
 		register_post_type(
 			$this->post_type, array(
-				'labels'        => array(
+				'labels'             => array(
 					'menu_name'          => __( 'SupportFlow', 'supportflow' ),
 					'name'               => __( 'Threads', 'supportflow' ),
 					'singular_name'      => __( 'Thread', 'supportflow' ),
@@ -279,10 +279,10 @@ class SupportFlow {
 					'not_found'          => __( 'No threads found', 'supportflow' ),
 					'not_found_in_trash' => __( 'No threads found in trash', 'supportflow' ),
 				),
-				'public'        => true,
-				'menu_position' => 3,
+				'public'             => true,
+				'menu_position'      => 3,
 				'publicly_queryable' => false,
-				'supports'      => false,
+				'supports'           => false,
 			)
 		);
 	}
@@ -608,17 +608,17 @@ class SupportFlow {
 			'post_id'     => '',
 			'search'      => '',
 			'order'       => 'DESC', // 'DESC', 'ASC',
-			'numberposts' => -1,
+			'numberposts' => - 1,
 		);
 
 		$args      = array_merge( $default_args, $args );
 		$post_args = array(
-			'search'      => $args['search'],
-			'post_parent' => $args['post_id'],
-			'post_status' => $args['status'],
-			'post_type'   => $this->reply_type,
-			'order'       => $args['order'],
-			'numberposts' => $args['numberposts'],
+			'search'           => $args['search'],
+			'post_parent'      => $args['post_id'],
+			'post_status'      => $args['status'],
+			'post_type'        => $this->reply_type,
+			'order'            => $args['order'],
+			'numberposts'      => $args['numberposts'],
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
@@ -663,6 +663,7 @@ class SupportFlow {
 
 		$query = new WP_Query( $args );
 		$count = $query->found_posts;
+
 		return (int) $count;
 	}
 
