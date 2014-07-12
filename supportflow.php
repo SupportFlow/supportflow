@@ -281,6 +281,7 @@ class SupportFlow {
 				),
 				'public'        => true,
 				'menu_position' => 3,
+				'publicly_queryable' => false,
 				'supports'      => false,
 			)
 		);
