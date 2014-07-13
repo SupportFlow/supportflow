@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or die( "Cheatin' uh?" );
+
 /**
  * Plugin Name: SupportFlow
  * Plugin URI: https://wordpress.org/plugins/supportflow/

@@ -5,6 +5,8 @@
  * @since    0.1
  */
 
+defined('ABSPATH') or die( "Cheatin' uh?" );
+
 class SupportFlow_Statistics extends SupportFlow {
 
 	public function __construct() {

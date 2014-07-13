@@ -3,6 +3,8 @@
  *
  */
 
+defined('ABSPATH') or die( "Cheatin' uh?" );
+
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {

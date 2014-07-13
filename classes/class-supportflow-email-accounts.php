@@ -3,6 +3,8 @@
  * Setting page to add/remove new E-Mail accounts to get replies
  */
 
+defined('ABSPATH') or die( "Cheatin' uh?" );
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
