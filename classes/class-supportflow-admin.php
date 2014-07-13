@@ -150,6 +150,9 @@ class SupportFlow_Admin extends SupportFlow {
 		$views['all']  = $view_all;
 		$views         = array_reverse( $views );
 
+		// Remove private option from filter links as they are just private replies to thread
+		unset( $views['private'] );
+
 		return $views;
 	}
 
