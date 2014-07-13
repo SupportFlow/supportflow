@@ -731,7 +731,7 @@ class SupportFlow {
 
 
 		// Adding a thread reply updates the post modified time for the thread
-		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql' ) ), array( 'ID' => $thread_id ) );
+		wp_update_post( array( 'ID' => $thread_id, 'post_modified' => current_time( 'mysql' ) ) );
 		clean_post_cache( $thread_id );
 		do_action( 'supportflow_thread_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 
