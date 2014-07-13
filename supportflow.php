@@ -2,9 +2,9 @@
 
 /**
  * Plugin Name: SupportFlow
- * Plugin URI:
+ * Plugin URI: https://wordpress.org/plugins/supportflow/
  * Description: Reinventing how you support your customers.
- * Author:      Daniel Bachhuber, Alex Mills, Andrew Spittle
+ * Author:      Daniel Bachhuber, Varun Agrawal, Alex Mills, Andrew Spittle
  * Author URI:
  * Version:     0.1
  *
