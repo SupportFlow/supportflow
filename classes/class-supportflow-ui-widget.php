@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 class SupportFlow_UI_Widget extends SupportFlow {
 

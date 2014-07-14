@@ -3,7 +3,7 @@
  * Class to create/insert predefined replies into the threads
  */
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 class SupportFlow_Predefined_Replies extends SupportFlow {
 

@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 /**
  * Plugin Name: SupportFlow

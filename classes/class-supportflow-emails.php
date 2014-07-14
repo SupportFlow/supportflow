@@ -3,7 +3,7 @@
  * Primary class for determining which emails are sent and what goes in the email
  */
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 class SupportFlow_Emails extends SupportFlow {
 

@@ -3,7 +3,7 @@
  * Allow attachments to be securely stored and served
  */
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 class SupportFlow_Attachments extends SupportFlow {
 

@@ -3,7 +3,7 @@
  * WP-CLI commands for SupportFlow
  */
 
-defined('ABSPATH') or die( "Cheatin' uh?" );
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 WP_CLI::add_command( 'supportflow', 'SupportFlow_WPCLI' );
 
