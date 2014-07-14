@@ -180,7 +180,7 @@ class SupportFlow_Permissions extends SupportFlow {
 							action                     : 'get_user_permissions',
 							user_id                    : user_id,
 							status                     : status,
-							_get_user_permissions_nonce: '<?php echo wp_create_nonce() ?>',
+							_get_user_permissions_nonce: '<?php echo wp_create_nonce( 'get_user_permissions' ) ?>',
 						},
 						success: function (content) {
 							jQuery('#user_permissions_table').html(content);
@@ -209,7 +209,7 @@ class SupportFlow_Permissions extends SupportFlow {
 							privilege_type            : privilege_type,
 							privilege_id              : privilege_id,
 							allowed                   : allowed,
-							_set_user_permission_nonce: '<?php echo wp_create_nonce() ?>',
+							_set_user_permission_nonce: '<?php echo wp_create_nonce( 'set_user_permission' ) ?>',
 						},
 						success : function (content) {
 							if (1 != content) {
@@ -239,7 +239,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	}
 
 	public function action_wp_ajax_get_user_permissions() {
-		check_ajax_referer( - 1, '_get_user_permissions_nonce' );
+		check_ajax_referer( 'get_user_permissions', '_get_user_permissions_nonce' );
 
 		if (
 			! isset( $_POST['user_id'], $_POST['status'] ) ||
@@ -328,7 +328,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	}
 
 	public function action_wp_ajax_set_user_permission() {
-		check_ajax_referer( - 1, '_set_user_permission_nonce' );
+		check_ajax_referer( 'set_user_permission', '_set_user_permission_nonce' );
 
 		if ( ! isset( $_POST['user_id'] )
 			|| ! isset( $_POST['privilege_type'] )
