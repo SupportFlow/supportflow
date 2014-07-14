@@ -28,7 +28,7 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 				'privilege_id'   => $user_permission['privilege_id'],
 			) );
 			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
-			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label";
+			$status .= " <label for='permission_$id' class='privilege_status'>" . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label>";
 			$this->_data[] = array(
 				'status'    => $status,
 				'privilege' => esc_html( $user_permission['privilege'] ),
