@@ -2,6 +2,9 @@
 /**
  * Primary class for ingesting emails from an IMAP email box, parsing, and adding to appropriate threads
  */
+
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_Email_Replies extends SupportFlow {
 
 	const email_id_key = 'orig_email_id';

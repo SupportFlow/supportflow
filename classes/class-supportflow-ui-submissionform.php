@@ -1,5 +1,7 @@
 <?php
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_UI_SubmissionForm extends SupportFlow {
 
 	public $messages = array();

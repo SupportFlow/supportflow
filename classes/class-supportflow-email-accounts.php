@@ -3,6 +3,8 @@
  * Setting page to add/remove new E-Mail accounts to get replies
  */
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -25,14 +27,14 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 			}
 
 			$this->_data[] = array(
-				'table_username'  => $account['username'],
-				'table_imap_host' => $account['imap_host'],
-				'table_imap_port' => $account['imap_port'],
-				'table_imap_ssl'  => $account['imap_ssl'] ? 'True' : 'False',
-				'table_smtp_host' => $account['smtp_host'],
-				'table_smtp_port' => $account['smtp_port'],
-				'table_smtp_ssl'  => $account['smtp_ssl'] ? 'True' : 'False',
-				'table_action'    => "<a href='#' data-account-id='$account_id' class='delete_email_account'>Delete</a>",
+				'table_username'  => esc_html( $account['username'] ),
+				'table_imap_host' => esc_html( $account['imap_host'] ),
+				'table_imap_port' => esc_html( $account['imap_port'] ),
+				'table_imap_ssl'  => esc_html( $account['imap_ssl'] ? 'True' : 'False' ),
+				'table_smtp_host' => esc_html( $account['smtp_host'] ),
+				'table_smtp_port' => esc_html( $account['smtp_port'] ),
+				'table_smtp_ssl'  => esc_html( $account['smtp_ssl'] ? 'True' : 'False' ),
+				'table_action'    => "<a href='#' data-account-id='" . esc_attr( $account_id ) . "' class='delete_email_account'>" . __( 'Delete', 'supportflow' ) . "</a>",
 			);
 		}
 	}
@@ -221,7 +223,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		?>
 		<h3><?php _e( 'Add New Account', 'supportflow' ) ?></h3>
 		<?php _e( 'Please enter IMAP Server Settings', 'supportflow' ) ?><br />
-		<form method="POST" id="add_new_email_account" action="<?php echo $form_action ?>">
+		<form method="POST" id="add_new_email_account" action="<?php echo esc_attr( $form_action ) ?>">
 			<input type="hidden" name="action" value="add" />
 			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
