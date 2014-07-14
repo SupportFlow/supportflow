@@ -1,5 +1,7 @@
 <?php
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_JSON_API extends SupportFlow {
 
 	public $action = 'supportflow_json';

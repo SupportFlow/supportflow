@@ -1,5 +1,7 @@
 <?php
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 add_action( 'wp_enqueue_scripts', 'sf_user_widget_enqueue_scripts' );
 add_action( 'admin_enqueue_scripts', 'sf_user_widget_enqueue_scripts' );
 function sf_user_widget_enqueue_scripts() {

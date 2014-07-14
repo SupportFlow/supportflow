@@ -3,11 +3,12 @@
  *
  */
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
 		add_action( 'wp_ajax_sf_forward_conversation', array( $this, 'action_wp_ajax_sf_email_conversation' ) );
-		add_action( 'wp_ajax_thread_attachment_upload', array( $this, 'action_wp_ajax_thread_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
@@ -155,14 +156,24 @@ class SupportFlow_Admin extends SupportFlow {
 	public function filter_views( $views ) {
 		global $wpdb;
 
-		// The 'all' count shouldn't include closed posts
-		$post_type   = SupportFlow()->post_type;
-		$num_posts   = wp_count_posts( $post_type, 'readable' );
-		$total_posts = array_sum( (array) $num_posts );
-		foreach ( get_post_stati( array( 'show_in_admin_all_list' => false ) ) as $state ) {
-			$total_posts -= $num_posts->$state;
+		$post_type     = SupportFlow()->post_type;
+		$statuses     = SupportFlow()->post_statuses;
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_threads'] ) {
+				$status_slugs[] = $status;
+			}
 		}
-		$total_posts -= $num_posts->sf_closed;
+
+		$wp_query    = new WP_Query( array(
+			'post_type'      => $post_type,
+			'post_parent'    => 0,
+			'posts_per_page' => 1,
+			'post_status'    => $status_slugs,
+		) );
+		$total_posts = $wp_query->found_posts;
+
 		$class    = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
 		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
 
@@ -183,6 +194,9 @@ class SupportFlow_Admin extends SupportFlow {
 		$views['mine'] = $view_mine;
 		$views['all']  = $view_all;
 		$views         = array_reverse( $views );
+
+		// Remove private option from filter links as they are just private replies to thread
+		unset( $views['private'] );
 
 		return $views;
 	}
@@ -312,8 +326,13 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		$statuses     = SupportFlow()->post_statuses;
-		$status_slugs = array_keys( $statuses );
-		$last_status  = array_pop( $status_slugs );
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_threads'] ) {
+				$status_slugs[] = $status;
+			}
+		}
 
 		// Order posts by post_modified if there's no orderby set
 		if ( ! $query->get( 'orderby' ) ) {

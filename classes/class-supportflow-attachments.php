@@ -2,6 +2,9 @@
 /**
  * Allow attachments to be securely stored and served
  */
+
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_Attachments extends SupportFlow {
 
 	var $file_hash = '';

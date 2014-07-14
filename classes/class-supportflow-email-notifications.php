@@ -5,6 +5,8 @@
  * @since    0.1
  */
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -127,7 +129,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 							privilege_type              : privilege_type,
 							privilege_id                : privilege_id,
 							allowed                     : allowed,
-							_set_email_notfication_nonce: '<?php echo wp_create_nonce() ?>',
+							_set_email_notfication_nonce: '<?php echo wp_create_nonce( 'set_email_notfication' ) ?>',
 						},
 						success : function (content) {
 							if (1 != content) {
@@ -251,7 +253,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 	 * AJAX request to change user E-Mail notification settings
 	 */
 	public function action_wp_ajax_set_email_notfication() {
-		check_ajax_referer( - 1, '_set_email_notfication_nonce' );
+		check_ajax_referer( 'set_email_notfication', '_set_email_notfication_nonce' );
 
 		if ( ! isset( $_POST['privilege_type'] )
 			|| ! isset( $_POST['privilege_id'] )

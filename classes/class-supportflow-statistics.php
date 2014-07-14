@@ -5,6 +5,8 @@
  * @since    0.1
  */
 
+defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
+
 class SupportFlow_Statistics extends SupportFlow {
 
 	public function __construct() {
@@ -35,7 +37,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	public function statistics_page() {
 		// Add JS and CSS code required by page
 		$this->insert_css_code();
-		$this->insert_js_code()
+		$this->insert_js_code();
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Statistics', 'supportflow' ) ?></h2>
@@ -148,6 +150,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_overall_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -183,6 +186,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_tag_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_tag'    => __( 'Tag', 'supportflow' ),
@@ -205,6 +209,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_30_days_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -235,6 +240,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_12_month_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -264,6 +270,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_5_year_stats() {
 		$statistics_table = new SupportFlow_Statistics_Table();
+		$items = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
