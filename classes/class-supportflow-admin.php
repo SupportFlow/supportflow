@@ -8,7 +8,6 @@ defined('ABSPATH') or die( "Cheatin' uh?" );
 class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
-		add_action( 'wp_ajax_thread_attachment_upload', array( $this, 'action_wp_ajax_thread_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
