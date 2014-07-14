@@ -4,11 +4,10 @@ defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
 /**
  * Plugin Name: SupportFlow
- * Plugin URI: https://wordpress.org/plugins/supportflow/
+ * Plugin URI:  https://wordpress.org/plugins/supportflow/
  * Description: Reinventing how you support your customers.
  * Author:      Daniel Bachhuber, Varun Agrawal, Alex Mills, Andrew Spittle
- * Author URI:
- * Version:     0.1
+ * Version:     0.2
  *
  * Text Domain: supportflow
  * Domain Path: /languages/
