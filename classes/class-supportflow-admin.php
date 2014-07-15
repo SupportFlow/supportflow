@@ -929,8 +929,9 @@ class SupportFlow_Admin extends SupportFlow {
 						SupportFlow()->respondents_tax => SupportFlow()->get_email_hash( $respondent_email ),
 						'post_type'                    => SupportFlow()->post_type,
 					);
+					$respondent_photo  = get_avatar( $respondent_email, 16 );
 					$respondent_link   = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
-					$respondents[$key] = get_avatar( $respondent_email, 16 ) . '&nbsp;&nbsp;' . $respondent_link;
+					$respondents[$key] = $respondent_photo . '&nbsp;' . $respondent_link;
 				}
 				echo implode( '<br />', $respondents );
 				break;
