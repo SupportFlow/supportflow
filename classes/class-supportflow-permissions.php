@@ -303,7 +303,7 @@ class SupportFlow_Permissions extends SupportFlow {
 					'privilege_type' => 'email_accounts',
 					'type'           => 'E-Mail Account',
 					'privilege_id'   => $id,
-					'privilege'      => $email_account['username'] . ' (' . $email_account['imap_host'] . ')',
+					'privilege'      => $email_account['username'],
 					'allowed'        => $allowed,
 				);
 			}

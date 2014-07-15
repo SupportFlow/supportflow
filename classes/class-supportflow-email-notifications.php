@@ -225,7 +225,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 					'privilege_type' => 'email_accounts',
 					'type'           => 'E-Mail Account',
 					'privilege_id'   => $id,
-					'privilege'      => $email_account['username'] . ' (' . $email_account['imap_host'] . ')',
+					'privilege'      => $email_account['username'],
 					'allowed'        => in_array( $id, $email_notifications['email_accounts'] ),
 				);
 			}

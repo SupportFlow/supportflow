@@ -235,7 +235,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
 		foreach ( $email_accounts as $id => $email_account ) {
 			$selected = selected( isset( $_REQUEST['email_account'] ) && ( $_REQUEST['email_account'] == $id ), true, false );
-			echo "<option value='" . esc_attr( $id ) . "'$selected>" . esc_html( $email_account['username'] . ' (' . $email_account['imap_host'] . ')' ) . '</option>';
+			echo "<option value='" . esc_attr( $id ) . "'$selected>" . esc_html( $email_account['username'] ) . '</option>';
 		}
 		echo "</select>";
 
