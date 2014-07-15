@@ -984,7 +984,7 @@ class SupportFlow_Admin extends SupportFlow {
 			return $pagenow;
 		} elseif ( 'post.php' == $pagenow && ! empty( $_GET['action'] ) && 'edit' == $_GET['action'] && ! empty( $_GET['post'] ) ) {
 			$the_post = get_post( absint( $_GET['post'] ) );
-			return (  $the_post != null && $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
+			return (  is_a( $the_post, 'WP_Post' ) && $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
 		} else {
 			return false;
 		}
