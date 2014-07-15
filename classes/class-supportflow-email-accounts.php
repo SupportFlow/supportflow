@@ -73,13 +73,13 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	var $email_accounts;
 	var $existing_email_accounts;
 
-	const SUCCESS                  = 0;
-	const ACCOUNT_EXISTS           = 1;
-	const NO_ACCOUNT_EXISTS        = 2;
-	const IMAP_HOST_NOT_FOUND      = 3;
-	const IMAP_INVALID_CREDENTIALS = 4;
-	const IMAP_TIME_OUT            = 5;
-	const IMAP_CONNECTION_FAILED   = 6;
+	const SUCCESS                    = 0;
+	const ACCOUNT_EXISTS             = 1;
+	const NO_ACCOUNT_EXISTS          = 2;
+	const IMAP_HOST_NOT_FOUND        = 3;
+	const IMAP_INVALID_CREDENTIALS   = 4;
+	const IMAP_TIME_OUT              = 5;
+	const IMAP_CONNECTION_FAILED     = 6;
 	const SMTP_AUTHENTICATION_FAILED = 7;
 
 	function __construct() {
