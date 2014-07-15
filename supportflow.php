@@ -718,7 +718,7 @@ class SupportFlow {
 
 		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		$reply_id = wp_insert_post( $reply, true );
+		$reply_id = wp_insert_post( $reply );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
