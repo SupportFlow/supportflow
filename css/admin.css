@@ -2,6 +2,11 @@
 	color: #BC0B0B;
 }
 
+.respondent_link {
+	white-space: pre;
+	vertical-align: top;
+}
+
 #poststuff {
 	padding-top: 0;
 }

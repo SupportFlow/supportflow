@@ -930,7 +930,7 @@ class SupportFlow_Admin extends SupportFlow {
 						'post_type'                    => SupportFlow()->post_type,
 					);
 					$respondent_photo  = get_avatar( $respondent_email, 16 );
-					$respondent_link   = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
+					$respondent_link   = '<a class="respondent_link" href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
 					$respondents[$key] = $respondent_photo . '&nbsp;' . $respondent_link;
 				}
 				echo implode( '<br />', $respondents );
