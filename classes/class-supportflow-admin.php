@@ -73,8 +73,10 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
 			wp_localize_script( 'supportflow-thread-attachments', 'SFThreadAttachments', array(
-				'frame_title'  => __( 'Attach files', 'supportflow' ),
-				'button_title' => __( 'Insert as attachment', 'supportflow' ),
+				'frame_title'       => __( 'Attach files', 'supportflow' ),
+				'button_title'      => __( 'Insert as attachment', 'supportflow' ),
+				'remove_attachment' => __( 'Remove', 'supportflow' ),
+				'sure_remove'       => __( 'Are you sure want to remove this attachment?', 'supportflow' ),
 			) );
 			wp_localize_script( 'supportflow-threads', 'SFThreads', array(
 				'no_title_msg'      => __( 'You must need to specify the subject of the thread', 'supportpress' ),
@@ -755,7 +757,7 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
-		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" />';
+		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" value="," />';
 		echo '</div>';
 		echo '<div id="submit-action">';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
