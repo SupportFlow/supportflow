@@ -44,10 +44,40 @@ class SupportFlow_Preferences extends SupportFlow {
 		?>
 
 		<div class="wrap">
+			<?php $this->user_thread_signature_page() ?>
+			<br />
 			<?php $this->notification_setting_page() ?>
 		</div>
 
 		<?php
+	}
+
+	public function user_thread_signature_page() {
+		if (
+			isset( $_POST['action'], $_POST['_wpnonce'], $_POST['update_signature_value'] ) &&
+			'update_signature' == $_POST['action'] &&
+			wp_verify_nonce( $_POST['_wpnonce'], 'update_signature' )
+		) {
+			$signature         = sanitize_text_field( $_POST['update_signature_value'] );
+			$sign_updated = true;
+			update_user_meta( get_current_user_id(), 'sf_user_signature', $signature );
+		} else {
+			$signature = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
+		}
+
+		?>
+		<h2><?php _e( 'My signature', 'supportflow' ) ?></h2>
+		<p><?php _e( 'Please enter your signature you wish to add to your thread reply. To remove signature clear the text box and then update it. Note: It will be automatically appended at the end of your thread replies', 'supportflow' ) ?></p>
+		<?php if ( isset( $sign_updated ) && $sign_updated ) {
+			echo '<h3>' . __( 'Signature updated successfully.', 'supportflow' ) . '</h3>';
+		} ?>
+		<form id="update_signature" method="POST">
+			<?php wp_nonce_field( 'update_signature' ) ?>
+			<input type="hidden" name="action" value="update_signature" />
+			<textarea id="update_signature" name="update_signature_value" rows="7"><?php esc_html_e( $signature ) ?></textarea>
+			<?php submit_button( __( 'Update my signature', 'supportflow' ) ); ?>
+		</form>
+	<?php
 	}
 
 	/**

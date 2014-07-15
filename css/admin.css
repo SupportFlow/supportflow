@@ -21,6 +21,10 @@
 	font-size:   16px;
 }
 
+#update_signature {
+	width: 30em;
+}
+
 #supportflow-details .meta-item-label {
 	font-weight: 600;
 }
