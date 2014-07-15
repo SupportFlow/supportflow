@@ -80,7 +80,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	const IMAP_INVALID_CREDENTIALS = 4;
 	const IMAP_TIME_OUT            = 5;
 	const IMAP_CONNECTION_FAILED   = 6;
-
+	const SMTP_AUTHENTICATION_FAILED = 7;
 
 	function __construct() {
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
@@ -176,6 +176,9 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 					break;
 				case self::IMAP_CONNECTION_FAILED:
 					echo '<h3>' . __( 'Unknown error while connecting to the IMAP server. Please check your IMAP settings and try again.', 'supportflow' ) . '</h3>';
+					break;
+				case self::SMTP_AUTHENTICATION_FAILED:
+					echo '<h3>' . __( 'Unable to authenticate SMTP account. Please check your SMTP setting and try again.', 'supportflow' ) . '</h3>';
 					break;
 			}
 		}
@@ -332,6 +335,8 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Add a new E-Mail account to database
 	 */
 	function add_email_account( $imap_host, $imap_port, $imap_ssl, $smtp_host, $smtp_port, $smtp_ssl, $username, $password, $test_login = true ) {
+		global $phpmailer;
+
 		$email_accounts = & $this->email_accounts;
 		$imap_host      = sanitize_text_field( $imap_host );
 		$imap_port      = intval( $imap_port );
@@ -364,6 +369,29 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 				} else {
 					return self::IMAP_CONNECTION_FAILED;
 				}
+			}
+
+			// Initialize PHPMailer
+			wp_mail( '', '', '' );
+
+			// Set PHPMailer SMTP settings
+			$phpmailer->IsSMTP();
+			$phpmailer->Host       = $smtp_host;
+			$phpmailer->Port       = $smtp_port;
+			$phpmailer->SMTPSecure = $smtp_ssl ? 'ssl' : '';
+			$phpmailer->Username   = $username;
+			$phpmailer->Password   = $password;
+			$phpmailer->SMTPAuth   = true;
+
+			// $phpmail raise fatal error on SMTP connect failure
+			try {
+				$smtp_authentication = $phpmailer->smtpConnect();
+			} catch ( Exception $e ) {
+
+			}
+
+			if ( ! isset( $smtp_authentication ) || ! $smtp_authentication ) {
+				return self::SMTP_AUTHENTICATION_FAILED;
 			}
 		}
 
