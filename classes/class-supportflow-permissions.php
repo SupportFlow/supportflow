@@ -42,6 +42,10 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 		return $item[$column_name];
 	}
 
+	function no_items() {
+		_e( 'No tag/e-mail accounts found. Please add them before setting user permissions. Note: You can only set permissions for non-admin users.', 'supportflow' );
+	}
+
 	function get_columns() {
 		return array(
 			'status'    => __( 'Status', 'supportflow' ),

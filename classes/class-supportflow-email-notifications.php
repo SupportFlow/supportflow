@@ -40,6 +40,10 @@ class SupportFlow_Email_Notifications_Table extends WP_List_Table {
 		return $item[$column_name];
 	}
 
+	function no_items() {
+		_e( 'You don\'t have permission to any tag/e-mail account or maybe no tag/e-mail account exists yet.', 'supportflow' );
+	}
+
 	function get_columns() {
 		return array(
 			'status'    => __( 'Status', 'supportflow' ),
