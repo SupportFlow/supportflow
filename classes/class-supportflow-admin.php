@@ -910,6 +910,7 @@ class SupportFlow_Admin extends SupportFlow {
 			case 'sf_excerpt':
 				$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
 				if ( ! isset( $replies[0] ) ) {
+					echo '—';
 					break;
 				}
 				$first_reply = $replies[0]->post_content;
