@@ -40,6 +40,10 @@ class SupportFlow_Email_Notifications_Table extends WP_List_Table {
 		return $item[$column_name];
 	}
 
+	function no_items() {
+		_e( "You don't have <b>permission</b> to any tag/e-mail account, or maybe no tag/e-mail account exists yet. Please ask your administrator to give you permission to an e-mail account or tag.", 'supportflow' );
+	}
+
 	function get_columns() {
 		return array(
 			'status'    => __( 'Status', 'supportflow' ),
@@ -225,7 +229,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 					'privilege_type' => 'email_accounts',
 					'type'           => 'E-Mail Account',
 					'privilege_id'   => $id,
-					'privilege'      => $email_account['username'] . ' (' . $email_account['imap_host'] . ')',
+					'privilege'      => $email_account['username'],
 					'allowed'        => in_array( $id, $email_notifications['email_accounts'] ),
 				);
 			}

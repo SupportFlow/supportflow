@@ -718,7 +718,7 @@ class SupportFlow {
 
 		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		$reply_id = wp_insert_post( $reply, true );
+		$reply_id = wp_insert_post( $reply );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
@@ -732,7 +732,9 @@ class SupportFlow {
 
 
 		// Adding a thread reply updates the post modified time for the thread
-		$query = $wpdb->update( $wpdb->posts, array( 'post_modified' => current_time( 'mysql' ) ), array( 'ID' => $thread_id ) );
+		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+		wp_update_post( array( 'ID' => $thread_id, 'post_modified' => current_time( 'mysql' ) ) );
+		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		clean_post_cache( $thread_id );
 		do_action( 'supportflow_thread_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 

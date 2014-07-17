@@ -236,11 +236,8 @@ class SupportFlow_Admin extends SupportFlow {
 		echo "<select name='email_account' id='email_account' class='postform'>";
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
 		foreach ( $email_accounts as $id => $email_account ) {
-			if ( empty( $email_account ) ) {
-				continue;
-			}
 			$selected = selected( isset( $_REQUEST['email_account'] ) && ( $_REQUEST['email_account'] == $id ), true, false );
-			echo "<option value='" . esc_attr( $id ) . "'$selected>" . esc_html( $email_account['username'] . ' (' . $email_account['imap_host'] . ')' ) . '</option>';
+			echo "<option value='" . esc_attr( $id ) . "'$selected>" . esc_html( $email_account['username'] ) . '</option>';
 		}
 		echo "</select>";
 
@@ -657,7 +654,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		<div id="major-publishing-actions">
 			<div id="publishing-action">
-				<?php submit_button( $submit_text, 'primary', 'save', false ); ?>
+				<?php submit_button( $submit_text, 'save-button primary', 'save', false ); ?>
 			</div>
 			<div class="clear"></div>
 		</div>
@@ -915,6 +912,7 @@ class SupportFlow_Admin extends SupportFlow {
 			case 'sf_excerpt':
 				$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
 				if ( ! isset( $replies[0] ) ) {
+					echo '—';
 					break;
 				}
 				$first_reply = $replies[0]->post_content;
@@ -934,8 +932,9 @@ class SupportFlow_Admin extends SupportFlow {
 						SupportFlow()->respondents_tax => SupportFlow()->get_email_hash( $respondent_email ),
 						'post_type'                    => SupportFlow()->post_type,
 					);
-					$respondent_link   = '<a href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
-					$respondents[$key] = get_avatar( $respondent_email, 16 ) . '&nbsp;&nbsp;' . $respondent_link;
+					$respondent_photo  = get_avatar( $respondent_email, 16 );
+					$respondent_link   = '<a class="respondent_link" href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
+					$respondents[$key] = $respondent_photo . '&nbsp;' . $respondent_link;
 				}
 				echo implode( '<br />', $respondents );
 				break;
@@ -985,9 +984,8 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( in_array( $pagenow, array( 'edit.php', 'post-new.php' ) ) && ! empty( $_GET['post_type'] ) && $_GET['post_type'] == SupportFlow()->post_type ) {
 			return $pagenow;
 		} elseif ( 'post.php' == $pagenow && ! empty( $_GET['action'] ) && 'edit' == $_GET['action'] && ! empty( $_GET['post'] ) ) {
-			$the_post = get_post( $_GET['post'] );
-
-			return ( $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
+			$the_post = get_post( absint( $_GET['post'] ) );
+			return (  is_a( $the_post, 'WP_Post' ) && $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
 		} else {
 			return false;
 		}
