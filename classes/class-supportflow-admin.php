@@ -757,6 +757,9 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '<input type="hidden" id="reply-attachments" name="reply-attachments" value="," />';
 		echo '</div>';
 		echo '<div id="submit-action">';
+		$signature_label_title = __( 'Append your signature at the bottom of the reply. Signature can be removed or changed in preferences page', 'supportflow' );
+		echo '<input type="checkbox" checked="checked" id="insert-signature" name="insert-signature" />';
+		echo "<label for='insert-signature' title='$signature_label_title'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
 		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
 		if ( 'post-new.php' == $pagenow ) {
@@ -1019,7 +1022,17 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
-			$reply      = wp_filter_nohtml_kses( $_POST['reply'] );
+			$reply = $_POST['reply'];
+
+			if ( isset( $_POST['insert-signature'] ) && 'on' == $_POST['insert-signature'] ) {
+				$agent_signature = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
+				if ( ! empty( $agent_signature ) ) {
+					$reply .= "\n\n-----\n$agent_signature";
+				}
+			}
+
+			$reply = wp_filter_nohtml_kses( $reply );
+
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
 				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['reply-attachments'], ',' ) ) );
