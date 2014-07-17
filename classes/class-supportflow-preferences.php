@@ -58,7 +58,7 @@ class SupportFlow_Preferences extends SupportFlow {
 			'update_signature' == $_POST['action'] &&
 			wp_verify_nonce( $_POST['_wpnonce'], 'update_signature' )
 		) {
-			$signature         = sanitize_text_field( $_POST['update_signature_value'] );
+			$signature         = wp_kses( $_POST['update_signature_value'], array() );
 			$sign_updated = true;
 			update_user_meta( get_current_user_id(), 'sf_user_signature', $signature );
 		} else {
