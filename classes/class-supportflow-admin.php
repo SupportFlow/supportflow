@@ -509,18 +509,20 @@ class SupportFlow_Admin extends SupportFlow {
 		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
 		$user_permissions = $user_permissions['email_accounts'];
 
-		$email_account_dropdown = '<select class="meta-item-dropdown">';
-		foreach ( $email_accounts as $id => $email_account_id ) {
-			if ( empty( $email_account_id ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
-				continue;
+		if ( 'post-new.php' == $pagenow ) {
+			$email_account_dropdown = '<select class="meta-item-dropdown">';
+			foreach ( $email_accounts as $id => $email_account_id ) {
+				if ( empty( $email_account_id ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
+					continue;
+				}
+				$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account_id['username'] ) . '</option>';
 			}
-			$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account_id['username'] ) . '</option>';
-		}
-		$email_account_dropdown .= '</select>';
+			$email_account_dropdown .= '</select>';
 
-		$email_account_keys  = array_keys( $email_accounts );
-		$email_account_id    = $email_account_keys[0];
-		$email_account_label = $email_accounts[$email_account_id]['username'];
+			$email_account_keys  = array_keys( $email_accounts );
+			$email_account_id    = $email_account_keys[0];
+			$email_account_label = $email_accounts[$email_account_id]['username'];
+		}
 
 		// Get E-Mail notification settings
 		$notification_id          = 0;
