@@ -510,11 +510,11 @@ class SupportFlow_Admin extends SupportFlow {
 		$user_permissions = $user_permissions['email_accounts'];
 
 		$email_account_dropdown = '<select class="meta-item-dropdown">';
-		foreach ( $email_accounts as $id => $email_accoun_id ) {
-			if ( empty( $email_accoun_id ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
+		foreach ( $email_accounts as $id => $email_account_id ) {
+			if ( empty( $email_account_id ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
 				continue;
 			}
-			$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_accoun_id['username'] ) . '</option>';
+			$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account_id['username'] ) . '</option>';
 		}
 		$email_account_dropdown .= '</select>';
 
