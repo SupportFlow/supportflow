@@ -128,6 +128,20 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		}
 	}
 
+	/**
+	 * Return a single E-Mail account
+	 * @param integer $id ID of E-Mail account
+	 * @return null|array array containing E-Mail account on success else null
+	 */
+	function get_email_account( $id ) {
+		$email_accounts = & $this->email_accounts;
+		if ( isset( $email_accounts[$id] ) && ! empty( $email_accounts[$id] ) ) {
+			return $email_accounts[$id];
+		} else {
+			return null;
+		}
+	}
+
 	/*
 	 * Loads the setting page to add/remove E-Mail accounts
 	 */

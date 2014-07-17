@@ -737,6 +737,9 @@ class SupportFlow_Admin extends SupportFlow {
 		);
 
 		$rand = array_rand( $placeholders );
+
+		
+
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
 		echo '<div class="alignright">';
 		echo '<select id="predefs"  class="predefined_replies_dropdown">';
@@ -746,7 +749,8 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</select></div>';
 
 		echo '<div id="thread-reply-box">';
-		echo "<textarea id='reply' name='reply' class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
+		echo "<textarea id='reply' name='reply' disabled class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
+		echo 'das';
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
