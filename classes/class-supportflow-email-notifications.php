@@ -41,7 +41,7 @@ class SupportFlow_Email_Notifications_Table extends WP_List_Table {
 	}
 
 	function no_items() {
-		_e( 'You don\'t have permission to any tag/e-mail account or maybe no tag/e-mail account exists yet.', 'supportflow' );
+		_e( "You don't have <b>permission</b> to any tag/e-mail account, or maybe no tag/e-mail account exists yet. Please ask your administrator to give you permission to an e-mail account or tag.", 'supportflow' );
 	}
 
 	function get_columns() {

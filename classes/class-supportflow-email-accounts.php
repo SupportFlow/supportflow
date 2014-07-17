@@ -44,7 +44,7 @@ class SupportFlow_Email_Accounts_Table extends WP_List_Table {
 	}
 
 	function no_items() {
-		_e( 'No E-Mail accounts found. Please add them in the form.', 'supportflow' );
+		_e( 'No E-Mail accounts found. Please <b>add them</b> in the form below.', 'supportflow' );
 	}
 
 	function get_columns() {

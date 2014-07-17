@@ -43,7 +43,9 @@ class SupportFlow_User_Permissions_Table extends WP_List_Table {
 	}
 
 	function no_items() {
-		_e( 'No tag/e-mail accounts found. Please add them before setting user permissions. Note: You can only set permissions for non-admin users.', 'supportflow' );
+		$message = __('No tag/e-mail accounts found. <b>%s</b> before setting user permissions.<br><b>Note: </b>Administrator accounts automatically have full access in SupportFlow.', 'supportflow');
+		$link = '<a href="">' . __('Please add them', 'supportflow') . '</a>';
+		printf($message, $link);
 	}
 
 	function get_columns() {
