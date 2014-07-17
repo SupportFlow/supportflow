@@ -958,6 +958,10 @@ class SupportFlow_Admin extends SupportFlow {
 					'post_type'     => SupportFlow()->post_type,
 					'email_account' => $email_account_id,
 				);
+				if ( ! isset( $email_accounts[$email_account_id] ) ) {
+					echo '—';
+					break;
+				}
 				$email_account_username = $email_accounts[$email_account_id]['username'];
 				$filter_link            = add_query_arg( $args, admin_url( 'edit.php' ) );
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $email_account_username ) . '</a>';
