@@ -157,16 +157,16 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 	}
 
 	/**
-	 * Get user id of all the users that will receive e-mail notifications for a thread reply
+	 * Get user id of all the users that will receive e-mail notifications for a ticket reply
 	 *
-	 * @param type $thread_id
+	 * @param type $ticket_id
 	 *
 	 * @return type array
 	 */
-	public function get_notified_user( $thread_id ) {
-		$tags                         = wp_get_post_terms( $thread_id, 'sf_tags', array( 'fields' => 'slugs' ) );
-		$email_account                = get_post_meta( $thread_id, 'email_account', true );
-		$email_notifications_override = get_post_meta( $thread_id, 'email_notifications_override', true );
+	public function get_notified_user( $ticket_id ) {
+		$tags                         = wp_get_post_terms( $ticket_id, 'sf_tags', array( 'fields' => 'slugs' ) );
+		$email_account                = get_post_meta( $ticket_id, 'email_account', true );
+		$email_notifications_override = get_post_meta( $ticket_id, 'email_notifications_override', true );
 
 		if ( ! is_array( $email_notifications_override ) ) {
 			$email_notifications_override = array();

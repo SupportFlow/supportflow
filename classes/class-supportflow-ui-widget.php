@@ -28,12 +28,12 @@ class SupportFlow_UI_Widget extends SupportFlow {
 		}
 
 		switch ( $response['api-action'] ) {
-			case 'create-thread':
-			case 'get-thread':
-				$response['widget_title'] = get_the_title( (int) $response['thread_id'] );
-				$response['html']         = $this->render_single_thread_replies_html( (int) $response['thread_id'] );
+			case 'create-ticket':
+			case 'get-ticket':
+				$response['widget_title'] = get_the_title( (int) $response['ticket_id'] );
+				$response['html']         = $this->render_single_ticket_replies_html( (int) $response['ticket_id'] );
 				break;
-			case 'add-thread-reply':
+			case 'add-ticket-reply':
 				$reply            = get_post( $response['comment_id'] );
 				$response['html'] = '<li>' . $this->render_single_reply_html( $reply ) . '</li>';
 				break;
@@ -42,11 +42,11 @@ class SupportFlow_UI_Widget extends SupportFlow {
 		return $response;
 	}
 
-	public function render_single_thread_replies_html( $thread_id ) {
+	public function render_single_ticket_replies_html( $ticket_id ) {
 
-		$replies = SupportFlow()->get_thread_replies( $thread_id, array( 'status' => 'public', 'order' => 'ASC' ) );
+		$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'status' => 'public', 'order' => 'ASC' ) );
 
-		$output = '<ul class="thread-replies">';
+		$output = '<ul class="ticket-replies">';
 		foreach ( $replies as $reply ) {
 			$output .= '<li>' . $this->render_single_reply_html( $reply ) . '</li>';
 		}
@@ -58,31 +58,31 @@ class SupportFlow_UI_Widget extends SupportFlow {
 	public function render_single_reply_html( $reply ) {
 		$reply_timestamp = mysql2date( 'M. n', $reply->post_date_gmt );
 		$reply_author    = get_post_meta( $reply->ID, 'reply_author' );
-		$output          = '<div class="thread-reply-body">'
+		$output          = '<div class="ticket-reply-body">'
 			. wpautop( stripslashes( $reply->post_content ) )
 			. '</div>'
-			. '<div class="thread-reply-meta">'
-			. '<span class="thread-reply-author">' . esc_html( $reply_author ) . '</span>'
-			. '<span class="thread-reply-timestamp">' . esc_html( $reply_timestamp ) . '</span>'
+			. '<div class="ticket-reply-meta">'
+			. '<span class="ticket-reply-author">' . esc_html( $reply_author ) . '</span>'
+			. '<span class="ticket-reply-timestamp">' . esc_html( $reply_timestamp ) . '</span>'
 			. '</div>';
 
 		return $output;
 	}
 
-	public function render_all_threads_html() {
+	public function render_all_tickets_html() {
 		$user = wp_get_current_user();
 
-		$threads = SupportFlow()->get_threads( array( 'respondent_email' => $user->user_email ) );
+		$tickets = SupportFlow()->get_tickets( array( 'respondent_email' => $user->user_email ) );
 
-		if ( empty( $threads ) ) {
-			$output = '<div class="thread nothreads">' . __( 'No open threads.', 'supportflow' ) . '</div>';
+		if ( empty( $tickets ) ) {
+			$output = '<div class="ticket notickets">' . __( 'No open tickets.', 'supportflow' ) . '</div>';
 		} else {
-			$output = '<ul id="respondent-threads">';
-			foreach ( $threads as $thread ) {
-				$output .= '<li id="thread-' . $thread->ID . '">';
-				$output .= '<h4 class="thread-title">' . get_the_title( $thread->ID ) . '</h4>';
-				$output .= '<div class="thread-replies">';
-				$replies    = SupportFlow()->get_thread_replies( $thread->ID, array( 'status' => 'public' ) );
+			$output = '<ul id="respondent-tickets">';
+			foreach ( $tickets as $ticket ) {
+				$output .= '<li id="ticket-' . $ticket->ID . '">';
+				$output .= '<h4 class="ticket-title">' . get_the_title( $ticket->ID ) . '</h4>';
+				$output .= '<div class="ticket-replies">';
+				$replies    = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'status' => 'public' ) );
 				$last_reply = array_shift( $replies );
 				$output .= $this->render_single_reply_html( $last_reply );
 				$output .= '</div>';
@@ -110,8 +110,8 @@ class SupportFlow_UI_Widget extends SupportFlow {
 
 		$widget_title = __( 'Support', 'supportflow' );
 
-		$start_thread_text    = __( 'Start thread', 'supportflow' );
-		$starting_thread_text = __( 'Starting thread...', 'supportflow' );
+		$start_ticket_text    = __( 'Start ticket', 'supportflow' );
+		$starting_ticket_text = __( 'Starting ticket...', 'supportflow' );
 		$send_reply_text      = __( 'Send reply', 'supportflow' );
 		$sending_reply_text   = __( 'Sending reply...', 'supportflow' );
 		wp_localize_script(
@@ -120,8 +120,8 @@ class SupportFlow_UI_Widget extends SupportFlow {
 			array(
 				'ajaxurl'              => $ajaxurl,
 				'widget_title'         => $widget_title,
-				'start_thread_text'    => $start_thread_text,
-				'starting_thread_text' => $starting_thread_text,
+				'start_ticket_text'    => $start_ticket_text,
+				'starting_ticket_text' => $starting_ticket_text,
 				'send_reply_text'      => $send_reply_text,
 				'sending_reply_text'   => $sending_reply_text,
 			)
@@ -142,29 +142,29 @@ class SupportFlow_UI_Widget extends SupportFlow {
 		<body>
 
 		<div id="supportflow-widget">
-			<button id="supportflow-back"><?php _e( 'All Threads', 'supportflow' ); ?></button>
+			<button id="supportflow-back"><?php _e( 'All Tickets', 'supportflow' ); ?></button>
 			<h1 id="widget-title"><?php echo $widget_title; ?></h1>
 
-			<div id="supportflow-newthread-box">
-				<button id="supportflow-newthread"><?php _e( 'Start a new thread', 'supportflow' ); ?></button>
-				<form id="supportflow-newthread-form">
-					<input type="text" id="new-thread-subject" name="new-thread-subject" class="thread-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportflow' ); ?>" autocomplete="off" />
-					<textarea id="new-thread-message" name="new-thread-message" class="thread-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportflow' ); ?>" autocomplete="off"></textarea>
-					<input id="new-thread-submit" type="submit" name="new-thread-submit" class="submit-button" value="<?php echo esc_attr( $start_thread_text ); ?>" />
+			<div id="supportflow-newticket-box">
+				<button id="supportflow-newticket"><?php _e( 'Start a new ticket', 'supportflow' ); ?></button>
+				<form id="supportflow-newticket-form">
+					<input type="text" id="new-ticket-subject" name="new-ticket-subject" class="ticket-subject" placeholder="<?php esc_attr_e( 'What can we help with?', 'supportflow' ); ?>" autocomplete="off" />
+					<textarea id="new-ticket-message" name="new-ticket-message" class="ticket-message" cols="25" rows="6" placeholder="<?php esc_attr_e( 'Tell us a bit more...', 'supportflow' ); ?>" autocomplete="off"></textarea>
+					<input id="new-ticket-submit" type="submit" name="new-ticket-submit" class="submit-button" value="<?php echo esc_attr( $start_ticket_text ); ?>" />
 				</form>
 			</div>
 
-			<div id="supportflow-all-threads">
-				<?php echo $this->render_all_threads_html(); ?>
+			<div id="supportflow-all-tickets">
+				<?php echo $this->render_all_tickets_html(); ?>
 			</div>
 
-			<div id="supportflow-single-thread">
-				<div id="supportflow-thread-body">
+			<div id="supportflow-single-ticket">
+				<div id="supportflow-ticket-body">
 				</div>
-				<form id="supportflow-existing-thread-form">
-					<textarea id="existing-thread-message" name="existing-thread-message" class="thread-message" cols="25" rows="6" autocomplete="off"></textarea>
-					<input id="existing-thread-submit" type="submit" name="existing-thread-submit" class="submit-button" value="<?php echo esc_attr( $send_reply_text ); ?>" />
-					<input id="existing-thread-id" name="thread-id" type="hidden" />
+				<form id="supportflow-existing-ticket-form">
+					<textarea id="existing-ticket-message" name="existing-ticket-message" class="ticket-message" cols="25" rows="6" autocomplete="off"></textarea>
+					<input id="existing-ticket-submit" type="submit" name="existing-ticket-submit" class="submit-button" value="<?php echo esc_attr( $send_reply_text ); ?>" />
+					<input id="existing-ticket-id" name="ticket-id" type="hidden" />
 				</form>
 			</div>
 		</div>

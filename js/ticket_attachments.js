@@ -10,9 +10,9 @@ jQuery(document).ready(function ($) {
 		// Call this from the upload button to initiate the upload frame.
 		uploader: function (event) {
 			var frame = wp.media({
-				title   : SFThreadAttachments.frame_title,
+				title   : SFTicketAttachments.frame_title,
 				multiple: true,
-				button  : { text: SFThreadAttachments.button_title },
+				button  : { text: SFTicketAttachments.button_title },
 			});
 
 			// Handle results from media manager.
@@ -20,7 +20,7 @@ jQuery(document).ready(function ($) {
 				var attachments = frame.state().get('selection').toJSON();
 				jQuery.each(attachments, function () {
 					var attachment_download_link = '<a class="reply-attachment-link" target="_blank" href="' + _.escape(this.url) + '">' +  _.escape(this.filename) + '</a>';
-					var attachment_remove_link   = '<a class="reply-attachment-remove delete" href="#" data-attachment-id=' + _.escape(this.id) + ' >' + SFThreadAttachments.remove_attachment + '</a>';
+					var attachment_remove_link   = '<a class="reply-attachment-remove delete" href="#" data-attachment-id=' + _.escape(this.id) + ' >' + SFTicketAttachments.remove_attachment + '</a>';
 					jQuery('#replies-attachments-list').append('<li id="media-items" class="reply-attachment">' +  attachment_download_link + '&nbsp;' + attachment_remove_link + '</li>');
 					jQuery('#reply-attachments').val(jQuery('#reply-attachments').val() + _.escape(this.id) + ',');
 				});
@@ -31,7 +31,7 @@ jQuery(document).ready(function ($) {
 		},
 
 		remove: function (event) {
-			if (confirm(SFThreadAttachments.sure_remove)) {
+			if (confirm(SFTicketAttachments.sure_remove)) {
 				var attachment_id = $(this).data('attachment-id');
 				var reply_attachments = $('#reply-attachments').val();
 				reply_attachments = reply_attachments.replace(',' + attachment_id + ',', ',');

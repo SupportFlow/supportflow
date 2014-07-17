@@ -32,8 +32,8 @@ class SupportFlow_Attachments extends SupportFlow {
 			update_option( self::secret_key_option, $this->secret_key );
 		}
 
-		// Only apply to files that are uploaded to a thread
-		if ( isset( $_REQUEST['post_id'] ) && SupportFlow()->is_thread( (int) $_REQUEST['post_id'] ) ) {
+		// Only apply to files that are uploaded to a ticket
+		if ( isset( $_REQUEST['post_id'] ) && SupportFlow()->is_ticket( (int) $_REQUEST['post_id'] ) ) {
 			add_filter( 'wp_handle_upload_prefilter', array( $this, 'wp_handle_upload_prefilter' ) );
 			add_filter( 'wp_handle_upload', array( $this, 'wp_handle_upload' ) );
 		}
@@ -45,7 +45,7 @@ class SupportFlow_Attachments extends SupportFlow {
 	public function filter_wp_get_attachment_url( $url, $attachment_id ) {
 
 		if ( $attachment = get_post( $attachment_id ) ) {
-			if ( SupportFlow()->is_thread( $attachment->post_parent ) ) {
+			if ( SupportFlow()->is_ticket( $attachment->post_parent ) ) {
 				return $attachment->guid;
 			}
 
@@ -84,7 +84,7 @@ class SupportFlow_Attachments extends SupportFlow {
 			return get_404_template();
 		}
 
-		// Check to see whether the user has permission to view the thread
+		// Check to see whether the user has permission to view the ticket
 		if ( $this->attachments_require_permission && ! $this->can_view_attachment( $post->ID ) ) {
 			wp_die( __( 'Sorry, you do not have permission to view this attachment.', 'supportflow' ) );
 		}
@@ -176,15 +176,15 @@ class SupportFlow_Attachments extends SupportFlow {
 			}
 		}
 
-		$thread_id   = get_post( $attachment_id )->post_parent;
-		$respondents = SupportFlow()->get_thread_respondents( $thread_id, array( 'fields' => 'emails' ) );
+		$ticket_id   = get_post( $attachment_id )->post_parent;
+		$respondents = SupportFlow()->get_ticket_respondents( $ticket_id, array( 'fields' => 'emails' ) );
 
 		// If the email address is a respondent, they can view
 		if ( in_array( $email_or_login, $respondents ) ) {
 			return true;
 		}
 
-		// @todo permissions check on whether the user is logged in as some who can view threads
+		// @todo permissions check on whether the user is logged in as some who can view tickets
 
 		return false;
 	}

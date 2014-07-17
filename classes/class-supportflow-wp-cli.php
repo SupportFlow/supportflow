@@ -85,8 +85,8 @@ EOB
 			'messages',
 			'predefined_messages',
 			'tags',
-			'threadmeta',
-			'threads',
+			'ticketmeta',
+			'tickets',
 			'usermeta',
 			'users',
 		);
@@ -99,36 +99,36 @@ EOB
 		}
 
 		/**
-		 * Import threads and their messages
+		 * Import tickets and their messages
 		 *
 		 * @todo Support for importing priorities. This seems to exist in the schema for old SP, but not in the interface
 		 */
-		$old_threads           = $spdb->get_results( "SELECT * FROM $spdb->threads" );
-		$count_threads_created = 0;
-		foreach ( $old_threads as $old_thread ) {
+		$old_tickets           = $spdb->get_results( "SELECT * FROM $spdb->tickets" );
+		$count_tickets_created = 0;
+		foreach ( $old_tickets as $old_ticket ) {
 
-			// Don't import a thread that's already been imported
-			if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE '_imported_id'=%d", $old_thread->thread_id ) ) ) {
-				WP_CLI::line( "Skipping: #{$old_thread->thread_id} '{$old_thread->subject}' already exists" );
+			// Don't import a ticket that's already been imported
+			if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE '_imported_id'=%d", $old_ticket->ticket_id ) ) ) {
+				WP_CLI::line( "Skipping: #{$old_ticket->ticket_id} '{$old_ticket->subject}' already exists" );
 				continue;
 			}
 
-			// Create the new thread
-			$thread_args = array(
-				'subject' => $old_thread->subject,
-				'date'    => $old_thread->dt,
-				'status'  => 'sf_' . $old_thread->state,
+			// Create the new ticket
+			$ticket_args = array(
+				'subject' => $old_ticket->subject,
+				'date'    => $old_ticket->dt,
+				'status'  => 'sf_' . $old_ticket->state,
 			);
-			$thread_id   = SupportFlow()->create_thread( $thread_args );
-			if ( is_wp_error( $thread_id ) ) {
+			$ticket_id   = SupportFlow()->create_ticket( $ticket_args );
+			if ( is_wp_error( $ticket_id ) ) {
 				continue;
 			}
 
-			// Add the respondent to the thread
-			SupportFlow()->update_thread_respondents( $thread_id, $old_thread->email );
+			// Add the respondent to the ticket
+			SupportFlow()->update_ticket_respondents( $ticket_id, $old_ticket->email );
 
-			// Get the thread's messages and import those too
-			$old_messages  = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE thread_id=%d", $old_thread->thread_id ) );
+			// Get the ticket's messages and import those too
+			$old_messages  = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE ticket_id=%d", $old_ticket->ticket_id ) );
 			$count_replies = 0;
 			foreach ( $old_messages as $old_message ) {
 				$message_args = array(
@@ -140,16 +140,16 @@ EOB
 				if ( function_exists( 'What_The_Email' ) ) {
 					$old_message->content = What_The_Email()->get_message( $old_message->content );
 				}
-				$reply_id = SupportFlow()->add_thread_reply( $thread_id, $old_message->content, $message_args );
+				$reply_id = SupportFlow()->add_ticket_reply( $ticket_id, $old_message->content, $message_args );
 				add_post_meta( $reply_id, '_imported_id', $old_message->message_id );
 				$count_replies ++;
 			}
 
-			// One the thread is created, log the old thread ID
-			update_post_meta( $thread_id, '_imported_id', $old_thread->thread_id );
+			// One the ticket is created, log the old ticket ID
+			update_post_meta( $ticket_id, '_imported_id', $old_ticket->ticket_id );
 
-			WP_CLI::line( "Created: #{$old_thread->thread_id} '{$old_thread->subject}' with {$count_replies} replies" );
-			$count_threads_created ++;
+			WP_CLI::line( "Created: #{$old_ticket->ticket_id} '{$old_ticket->subject}' with {$count_replies} replies" );
+			$count_tickets_created ++;
 		}
 
 		/**
@@ -158,7 +158,7 @@ EOB
 		 * @todo once we support predefined messages
 		 */
 
-		WP_CLI::success( "All done! Imported {$count_threads_created} threads." );
+		WP_CLI::success( "All done! Imported {$count_tickets_created} tickets." );
 
 	}
 

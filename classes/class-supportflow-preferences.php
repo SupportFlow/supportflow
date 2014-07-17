@@ -44,7 +44,7 @@ class SupportFlow_Preferences extends SupportFlow {
 		?>
 
 		<div class="wrap">
-			<?php $this->user_thread_signature_page() ?>
+			<?php $this->user_ticket_signature_page() ?>
 			<br />
 			<?php $this->notification_setting_page() ?>
 		</div>
@@ -52,7 +52,7 @@ class SupportFlow_Preferences extends SupportFlow {
 		<?php
 	}
 
-	public function user_thread_signature_page() {
+	public function user_ticket_signature_page() {
 		if (
 			isset( $_POST['action'], $_POST['_wpnonce'], $_POST['update_signature_value'] ) &&
 			'update_signature' == $_POST['action'] &&
@@ -67,7 +67,7 @@ class SupportFlow_Preferences extends SupportFlow {
 
 		?>
 		<h2><?php _e( 'My signature', 'supportflow' ) ?></h2>
-		<p><?php _e( 'Please enter your signature you wish to add to your thread reply. To remove signature clear the text box and then update it. Note: It will be automatically appended at the end of your thread replies', 'supportflow' ) ?></p>
+		<p><?php _e( 'Please enter your signature you wish to add to your ticket reply. To remove signature clear the text box and then update it. Note: It will be automatically appended at the end of your ticket replies', 'supportflow' ) ?></p>
 		<?php if ( isset( $sign_updated ) && $sign_updated ) {
 			echo '<h3>' . __( 'Signature updated successfully.', 'supportflow' ) . '</h3>';
 		} ?>
@@ -86,7 +86,7 @@ class SupportFlow_Preferences extends SupportFlow {
 	public function notification_setting_page() {
 		?>
 		<h2><?php _e( 'E-Mail Notifications', 'supportflow' ) ?></h2>
-		<p><?php _e( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual threads.', 'supportflow' ) ?></p>
+		<p><?php _e( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual tickets.', 'supportflow' ) ?></p>
 
 		<div id="email_notification_table">
 			<?php

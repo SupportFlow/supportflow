@@ -16,15 +16,15 @@ jQuery(document).ready(function () {
 		event.preventDefault();
 	});
 
-	// Require title and atleast respondent before saving a thread
+	// Require title and atleast respondent before saving a ticket
 	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
-			alert(SFThreads.no_title_msg);
+			alert(SFTickets.no_title_msg);
 			event.preventDefault();
 			return;
 		}
 		if ('' == jQuery('#respondents').val()) {
-			alert(SFThreads.no_respondent_msg);
+			alert(SFTickets.no_respondent_msg);
 			event.preventDefault();
 			return;
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to create/insert predefined replies into the threads
+ * Class to create/insert predefined replies into the tickets
  */
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );

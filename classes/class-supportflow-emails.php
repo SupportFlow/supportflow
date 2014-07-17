@@ -21,28 +21,28 @@ class SupportFlow_Emails extends SupportFlow {
 			return;
 		}
 
-		// When a new reply is added to a thread, notify the respondents and the agents
-		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_agents_thread_replies' ) );
-		add_action( 'supportflow_thread_reply_added', array( $this, 'notify_respondents_thread_replies' ), 10, 3 );
+		// When a new reply is added to a ticket, notify the respondents and the agents
+		add_action( 'supportflow_ticket_reply_added', array( $this, 'notify_agents_ticket_replies' ) );
+		add_action( 'supportflow_ticket_reply_added', array( $this, 'notify_respondents_ticket_replies' ), 10, 3 );
 	}
 
 	/**
-	 * When a new reply is added to the thread, notify the agent on the thread if there is one
+	 * When a new reply is added to the ticket, notify the agent on the ticket if there is one
 	 */
-	public function notify_agents_thread_replies( $reply_id ) {
+	public function notify_agents_ticket_replies( $reply_id ) {
 
 		$reply = get_post( $reply_id );
 		if ( ! $reply ) {
 			return;
 		}
 
-		$thread = SupportFlow()->get_thread( $reply->post_parent );
+		$ticket = SupportFlow()->get_ticket( $reply->post_parent );
 		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $thread->ID );
-		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $thread, 'reply' );
+		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $ticket->ID );
+		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $ticket, 'reply' );
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
-		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
+		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
 		$smtp_account     = $email_accounts[$email_account_id];
 
 		if ( empty( $agent_ids ) ) {
@@ -64,12 +64,12 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
-		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'agent' );
+		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
+		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
 		$attachments = array();
-		if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
-			foreach ( $thread_attachments as $attachment ) {
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+			foreach ( $ticket_attachments as $attachment ) {
 				$attachments[] = get_attached_file( $attachment->ID );
 			}
 		}
@@ -77,33 +77,33 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = stripslashes( $reply->post_content );
 		// Ticket details that are relevant to the agent
 		$message .= "\n\n-------";
-		// Thread status
-		$post_status = SupportFlow()->post_statuses[$thread->post_status]['label'];
+		// Ticket status
+		$post_status = SupportFlow()->post_statuses[$ticket->post_status]['label'];
 		$message .= "\n" . sprintf( __( "Status: %s", 'supportflow' ), $post_status );
 		// Assigned agent
-		$assigned_agent = ( $thread->post_author ) ? get_user_by( 'id', $thread->post_author )->display_name : __( 'None assigned', 'supportflow' );
+		$assigned_agent = ( $ticket->post_author ) ? get_user_by( 'id', $ticket->post_author )->display_name : __( 'None assigned', 'supportflow' );
 		$message .= "\n" . sprintf( __( "Agent: %s", 'supportflow' ), $assigned_agent );
 
-		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'agent' );
+		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
 
 		self::mail( $agent_emails, $subject, $message, '', $attachments, $smtp_account );
 	}
 
 	/**
-	 * When a new reply is added to the thread, notify all of the respondents on the thread
+	 * When a new reply is added to the ticket, notify all of the respondents on the ticket
 	 */
-	public function notify_respondents_thread_replies( $reply_id, $cc = array(), $bcc = array() ) {
+	public function notify_respondents_ticket_replies( $reply_id, $cc = array(), $bcc = array() ) {
 		// Respondents shouldn't receive private replies
 		$reply = get_post( $reply_id );
 		if ( ! $reply || 'private' == $reply->post_status ) {
 			return;
 		}
 
-		$thread      = SupportFlow()->get_thread( $reply->post_parent );
-		$respondents = SupportFlow()->get_thread_respondents( $thread->ID, array( 'fields' => 'emails' ) );
+		$ticket      = SupportFlow()->get_ticket( $reply->post_parent );
+		$respondents = SupportFlow()->get_ticket_respondents( $ticket->ID, array( 'fields' => 'emails' ) );
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
-		$email_account_id = get_post_meta( $thread->ID, 'email_account', true );
+		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
 		$smtp_account     = $email_accounts[$email_account_id];
 
 		// Don't email the person creating the reply, unless that's desired behavior
@@ -115,18 +115,18 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
-		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID );
-		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $thread->ID, 'respondent' );
+		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
+		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'respondent' );
 
 		$attachments = array();
-		if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
-			foreach ( $thread_attachments as $attachment ) {
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+			foreach ( $ticket_attachments as $attachment ) {
 				$attachments[] = get_attached_file( $attachment->ID );
 			}
 		}
 
 		$message = stripslashes( $reply->post_content );
-		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $thread->ID, 'respondent' );
+		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'respondent' );
 
 		$headers = '';
 
@@ -148,40 +148,40 @@ class SupportFlow_Emails extends SupportFlow {
 	/**
 	 * E-Mail a supportflow conversation to users
 	 *
-	 * @param integer      $thread_id
+	 * @param integer      $ticket_id
 	 * @param array|string $to
 	 */
-	public function email_conversation( $thread_id, $to ) {
+	public function email_conversation( $ticket_id, $to ) {
 
-		$thread         = SupportFlow()->get_thread( $thread_id );
-		$thread_replies = SupportFlow()->get_thread_replies( $thread_id );
-		$thread_owner   = $thread->post_author > 0 ? get_user_by( 'id', $thread->post_author )->data->user_nicename : __( 'Unassigned', 'supportflow' );
+		$ticket         = SupportFlow()->get_ticket( $ticket_id );
+		$ticket_replies = SupportFlow()->get_ticket_replies( $ticket_id );
+		$ticket_owner   = $ticket->post_author > 0 ? get_user_by( 'id', $ticket->post_author )->data->user_nicename : __( 'Unassigned', 'supportflow' );
 
 		$attachments = array();
 		$msg         = '';
-		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $thread->ID ) . ' ' . __( 'Conversation summery', 'supportflow' );
+		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID ) . ' ' . __( 'Conversation summery', 'supportflow' );
 
-		$msg .= '<b>' . __( 'Title', 'supportflow' ) . ':</b> ' . esc_html( $thread->post_title ) . '<br>';
-		$msg .= '<b>' . __( 'Status', 'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$thread->post_status]['label'] . '<br>';
-		$msg .= '<b>' . __( 'Owner', 'supportflow' ) . ':</b> ' . esc_html( $thread_owner ) . '<br>';
-		$msg .= '<b>' . __( 'Created on', 'supportflow' ) . ':</b> ' . $thread->post_date_gmt . ' GMT<br>';
-		$msg .= '<b>' . __( 'Last Updated on', 'supportflow' ) . ':</b> ' . $thread->post_modified_gmt . ' GMT<br>';
+		$msg .= '<b>' . __( 'Title', 'supportflow' ) . ':</b> ' . esc_html( $ticket->post_title ) . '<br>';
+		$msg .= '<b>' . __( 'Status', 'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$ticket->post_status]['label'] . '<br>';
+		$msg .= '<b>' . __( 'Owner', 'supportflow' ) . ':</b> ' . esc_html( $ticket_owner ) . '<br>';
+		$msg .= '<b>' . __( 'Created on', 'supportflow' ) . ':</b> ' . $ticket->post_date_gmt . ' GMT<br>';
+		$msg .= '<b>' . __( 'Last Updated on', 'supportflow' ) . ':</b> ' . $ticket->post_modified_gmt . ' GMT<br>';
 		$msg .= '<br><br>';
 
-		foreach ( array_reverse( $thread_replies ) as $thread_reply ) {
-			$date_time    = $thread_reply->post_date_gmt . ' GMT';
-			$reply_author = get_post_meta( $thread_reply->ID, 'reply_author', true );
+		foreach ( array_reverse( $ticket_replies ) as $ticket_reply ) {
+			$date_time    = $ticket_reply->post_date_gmt . ' GMT';
+			$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author', true );
 			if ( empty( $reply_author ) ) {
-				$reply_author = get_post_meta( $thread_reply->ID, 'reply_author_email', true );
+				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
 			}
 
 			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
 			$msg .= '<br>';
-			$msg .= esc_html( $thread_reply->post_content );
+			$msg .= esc_html( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
-			if ( $thread_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $thread_reply->ID ) ) ) {
-				foreach ( $thread_attachments as $attachment ) {
+			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID ) ) ) {
+				foreach ( $ticket_attachments as $attachment ) {
 					$attachments[] = get_attached_file( $attachment->ID );
 				}
 			}
