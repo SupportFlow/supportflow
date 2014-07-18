@@ -7,66 +7,6 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
-
-/**
- * Table to show existing E-Mail accounts with a option to remove existing
- */
-class SupportFlow_User_Permissions_Table extends WP_List_Table {
-	protected $_data;
-
-	function __construct( $user_permissions ) {
-		parent::__construct( array( 'screen' => 'sf_user_permissions_table' ) );
-
-		$this->_data = array();
-		foreach ( $user_permissions as $id => $user_permission ) {
-			$identfier = json_encode( array(
-				'user_id'        => $user_permission['user_id'],
-				'privilege_type' => $user_permission['privilege_type'],
-				'privilege_id'   => $user_permission['privilege_id'],
-			) );
-			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
-			$status .= " <label for='permission_$id' class='privilege_status'>" . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label>";
-			$this->_data[] = array(
-				'status'    => $status,
-				'privilege' => esc_html( $user_permission['privilege'] ),
-				'type'      => $user_permission['type'],
-				'user'      => esc_html( $user_permission['user'] ),
-			);
-		}
-	}
-
-	function column_default( $item, $column_name ) {
-		return $item[$column_name];
-	}
-
-	function no_items() {
-		$message = __('No tag/e-mail accounts found. <b>%s</b> before setting user permissions.<br><b>Note: </b>Administrator accounts automatically have full access in SupportFlow.', 'supportflow');
-		$link = '<a href="">' . __('Please add them', 'supportflow') . '</a>';
-		printf($message, $link);
-	}
-
-	function get_columns() {
-		return array(
-			'status'    => __( 'Status', 'supportflow' ),
-			'privilege' => __( 'Privilege', 'supportflow' ),
-			'type'      => __( 'Type', 'supportflow' ),
-			'user'      => __( 'User', 'supportflow' ),
-		);
-	}
-
-	function prepare_items() {
-		$columns               = $this->get_columns();
-		$data                  = $this->_data;
-		$hidden                = array();
-		$sortable              = array();
-		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $data;
-	}
-}
-
 class SupportFlow_Permissions extends SupportFlow {
 
 	/**
@@ -169,11 +109,7 @@ class SupportFlow_Permissions extends SupportFlow {
 		</table>
 
 		<div id="user_permissions_table">
-			<?php
-			$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( 0 ) );
-			$user_permissions_table->prepare_items();
-			$user_permissions_table->display();
-			?>
+			<?php $this->show_permissions_table( $this->get_user_permissions( 0 ) ) ?>
 		</div>
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
@@ -268,12 +204,45 @@ class SupportFlow_Permissions extends SupportFlow {
 			$get_allowed    = true;
 			$get_disallowed = true;
 		}
-
-		$user_permissions_table = new SupportFlow_User_Permissions_Table( $this->get_user_permissions( $user_id, $get_allowed, $get_disallowed ) );
-		$user_permissions_table->prepare_items();
-		$user_permissions_table->display();
-
+		$this->show_permissions_table( $this->get_user_permissions( $user_id, $get_allowed, $get_disallowed ) );
 		exit;
+	}
+
+	public function show_permissions_table( $user_permissions ) {
+		$message  = __( 'No tag/e-mail accounts found. <b>%s</b> before setting user permissions.<br><b>Note: </b>Administrator accounts automatically have full access in SupportFlow.', 'supportflow' );
+		$link     = '<a href="">' . __( 'Please add them', 'supportflow' ) . '</a>';
+		$no_items = sprintf( $message, $link );
+
+		$columns = array(
+			'status'    => __( 'Status', 'supportflow' ),
+			'privilege' => __( 'Privilege', 'supportflow' ),
+			'type'      => __( 'Type', 'supportflow' ),
+			'user'      => __( 'User', 'supportflow' ),
+		);
+
+		$data = array();
+		foreach ( $user_permissions as $id => $user_permission ) {
+			$identfier = json_encode( array(
+				'user_id'        => $user_permission['user_id'],
+				'privilege_type' => $user_permission['privilege_type'],
+				'privilege_id'   => $user_permission['privilege_id'],
+			) );
+			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-permission-identifier='" . $identfier . "' " . checked( $user_permission['allowed'], true, false ) . '>';
+			$status .= " <label for='permission_$id' class='privilege_status'>" . __( $user_permission['allowed'] ? 'Allowed' : 'Not allowed', 'supportflow' ) . "</label>";
+			$data[] = array(
+				'status'    => $status,
+				'privilege' => esc_html( $user_permission['privilege'] ),
+				'type'      => $user_permission['type'],
+				'user'      => esc_html( $user_permission['user'] ),
+			);
+		}
+
+		$permissions_table = new SupportFlow_Table( 'sf_user_permissions_table' );
+		$permissions_table->set_columns( $columns );
+		$permissions_table->set_no_items( $no_items );
+		$permissions_table->set_data( $data );
+		$permissions_table->display();
+
 	}
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {

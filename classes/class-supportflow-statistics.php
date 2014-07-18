@@ -149,7 +149,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Currently shows today, yesterday and overall (whole life) ticket stats
 	 */
 	public function show_overall_stats() {
-		$statistics_table = new SupportFlow_Statistics_Table();
+		$statistics_table = new SupportFlow_Table();
 		$items = array();
 
 		$statistics_table->set_columns( array(
@@ -185,7 +185,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Show tickets status per tag
 	 */
 	public function show_tag_stats() {
-		$statistics_table = new SupportFlow_Statistics_Table();
+		$statistics_table = new SupportFlow_Table();
 		$items = array();
 
 		$statistics_table->set_columns( array(
@@ -208,7 +208,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Shows stats of ticket created in last 30 days
 	 */
 	public function show_30_days_stats() {
-		$statistics_table = new SupportFlow_Statistics_Table();
+		$statistics_table = new SupportFlow_Table();
 		$items = array();
 
 		$statistics_table->set_columns( array(
@@ -239,7 +239,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Shows stats of ticket created in last 12 months
 	 */
 	public function show_12_month_stats() {
-		$statistics_table = new SupportFlow_Statistics_Table();
+		$statistics_table = new SupportFlow_Table();
 		$items = array();
 
 		$statistics_table->set_columns( array(
@@ -269,7 +269,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Shows stats of ticket created in last 5 years
 	 */
 	public function show_5_year_stats() {
-		$statistics_table = new SupportFlow_Statistics_Table();
+		$statistics_table = new SupportFlow_Table();
 		$items = array();
 
 		$statistics_table->set_columns( array(
@@ -416,37 +416,6 @@ class SupportFlow_Statistics extends SupportFlow {
 		return sprintf( $link, $post_type, $post_status, $date, $value );
 	}
 
-}
-
-
-/**
- * Table to show statistics
- */
-class SupportFlow_Statistics_Table extends WP_List_Table {
-
-	function __construct() {
-		parent::__construct( array( 'screen' => 'sf_statistics_table' ) );
-	}
-
-	protected function column_default( $item, $column_name ) {
-		return $item[$column_name];
-	}
-
-	/**
-	 * Set columns that should be displayed in table
-	 * @param array $columns
-	 */
-	function set_columns( $columns ) {
-		$this->_column_headers = array( $columns, array(), array() );
-	}
-
-	/**
-	 * Set data that should be displayed in table
-	 * @param array $data
-	 */
-	function set_data( $data ) {
-		$this->items = $data;
-	}
 }
 
 SupportFlow()->extend->statistics = new SupportFlow_Statistics();

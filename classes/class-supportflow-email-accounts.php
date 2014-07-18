@@ -5,71 +5,6 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
-
-/**
- * Table to show existing E-Mail accounts with a option to remove existing
- */
-class SupportFlow_Email_Accounts_Table extends WP_List_Table {
-	protected $_data;
-
-	function __construct( $accounts ) {
-		parent::__construct();
-
-		$this->_data = array();
-
-		foreach ( $accounts as $account_id => $account ) {
-			// Account is deleted
-			if ( empty( $account ) ) {
-				continue;
-			}
-
-			$this->_data[] = array(
-				'table_username'  => esc_html( $account['username'] ),
-				'table_imap_host' => esc_html( $account['imap_host'] ),
-				'table_imap_port' => esc_html( $account['imap_port'] ),
-				'table_imap_ssl'  => esc_html( $account['imap_ssl'] ? 'True' : 'False' ),
-				'table_smtp_host' => esc_html( $account['smtp_host'] ),
-				'table_smtp_port' => esc_html( $account['smtp_port'] ),
-				'table_smtp_ssl'  => esc_html( $account['smtp_ssl'] ? 'True' : 'False' ),
-				'table_action'    => "<a href='#' data-account-id='" . esc_attr( $account_id ) . "' class='delete_email_account'>" . __( 'Delete', 'supportflow' ) . "</a>",
-			);
-		}
-	}
-
-	function column_default( $item, $column_name ) {
-		return $item[ $column_name ];
-	}
-
-	function no_items() {
-		_e( 'No E-Mail accounts found. Please <b>add them</b> in the form below.', 'supportflow' );
-	}
-
-	function get_columns() {
-		return array(
-			'table_username'  => __( 'Username', 'supportflow' ),
-			'table_imap_host' => __( 'IMAP Host', 'supportflow' ),
-			'table_imap_port' => __( 'IMAP Port', 'supportflow' ),
-			'table_imap_ssl'  => __( 'IMAP use SSL', 'supportflow' ),
-			'table_smtp_host' => __( 'SMTP Host', 'supportflow' ),
-			'table_smtp_port' => __( 'SMTP Port', 'supportflow' ),
-			'table_smtp_ssl'  => __( 'SMTP use SSL', 'supportflow' ),
-			'table_action'    => __( 'Action', 'supportflow' ),
-		);
-	}
-
-	function prepare_items() {
-		$columns               = $this->get_columns();
-		$data                  = $this->_data;
-		$hidden                = array();
-		$sortable              = array();
-		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $data;
-	}
-}
-
 /**
  * Setting page to add/remove new E-Mail accounts to get replies
  */
@@ -220,8 +155,42 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * List all the existing E-Mail accounts in a table
 	 */
 	public function list_email_accounts() {
-		$email_accounts_table = new SupportFlow_Email_Accounts_Table( $this->email_accounts );
-		$email_accounts_table->prepare_items();
+		$no_items = __( 'No E-Mail accounts found. Please <b>add them</b> in the form below.', 'supportflow' );
+
+		$columns = array(
+			'table_username'  => __( 'Username', 'supportflow' ),
+			'table_imap_host' => __( 'IMAP Host', 'supportflow' ),
+			'table_imap_port' => __( 'IMAP Port', 'supportflow' ),
+			'table_imap_ssl'  => __( 'IMAP use SSL', 'supportflow' ),
+			'table_smtp_host' => __( 'SMTP Host', 'supportflow' ),
+			'table_smtp_port' => __( 'SMTP Port', 'supportflow' ),
+			'table_smtp_ssl'  => __( 'SMTP use SSL', 'supportflow' ),
+			'table_action'    => __( 'Action', 'supportflow' ),
+		);
+
+		$data = array();
+		foreach ( $this->email_accounts as $account_id => $account ) {
+			// Account is deleted
+			if ( empty( $account ) ) {
+				continue;
+			}
+
+			$data[] = array(
+				'table_username'  => esc_html( $account['username'] ),
+				'table_imap_host' => esc_html( $account['imap_host'] ),
+				'table_imap_port' => esc_html( $account['imap_port'] ),
+				'table_imap_ssl'  => esc_html( $account['imap_ssl'] ? 'True' : 'False' ),
+				'table_smtp_host' => esc_html( $account['smtp_host'] ),
+				'table_smtp_port' => esc_html( $account['smtp_port'] ),
+				'table_smtp_ssl'  => esc_html( $account['smtp_ssl'] ? 'True' : 'False' ),
+				'table_action'    => "<a href='#' data-account-id='" . esc_attr( $account_id ) . "' class='delete_email_account'>" . __( 'Delete', 'supportflow' ) . "</a>",
+			);
+		}
+
+		$email_accounts_table = new SupportFlow_Table();
+		$email_accounts_table->set_columns( $columns );
+		$email_accounts_table->set_no_items( $no_items );
+		$email_accounts_table->set_data( $data );
 		$email_accounts_table->display();
 
 	}
