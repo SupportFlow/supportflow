@@ -1010,6 +1010,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 * and new reply data
 	 */
 	public function action_save_post( $thread_id ) {
+		$email_account_id = get_post_meta($thread_id, 'email_account', true);
 
 		if ( SupportFlow()->post_type != get_post_type( $thread_id ) ) {
 			return;
@@ -1020,7 +1021,7 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->update_thread_respondents( $thread_id, $respondents );
 		}
 
-		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account'] ) ) {
+		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account'] ) && '' == $email_account_id ) {
 			$email_account = (int) $_POST['post_email_account'];
 			update_post_meta( $thread_id, 'email_account', $email_account );
 		}
