@@ -161,7 +161,7 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type                = apply_filters( 'supportflow_ticket_post_type', 'sf_ticket' );
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' ); // Retained sf_thread for backward compatiblity with old versions
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
