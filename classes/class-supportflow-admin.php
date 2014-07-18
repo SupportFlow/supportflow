@@ -731,32 +731,40 @@ class SupportFlow_Admin extends SupportFlow {
 			}
 		}
 
-		$placeholders = array(
-			__( "What's burning?", 'supportflow' ),
-			__( 'What do you need to get off your chest?', 'supportflow' ),
-		);
+		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
+		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
-		$rand = array_rand( $placeholders );
+		$thread_lock       = ( null == $email_account );
+		$disabled_attr     = $thread_lock ? 'disabled' : '';
+		$submit_attr_array = $thread_lock ? array( 'disabled' => 'true' ) : array();
 
-		
+		if ( $thread_lock ) {
+			$placeholder = __( "Thread is locked permanently because E-Mail account associated with it is deleted. Please create a new thread now. You can't now reply to it.", 'supportflow' );
+		} else {
+			$placeholders = array(
+				__( "What's burning?", 'supportflow' ),
+				__( 'What do you need to get off your chest?', 'supportflow' ),
+			);
+			$rand        = array_rand( $placeholders );
+			$placeholder = $placeholders[$rand];
+		}
 
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
 		echo '<div class="alignright">';
-		echo '<select id="predefs"  class="predefined_replies_dropdown">';
+		echo '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
 		foreach ( $pre_defs as $pre_def ) {
 			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
 		}
 		echo '</select></div>';
 
 		echo '<div id="thread-reply-box">';
-		echo "<textarea id='reply' name='reply' disabled class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholders[$rand] ) . "'>";
-		echo 'das';
+		echo "<textarea id='reply' name='reply' $disabled_attr class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
 		echo '<div id="replies-attachments-wrap">';
 		echo '<div class="drag-drop-buttons">';
-		echo '<input id="reply-attachment-browse-button" type="button" value="' . esc_attr( __( 'Attach files', 'supportflow' ) ) . '" class="button" />';
+		echo '<input id="reply-attachment-browse-button" ' . $disabled_attr . ' type="button" value="' . esc_attr( __( 'Attach files', 'supportflow' ) ) . '" class="button" />';
 		echo '</div>';
 		echo '<ul id="replies-attachments-list">';
 		echo '</ul>';
@@ -764,16 +772,16 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</div>';
 		echo '<div id="submit-action">';
 		$signature_label_title = __( 'Append your signature at the bottom of the reply. Signature can be removed or changed in preferences page', 'supportflow' );
-		echo '<input type="checkbox" checked="checked" id="insert-signature" name="insert-signature" />';
+		echo '<input type="checkbox" ' . $disabled_attr . '	checked="checked" id="insert-signature" name="insert-signature" />';
 		echo "<label for='insert-signature' title='$signature_label_title'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
-		echo '<input type="checkbox" id="mark-private" name="mark-private" />';
+		echo '<input type="checkbox" ' . $disabled_attr . ' id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
 		if ( 'post-new.php' == $pagenow ) {
 			$submit_text = __( 'Start Thread', 'supportflow' );
 		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
 		}
-		submit_button( $submit_text, 'primary save-button', 'save', false );
+		submit_button( $submit_text, 'primary save-button', 'save', false, $submit_attr_array );
 		echo '</div>';
 		echo '</div>';
 
@@ -1011,6 +1019,8 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function action_save_post( $thread_id ) {
 		$email_account_id = get_post_meta($thread_id, 'email_account', true);
+		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
+		$thread_lock   = ( null == $email_account );
 
 		if ( SupportFlow()->post_type != get_post_type( $thread_id ) ) {
 			return;
@@ -1032,7 +1042,7 @@ class SupportFlow_Admin extends SupportFlow {
 			update_post_meta( $thread_id, 'email_notifications_override', $email_notifications_override );
 		}
 
-		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) ) {
+		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) && ! $thread_lock ) {
 			$reply = $_POST['reply'];
 
 			if ( isset( $_POST['insert-signature'] ) && 'on' == $_POST['insert-signature'] ) {
