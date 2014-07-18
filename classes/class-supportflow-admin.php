@@ -452,8 +452,10 @@ class SupportFlow_Admin extends SupportFlow {
 		?>
 		<p class="description"><?php _e( "Please enter E-Mail address seperated by comma to whom you want to send this conversation.", 'supportflow' ) ?></p>
 		<br />
-		<input type="text" id="email_conversation_to" />
-		<?php submit_button( __( 'Send', 'supportflow' ), '', 'email_conversation_submit', false ); ?>
+		<form name="email_conversation">
+			<input type="text" id="email_conversation_to" />
+			<?php submit_button( __( 'Send', 'supportflow' ), '', 'email_conversation_submit', false ); ?>
+		</form>
 		<p id="email_conversation_status"></p>
 	<?php
 	}
