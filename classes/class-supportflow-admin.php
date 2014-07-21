@@ -1018,7 +1018,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 * and new reply data
 	 */
 	public function action_save_post( $ticket_id ) {
-		$email_account_id = get_post_meta($thread_id, 'email_account', true);
+		$email_account_id = get_post_meta( $thread_id, 'email_account', true );
 		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 		$thread_lock   = ( null == $email_account && '' != $email_account );
 
