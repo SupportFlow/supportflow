@@ -734,7 +734,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
-		$thread_lock       = ( null == $email_account );
+		$thread_lock       = ( null == $email_account && '' != $email_account_id );
 		$disabled_attr     = $thread_lock ? 'disabled' : '';
 		$submit_attr_array = $thread_lock ? array( 'disabled' => 'true' ) : array();
 
@@ -1020,7 +1020,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function action_save_post( $ticket_id ) {
 		$email_account_id = get_post_meta($thread_id, 'email_account', true);
 		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
-		$thread_lock   = ( null == $email_account );
+		$thread_lock   = ( null == $email_account && '' != $email_account );
 
 		if ( SupportFlow()->post_type != get_post_type( $ticket_id ) ) {
 			return;
