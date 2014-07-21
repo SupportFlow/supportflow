@@ -106,7 +106,7 @@
 	font-size: 1.2em;
 }
 
-#supportflow-replies.postbox #thread-reply-box {
+#supportflow-replies.postbox #ticket-reply-box {
 	width: 100%;
 }
 
@@ -160,38 +160,38 @@
 	margin-top: 0;
 }
 
-#supportflow-replies.postbox ul.private-replies li .thread-meta {
+#supportflow-replies.postbox ul.private-replies li .ticket-meta {
 	color:      #BBB;
 	font-size:  0.9em;
 	text-align: right;
 }
 
-#supportflow-replies.postbox ul.thread-replies li {
+#supportflow-replies.postbox ul.ticket-replies li {
 	clear:         left;
 	margin-top:    20px;
 	margin-bottom: 20px;
 }
 
-#supportflow-replies.postbox ul.thread-replies li .thread-reply-attachments li,
-#supportflow-replies.postbox ul.private-replies li .thread-reply-attachments li {
+#supportflow-replies.postbox ul.ticket-replies li .ticket-reply-attachments li,
+#supportflow-replies.postbox ul.private-replies li .ticket-reply-attachments li {
 	margin-top:    3px;
 	margin-bottom: 3px;
 	font-size:     0.9em;
 }
 
-#supportflow-replies.postbox ul.thread-replies li .reply-avatar {
+#supportflow-replies.postbox ul.ticket-replies li .reply-avatar {
 	float: left;
 	width: 100px;	
         word-wrap: break-word;
 }
 
-#supportflow-replies.postbox ul.thread-replies li .reply-author {
+#supportflow-replies.postbox ul.ticket-replies li .reply-author {
 	margin:    0;
 	font-size: 0.9em;
 	color:     #666666;
 }
 
-#supportflow-replies.postbox ul.thread-replies li .thread-reply {
+#supportflow-replies.postbox ul.ticket-replies li .ticket-reply {
 	background-color:      #FFFFFF;
 	margin-left:           105px;
 	min-height:            80px;
@@ -204,7 +204,7 @@
 	word-wrap:             break-word;
 }
 
-#supportflow-replies.postbox ul.thread-replies li .thread-meta {
+#supportflow-replies.postbox ul.ticket-replies li .ticket-meta {
 	margin-left: 105px;
 	font-size:   0.9em;
 	color:       #666666;

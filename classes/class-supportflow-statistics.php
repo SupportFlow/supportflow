@@ -1,6 +1,6 @@
 <?php
 /**
- * Show SupportFlow thread statistics
+ * Show SupportFlow ticket statistics
  *
  * @since    0.1
  */
@@ -154,9 +154,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
-			'table_new'    => __( 'New threads', 'supportflow' ),
-			'table_open'   => __( 'Open threads', 'supportflow' ),
-			'table_closed' => __( 'Closed threads', 'supportflow' ),
+			'table_new'    => __( 'New tickets', 'supportflow' ),
+			'table_open'   => __( 'Open tickets', 'supportflow' ),
+			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
 		$labels = array( 'Today', 'Yesterday' );
@@ -190,9 +190,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 		$statistics_table->set_columns( array(
 			'table_tag'    => __( 'Tag', 'supportflow' ),
-			'table_new'    => __( 'New threads', 'supportflow' ),
-			'table_open'   => __( 'Open threads', 'supportflow' ),
-			'table_closed' => __( 'Closed threads', 'supportflow' ),
+			'table_new'    => __( 'New tickets', 'supportflow' ),
+			'table_open'   => __( 'Open tickets', 'supportflow' ),
+			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
 		foreach ( get_terms(SupportFlow()->tags_tax, 'hide_empty=0' ) as $tag ) {
@@ -213,9 +213,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
-			'table_new'    => __( 'New threads', 'supportflow' ),
-			'table_open'   => __( 'Open threads', 'supportflow' ),
-			'table_closed' => __( 'Closed threads', 'supportflow' ),
+			'table_new'    => __( 'New tickets', 'supportflow' ),
+			'table_open'   => __( 'Open tickets', 'supportflow' ),
+			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
 		for ( $i = 0; $i < 30; $i ++ ) {
@@ -244,9 +244,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
-			'table_new'    => __( 'New threads', 'supportflow' ),
-			'table_open'   => __( 'Open threads', 'supportflow' ),
-			'table_closed' => __( 'Closed threads', 'supportflow' ),
+			'table_new'    => __( 'New tickets', 'supportflow' ),
+			'table_open'   => __( 'Open tickets', 'supportflow' ),
+			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
 		for ( $i = 0; $i < 12; $i ++ ) {
@@ -274,9 +274,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
-			'table_new'    => __( 'New threads', 'supportflow' ),
-			'table_open'   => __( 'Open threads', 'supportflow' ),
-			'table_closed' => __( 'Closed threads', 'supportflow' ),
+			'table_new'    => __( 'New tickets', 'supportflow' ),
+			'table_open'   => __( 'Open tickets', 'supportflow' ),
+			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
 		for ( $i = 0; $i < 5; $i ++ ) {
@@ -297,7 +297,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	/**
 	 * Stats of post created on a particular date
 	 * @param array $post_date Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
-	 * @param integer $link_date Date in format used in filtering by WP in all threads page. e.g. 19941205
+	 * @param integer $link_date Date in format used in filtering by WP in all tickets page. e.g. 19941205
 	 * @param string $link_value Value to show user of link in table
 	 * @return array Tickets stats created on a particular date. This array is directly usable in table
 	 */
@@ -315,7 +315,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	/**
 	 * Stats of post created of a particular tag
 	 * @param string $post_tag Slug of tag for which you want to get stats for
-	 * @param integer $link_tag Tag in format used in filtering by WP in all threads page.
+	 * @param integer $link_tag Tag in format used in filtering by WP in all tickets page.
 	 * @param string $link_value Value to show user of link in table
 	 * @return array Tickets stats created for a particular tag. This array is directly usable in table
 	 */
@@ -380,9 +380,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 
 	/**
-	 * Generate a link that shows matching tickets in all thread page
-	 * @param integer $link_date Date in format used in filtering by WP in all threads page. e.g. 19941205
-	 * @param string $post_status Post statuses that should be shown in all threads page
+	 * Generate a link that shows matching tickets in all ticket page
+	 * @param integer $link_date Date in format used in filtering by WP in all tickets page. e.g. 19941205
+	 * @param string $post_status Post statuses that should be shown in all tickets page
 	 * @param string $link_value Value of hyperlink that should be shown to user
 	 * @return string A hyperlink
 	 */
@@ -399,9 +399,9 @@ class SupportFlow_Statistics extends SupportFlow {
 
 
 	/**
-	 * Generate a link that shows matching tickets in all thread page
+	 * Generate a link that shows matching tickets in all ticket page
 	 * @param string $link_tag Slug of tag
-	 * @param string $post_status Post statuses that should be shown in all threads page
+	 * @param string $post_status Post statuses that should be shown in all tickets page
 	 * @param string $link_value Value of hyperlink that should be shown to user
 	 * @return string A hyperlink
 	 */

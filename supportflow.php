@@ -161,36 +161,36 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' );
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' ); // Retained sf_thread for backward compatiblity with old versions
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type             = apply_filters( 'supportflow_thread_comment_type', 'sf_comment' );
-		$this->reply_type               = apply_filters( 'supportflow_thread_reply_type', 'sf_thread' );
+		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
+		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
 
 		$this->email_term_prefix = 'sf-';
 
-		$this->thread_secret_key = 'thread_secret';
+		$this->ticket_secret_key = 'ticket_secret';
 
 		$this->post_statuses = apply_filters(
-			'supportflow_thread_post_statuses', array(
+			'supportflow_ticket_post_statuses', array(
 				'sf_new'     => array(
-					'show_threads' => true,
+					'show_tickets' => true,
 					'label'        => __( 'New', 'supportflow' ),
 					'label_count'  => _n_noop( 'New <span class="count">(%s)</span>', 'New <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_open'    => array(
-					'show_threads' => true,
+					'show_tickets' => true,
 					'label'        => __( 'Open', 'supportflow' ),
 					'label_count'  => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_pending' => array(
-					'show_threads' => true,
+					'show_tickets' => true,
 					'label'        => __( 'Pending', 'supportflow' ),
 					'label_count'  => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
 				),
 				'sf_closed'  => array(
-					'show_threads' => false,
+					'show_tickets' => false,
 					'label'        => __( 'Closed', 'supportflow' ),
 					'label_count'  => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'supportflow' ),
 				),
@@ -273,17 +273,17 @@ class SupportFlow {
 			$this->post_type, array(
 				'labels'             => array(
 					'menu_name'          => __( 'SupportFlow', 'supportflow' ),
-					'name'               => __( 'Threads', 'supportflow' ),
-					'singular_name'      => __( 'Thread', 'supportflow' ),
-					'all_items'          => __( 'All Threads', 'supportflow' ),
-					'add_new'            => __( 'New Thread', 'supportflow' ),
-					'add_new_item'       => __( 'Start New Thread', 'supportflow' ),
+					'name'               => __( 'Tickets', 'supportflow' ),
+					'singular_name'      => __( 'Ticket', 'supportflow' ),
+					'all_items'          => __( 'All Tickets', 'supportflow' ),
+					'add_new'            => __( 'New Ticket', 'supportflow' ),
+					'add_new_item'       => __( 'Start New Ticket', 'supportflow' ),
 					'edit_item'          => __( 'Discussion', 'supportflow' ),
-					'new_item'           => __( 'New Thread', 'supportflow' ),
-					'view_item'          => __( 'View Thread', 'supportflow' ),
-					'search_items'       => __( 'Search Threads', 'supportflow' ),
-					'not_found'          => __( 'No threads found', 'supportflow' ),
-					'not_found_in_trash' => __( 'No threads found in trash', 'supportflow' ),
+					'new_item'           => __( 'New Ticket', 'supportflow' ),
+					'view_item'          => __( 'View Ticket', 'supportflow' ),
+					'search_items'       => __( 'Search Tickets', 'supportflow' ),
+					'not_found'          => __( 'No tickets found', 'supportflow' ),
+					'not_found_in_trash' => __( 'No tickets found in trash', 'supportflow' ),
 				),
 				'public'             => true,
 				'menu_position'      => 3,
@@ -338,7 +338,7 @@ class SupportFlow {
 	}
 
 	/**
-	 * Register the custom post (thread) statuses
+	 * Register the custom post (ticket) statuses
 	 *
 	 * @since SupportFlow 0.1
 	 * @uses  register_post_status() To register the post statuses
@@ -390,19 +390,19 @@ class SupportFlow {
 		return $email;
 	}
 
-	/** Thread Functions ******************************************************/
+	/** Ticket Functions ******************************************************/
 
 	/**
-	 * Check whether a post_id is a thread
+	 * Check whether a post_id is a ticket
 	 */
-	public function is_thread( $post ) {
+	public function is_ticket( $post ) {
 		return (bool) ( $this->post_type == get_post_type( $post ) );
 	}
 
 	/**
-	 * Create a new thread
+	 * Create a new ticket
 	 */
-	public function create_thread( $args ) {
+	public function create_ticket( $args ) {
 		// The __get() magic doesn't allow key() usage so gotta copy it
 		$post_statuses = $this->post_statuses;
 
@@ -421,58 +421,58 @@ class SupportFlow {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$thread = array(
+		$ticket = array(
 			'post_type'   => $this->post_type,
 			'post_title'  => $args['subject'],
 			'post_author' => $args['assignee'],
 			'post_date'   => $args['date'],
 		);
 
-		// Validate the thread status
+		// Validate the ticket status
 		if ( ! get_post_status_object( $args['status'] ) ) {
 			$args['status'] = $defaults['status'];
 		}
-		$thread['post_status'] = $args['status'];
-		$thread_id             = wp_insert_post( $thread );
+		$ticket['post_status'] = $args['status'];
+		$ticket_id             = wp_insert_post( $ticket );
 
-		if ( is_wp_error( $thread_id ) ) {
-			return $thread_id;
+		if ( is_wp_error( $ticket_id ) ) {
+			return $ticket_id;
 		}
 
 		// Assign the respondent(s)
 		if ( ! empty( $args['respondent_email'] ) ) {
-			$this->update_thread_respondents( $thread_id, $args['respondent_email'] );
+			$this->update_ticket_respondents( $ticket_id, $args['respondent_email'] );
 		}
 
 		if ( is_numeric( $args['email_account'] ) ) {
-			update_post_meta( $thread_id, 'email_account', $args['email_account'] );
+			update_post_meta( $ticket_id, 'email_account', $args['email_account'] );
 		}
 
-		// If there was a message, add it to the thread
+		// If there was a message, add it to the ticket
 		if ( ! empty( $args['message'] ) && ! empty( $args['respondent_email'] ) ) {
 			$reply_details = array(
 				'reply_author'       => $args['reply_author'],
 				'reply_author_email' => $args['reply_author_email'],
 				'user_id'            => $args['respondent_id'],
 			);
-			$this->add_thread_reply( $thread_id, $args['message'], $reply_details );
+			$this->add_ticket_reply( $ticket_id, $args['message'], $reply_details );
 		}
 
-		return $thread_id;
+		return $ticket_id;
 	}
 
 	/**
-	 * @todo This should produce an object with thread details, respondents, and replies
+	 * @todo This should produce an object with ticket details, respondents, and replies
 	 */
-	public function get_thread( $thread_id ) {
+	public function get_ticket( $ticket_id ) {
 
-		return get_post( $thread_id );
+		return get_post( $ticket_id );
 	}
 
 	/**
-	 * @todo This should produce a series of thread objects with respondents, replies, etc.
+	 * @todo This should produce a series of ticket objects with respondents, replies, etc.
 	 */
-	public function get_threads( $args = array() ) {
+	public function get_tickets( $args = array() ) {
 
 		$defaults = array(
 			'respondent_email' => '',
@@ -481,13 +481,13 @@ class SupportFlow {
 		);
 		$args     = array_merge( $defaults, $args );
 
-		$thread_args = array();
+		$ticket_args = array();
 		if ( empty( $args['post_status'] ) ) {
-			$thread_args['post_status'] = array_keys( $this->post_statuses );
+			$ticket_args['post_status'] = array_keys( $this->post_statuses );
 		}
 
 		if ( ! empty( $args['respondent_email'] ) ) {
-			$thread_args['tax_query'] = array(
+			$ticket_args['tax_query'] = array(
 				array(
 					'taxonomy' => $this->respondents_tax,
 					'field'    => 'slug',
@@ -496,15 +496,15 @@ class SupportFlow {
 			);
 		}
 
-		$thread_args['post_type'] = $this->post_type;
-		$thread_args['orderby']   = $args['orderby'];
+		$ticket_args['post_type'] = $this->post_type;
+		$ticket_args['orderby']   = $args['orderby'];
 
-		$threads = new WP_Query( $thread_args );
-		if ( is_wp_error( $threads ) ) {
-			return $threads;
+		$tickets = new WP_Query( $ticket_args );
+		if ( is_wp_error( $tickets ) ) {
+			return $tickets;
 		}
 
-		return $threads->posts;
+		return $tickets->posts;
 	}
 
 	/**
@@ -537,18 +537,18 @@ class SupportFlow {
 	}
 
 	/**
-	 * Get a thread's respondents
+	 * Get a ticket's respondents
 	 *
 	 * @todo support retrieving more fields
 	 */
-	public function get_thread_respondents( $thread_id, $args = array() ) {
+	public function get_ticket_respondents( $ticket_id, $args = array() ) {
 
 		$default_args = array(
 			'fields' => 'all', // 'all', 'emails'
 		);
 		$args         = array_merge( $default_args, $args );
 
-		$raw_respondents = wp_get_object_terms( $thread_id, $this->respondents_tax );
+		$raw_respondents = wp_get_object_terms( $ticket_id, $this->respondents_tax );
 		if ( is_wp_error( $raw_respondents ) ) {
 			return array();
 		}
@@ -564,13 +564,13 @@ class SupportFlow {
 	}
 
 	/**
-	 * Update a thread's respondents
+	 * Update a ticket's respondents
 	 *
-	 * @param int   $thread_id
+	 * @param int   $ticket_id
 	 * @param array $respondents An array of email addresses
 	 * @param bool  $append      Whether or not to append these email addresses to any existing addresses
 	 */
-	public function update_thread_respondents( $thread_id, $respondents, $append = false ) {
+	public function update_ticket_respondents( $ticket_id, $respondents, $append = false ) {
 
 		if ( is_string( $respondents ) ) {
 			$respondents = array( $respondents );
@@ -590,18 +590,18 @@ class SupportFlow {
 				$term_ids[] = $term['term_id'];
 			}
 		}
-		wp_set_object_terms( $thread_id, $term_ids, $this->respondents_tax, $append );
+		wp_set_object_terms( $ticket_id, $term_ids, $this->respondents_tax, $append );
 	}
 
 	/**
-	 * Get all of the replies associated with a thread
+	 * Get all of the replies associated with a ticket
 	 */
-	public function get_thread_replies( $thread_id, $args = array() ) {
+	public function get_ticket_replies( $ticket_id, $args = array() ) {
 
-		$args['post_id'] = $thread_id;
-		$thread_replies  = SupportFlow()->get_replies( $args );
+		$args['post_id'] = $ticket_id;
+		$ticket_replies  = SupportFlow()->get_replies( $args );
 
-		return $thread_replies;
+		return $ticket_replies;
 	}
 
 	/**
@@ -628,11 +628,11 @@ class SupportFlow {
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
-		$thread_replies = get_posts( $post_args );
+		$ticket_replies = get_posts( $post_args );
 
 		remove_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ) );
 
-		return $thread_replies;
+		return $ticket_replies;
 	}
 
 	/**
@@ -655,16 +655,16 @@ class SupportFlow {
 	}
 
 	/**
-	 * Get the total number of replies associated with a thread
+	 * Get the total number of replies associated with a ticket
 	 *
 	 * @todo support filtering to specific types or replier
 	 */
-	public function get_thread_replies_count( $thread_id, $args = array() ) {
+	public function get_ticket_replies_count( $ticket_id, $args = array() ) {
 		$args = array(
 			'posts_per_page' => 1,
 			'post_type'      => $this->post_type,
 			'post_status'    => 'public',
-			'post_parent'    => $thread_id,
+			'post_parent'    => $ticket_id,
 		);
 
 		$query = new WP_Query( $args );
@@ -674,9 +674,9 @@ class SupportFlow {
 	}
 
 	/**
-	 * Add a reply to a given thread
+	 * Add a reply to a given ticket
 	 */
-	public function add_thread_reply( $thread_id, $reply_text, $details = array() ) {
+	public function add_ticket_reply( $ticket_id, $reply_text, $details = array() ) {
 		global $wpdb;
 
 		$default_details = array(
@@ -709,7 +709,7 @@ class SupportFlow {
 
 		$reply = array(
 			'post_content' => $reply_text,
-			'post_parent'  => (int) $thread_id,
+			'post_parent'  => (int) $ticket_id,
 			'post_date'    => $details['time'],
 			'post_status'  => $details['post_status'],
 			'post_type'    => $this->reply_type,
@@ -717,7 +717,7 @@ class SupportFlow {
 			'user_id'      => (int) $details['user_id'],
 		);
 
-		$reply = apply_filters( 'supportflow_pre_insert_thread_reply', $reply );
+		$reply = apply_filters( 'supportflow_pre_insert_ticket_reply', $reply );
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		$reply_id = wp_insert_post( $reply );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
@@ -732,42 +732,42 @@ class SupportFlow {
 		add_post_meta( $reply_id, 'reply_author_email', esc_sql( $details['reply_author_email'] ) );
 
 
-		// Adding a thread reply updates the post modified time for the thread
+		// Adding a ticket reply updates the post modified time for the ticket
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		wp_update_post( array( 'ID' => $thread_id, 'post_modified' => current_time( 'mysql' ) ) );
+		wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
 		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		clean_post_cache( $thread_id );
-		do_action( 'supportflow_thread_reply_added', $reply_id, $details['cc'], $details['bcc'] );
+		clean_post_cache( $ticket_id );
+		do_action( 'supportflow_ticket_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 
 		return $reply_id;
 	}
 
 	/**
-	 * Generate the secure key for replying to this thread
+	 * Generate the secure key for replying to this ticket
 	 *
 	 * @todo Rather than storing this in the database, it should be generated on the fly
 	 * with an encryption algorithim
 	 */
-	public function get_secret_for_thread( $thread_id ) {
+	public function get_secret_for_ticket( $ticket_id ) {
 
-		if ( $secret = get_post_meta( $thread_id, $this->thread_secret_key, true ) ) {
+		if ( $secret = get_post_meta( $ticket_id, $this->ticket_secret_key, true ) ) {
 			return $secret;
 		}
 
 		$secret = wp_generate_password( 8, false );
-		update_post_meta( $thread_id, $this->thread_secret_key, $secret );
+		update_post_meta( $ticket_id, $this->ticket_secret_key, $secret );
 
 		return $secret;
 	}
 
 	/**
-	 * Get the thread ID from a secret
+	 * Get the ticket ID from a secret
 	 */
-	public function get_thread_from_secret( $secret ) {
+	public function get_ticket_from_secret( $secret ) {
 		global $wpdb;
-		$thread_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->thread_secret_key, $secret ) );
+		$ticket_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->ticket_secret_key, $secret ) );
 
-		return ( $thread_id ) ? (int) $thread_id : 0;
+		return ( $ticket_id ) ? (int) $ticket_id : 0;
 	}
 
 	/**

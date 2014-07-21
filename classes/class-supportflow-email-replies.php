@@ -1,6 +1,6 @@
 <?php
 /**
- * Primary class for ingesting emails from an IMAP email box, parsing, and adding to appropriate threads
+ * Primary class for ingesting emails from an IMAP email box, parsing, and adding to appropriate tickets
  */
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
@@ -20,9 +20,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 	}
 
-	public function filter_reply_notify_subject( $subject, $reply_id, $thread_id ) {
+	public function filter_reply_notify_subject( $subject, $reply_id, $ticket_id ) {
 
-		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_thread( $thread_id ) . ']';
+		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_ticket( $ticket_id ) . ']';
 
 		return $subject;
 	}
@@ -155,7 +155,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		if ( ! empty( $email->headers->subject ) ) {
 			$subject = $email->headers->subject;
 		} else {
-			$subject = sprintf( __( 'New thread from %s', 'supportflow' ), $email->headers->fromaddress );
+			$subject = sprintf( __( 'New ticket from %s', 'supportflow' ), $email->headers->fromaddress );
 		}
 
 		$reply_author       = isset( $email->headers->from[0]->personal ) ? $email->headers->from[0]->personal : '';
@@ -182,10 +182,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			}
 		}
 
-		// Check to see if this message was in response to an existing thread
-		$thread_id = false;
+		// Check to see if this message was in response to an existing ticket
+		$ticket_id = false;
 		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) ) {
-			$thread_id = SupportFlow()->get_thread_from_secret( $matches[1] );
+			$ticket_id = SupportFlow()->get_ticket_from_secret( $matches[1] );
 		}
 
 		// Add anyone else that was in the 'to' or 'cc' fields as respondents
@@ -203,17 +203,17 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 		$respondents[] = $reply_author_email;
 
-		if ( $thread_id ) {
+		if ( $ticket_id ) {
 			$reply_args = array(
 				'reply_author'       => $reply_author,
 				'reply_author_email' => $reply_author_email,
 			);
-			SupportFlow()->update_thread_respondents( $thread_id, $respondents, true );
-			SupportFlow()->add_thread_reply( $thread_id, $message, $reply_args );
+			SupportFlow()->update_ticket_respondents( $ticket_id, $respondents, true );
+			SupportFlow()->add_ticket_reply( $ticket_id, $message, $reply_args );
 
 		} else {
-			// If this wasn't in reply to an existing message, create a new thread
-			$new_thread_args = array(
+			// If this wasn't in reply to an existing message, create a new ticket
+			$new_ticket_args = array(
 				'subject'            => $subject,
 				'reply_author'       => $reply_author,
 				'reply_author_email' => $reply_author_email,
@@ -222,14 +222,14 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'email_account'      => $email_account_id,
 			);
 
-			$thread_id = SupportFlow()->create_thread( $new_thread_args );
+			$ticket_id = SupportFlow()->create_ticket( $new_ticket_args );
 		}
 
-		$all_replies = SupportFlow()->get_thread_replies( $thread_id );
+		$all_replies = SupportFlow()->get_ticket_replies( $ticket_id );
 		$new_reply   = $all_replies[count( $all_replies ) - 1];
 
 		foreach ( $new_attachment_ids as $new_attachment_id ) {
-			// Associate the thread ID as the parent to our new attachment
+			// Associate the ticket ID as the parent to our new attachment
 			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $new_reply->ID, 'post_status' => 'inherit' ) );
 		}
 

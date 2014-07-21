@@ -12,7 +12,7 @@ SupportFlow is a web based help desk support software. It allows agents to reply
 
 = 0.2 =
 * Fix nonce and escaping bugs.
-* Add ability to forward a thread to someone outside of SupportFlow.
+* Add ability to forward a ticket to someone outside of SupportFlow.
 * Add a statistics page.
 * Various minor bug fixes.
 * Various UI and UX tweaks.

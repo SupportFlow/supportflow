@@ -71,7 +71,7 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 			return;
 		}
 
-		$thread_id = SupportFlow()->create_thread(
+		$ticket_id = SupportFlow()->create_ticket(
 			array(
 				'subject'         => $_POST['supportflow']['subject'],
 				'message'         => $_POST['supportflow']['message'],
@@ -80,13 +80,13 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 			)
 		);
 
-		if ( is_wp_error( $thread_id ) ) {
-			$this->messages[] = 'There was an error creating the thread: ' . $thread_id->get_error_message();
+		if ( is_wp_error( $ticket_id ) ) {
+			$this->messages[] = 'There was an error creating the ticket: ' . $ticket_id->get_error_message();
 
 			return;
 		}
 
-		$this->messages[] = 'Thread (ticket) number ' . $thread_id . ' created.';
+		$this->messages[] = 'Ticket (ticket) number ' . $ticket_id . ' created.';
 	}
 }
 
