@@ -1,6 +1,7 @@
 jQuery(document).ready(function () {
 	// Send conversation to E-Mail ID's
-	jQuery('#email_conversation_submit').click(function (event) {
+	
+	var email_conversion = function (event) {
 		event.preventDefault();
 		var email_ids = jQuery('#email_conversation_to').val();
 
@@ -29,5 +30,13 @@ jQuery(document).ready(function () {
 			},
 		});
 
+	}
+	
+	jQuery('#email_conversation_submit').click(email_conversion);
+	jQuery('#email_conversation_to').keyup(function () {
+		if (event.keyCode == 10) {
+			email_conversion();
+		}
 	});
+	
 });
