@@ -1056,7 +1056,12 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
-				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['reply-attachments'], ',' ) ) );
+				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				// Remove non-int attachment ID's from array
+				$attachements   = array_filter( $attachements, function ( $val ) {
+					return (string) (int) $val === (string) $val;
+				} );
+				$attachment_ids = array_map( 'intval', $attachements );
 			} else {
 				$attachment_ids = '';
 			}
