@@ -734,7 +734,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
-		$thread_lock       = ( null == $email_account );
+		$thread_lock       = ( null == $email_account && '' != $email_account_id );
 		$disabled_attr     = $thread_lock ? 'disabled' : '';
 		$submit_attr_array = $thread_lock ? array( 'disabled' => 'true' ) : array();
 
@@ -1018,9 +1018,9 @@ class SupportFlow_Admin extends SupportFlow {
 	 * and new reply data
 	 */
 	public function action_save_post( $ticket_id ) {
-		$email_account_id = get_post_meta($thread_id, 'email_account', true);
+		$email_account_id = get_post_meta( $thread_id, 'email_account', true );
 		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
-		$thread_lock   = ( null == $email_account );
+		$thread_lock   = ( null == $email_account && '' != $email_account );
 
 		if ( SupportFlow()->post_type != get_post_type( $ticket_id ) ) {
 			return;
@@ -1056,7 +1056,12 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
-				$attachment_ids = array_map( 'intval', explode( ',', trim( $_POST['reply-attachments'], ',' ) ) );
+				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				// Remove non-int attachment ID's from array
+				$attachements   = array_filter( $attachements, function ( $val ) {
+					return (string) (int) $val === (string) $val;
+				} );
+				$attachment_ids = array_map( 'intval', $attachements );
 			} else {
 				$attachment_ids = '';
 			}
