@@ -734,12 +734,12 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
-		$thread_lock       = ( null == $email_account && '' != $email_account_id );
-		$disabled_attr     = $thread_lock ? 'disabled' : '';
-		$submit_attr_array = $thread_lock ? array( 'disabled' => 'true' ) : array();
+		$ticket_lock       = ( null == $email_account && '' != $email_account_id );
+		$disabled_attr     = $ticket_lock ? 'disabled' : '';
+		$submit_attr_array = $ticket_lock ? array( 'disabled' => 'true' ) : array();
 
-		if ( $thread_lock ) {
-			$placeholder = __( "Thread is locked permanently because E-Mail account associated with it is deleted. Please create a new thread now. You can't now reply to it.", 'supportflow' );
+		if ( $ticket_lock ) {
+			$placeholder = __( "Ticket is locked permanently because E-Mail account associated with it is deleted. Please create a new ticket now. You can't now reply to it.", 'supportflow' );
 		} else {
 			$placeholders = array(
 				__( "What's burning?", 'supportflow' ),
@@ -757,8 +757,8 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 		echo '</select></div>';
 
-		echo '<div id="thread-reply-box">';
-		echo "<textarea id='reply' name='reply' $disabled_attr class='thread-reply' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
+		echo '<div id="ticket-reply-box">';
+		echo "<textarea id='reply' name='reply' $disabled_attr class='ticket-reply' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
@@ -1018,9 +1018,9 @@ class SupportFlow_Admin extends SupportFlow {
 	 * and new reply data
 	 */
 	public function action_save_post( $ticket_id ) {
-		$email_account_id = get_post_meta( $thread_id, 'email_account', true );
+		$email_account_id = get_post_meta( $ticket_id, 'email_account', true );
 		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
-		$thread_lock   = ( null == $email_account && '' != $email_account );
+		$ticket_lock   = ( null == $email_account && '' != $email_account );
 
 		if ( SupportFlow()->post_type != get_post_type( $ticket_id ) ) {
 			return;
@@ -1042,7 +1042,7 @@ class SupportFlow_Admin extends SupportFlow {
 			update_post_meta( $ticket_id, 'email_notifications_override', $email_notifications_override );
 		}
 
-		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) && ! $thread_lock ) {
+		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) && ! $ticket_lock ) {
 			$reply = $_POST['reply'];
 
 			if ( isset( $_POST['insert-signature'] ) && 'on' == $_POST['insert-signature'] ) {
