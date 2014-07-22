@@ -226,6 +226,7 @@ class SupportFlow {
 		require_once( $this->plugin_dir . 'classes/class-supportflow-email-notifications.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-preferences.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-table.php' );
+		require_once( $this->plugin_dir . 'classes/class-supportflow-dashboard.php' );
 
 		/** Extensions ********************************************************/
 
