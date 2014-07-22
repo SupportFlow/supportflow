@@ -166,7 +166,7 @@ class SupportFlow {
 		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
 		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
-		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
+		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_thread' ); // Retained sf_thread for backward compatiblity with old versions
 
 		$this->email_term_prefix = 'sf-';
 
