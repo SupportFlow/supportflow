@@ -27,8 +27,32 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		return $subject;
 	}
 
-
 	function retrieve_email_replies() {
+
+		// Opens a temp file
+		$tmp_file = sys_get_temp_dir() . '/sf_cron_lock.txt';
+		$fp       = fopen( $tmp_file, 'c+' );
+
+		// Unlock file if created 2+ hours earlier
+		$time      = time();
+		$file_time = (int) fgets( $fp );
+		if ( 0 != $file_time && $time > $file_time + 2 * HOUR_IN_SECONDS ) {
+			flock( $fp, LOCK_UN );
+		}
+
+		// Die if temp file is locked. i.e. cron is running
+		if ( 6 != fwrite( $fp, 'length' ) ) {
+			die;
+		}
+
+		// Save current time to file
+		ftruncate( $fp, 0 );
+		rewind( $fp );
+		fwrite( $fp, (string) $time );
+
+		// Lock the file while running cron
+		flock( $fp, LOCK_EX );
+
 		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		foreach ( $email_accounts as $id => $email_account ) {
 			$imap_account = array_merge( $email_account, array(
@@ -39,6 +63,10 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 			$this->download_and_process_email_replies( $imap_account );
 		}
+
+		// Unlock the file and close it
+		flock( $fp, LOCK_UN );
+		fclose( $fp );
 	}
 
 	/**
