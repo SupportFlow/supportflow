@@ -764,10 +764,24 @@ class SupportFlow {
 	 * Get the ticket ID from a secret
 	 */
 	public function get_ticket_from_secret( $secret ) {
-		global $wpdb;
-		$ticket_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->ticket_secret_key, $secret ) );
+		$post_statuses = $this->post_statuses;
 
-		return ( $ticket_id ) ? (int) $ticket_id : 0;
+		$posts = get_posts( array(
+			'post_type'   => SupportFlow()->post_type,
+			'post_status' => key( $post_statuses ),
+			'meta_query'  => array(
+				array(
+					'key'   => $this->ticket_secret_key,
+					'value' => $secret,
+				),
+			)
+		) );
+
+		if ( isset( $posts[0] ) ) {
+			return $posts[0]->ID;
+		} else {
+			return 0;
+		}
 	}
 
 	/**
