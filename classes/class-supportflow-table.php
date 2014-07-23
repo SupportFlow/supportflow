@@ -33,7 +33,12 @@ class SupportFlow_Table extends WP_List_Table {
 	 * @param string $msg
 	 */
 	public function set_no_items( $msg ) {
-		$this->no_item_message = $msg;
+		$allowed_html = array_merge(
+			wp_kses_allowed_html( 'data' ),
+			array( 'br' => array() )
+		);
+
+		$this->no_item_message = wp_kses( $msg, $allowed_html );
 	}
 
 	function no_items() {
