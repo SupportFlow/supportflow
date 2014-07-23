@@ -677,8 +677,6 @@ class SupportFlow {
 	 * Add a reply to a given ticket
 	 */
 	public function add_ticket_reply( $ticket_id, $reply_text, $details = array() ) {
-		global $wpdb;
-
 		$default_details = array(
 			'time'               => current_time( 'mysql' ),
 			'reply_author'       => '',
