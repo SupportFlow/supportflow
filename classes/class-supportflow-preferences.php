@@ -40,16 +40,15 @@ class SupportFlow_Preferences extends SupportFlow {
 	}
 
 	public function preferences_page() {
+		echo '<div class="wrap">';
+
 		$this->enqueue_scripts();
-		?>
 
-		<div class="wrap">
-			<?php $this->user_ticket_signature_page() ?>
-			<br />
-			<?php $this->notification_setting_page() ?>
-		</div>
+		$this->user_ticket_signature_page();
+		echo '<br />';
+		$this->notification_setting_page();
 
-		<?php
+		echo '</div>';
 	}
 
 	public function user_ticket_signature_page() {
@@ -84,21 +83,41 @@ class SupportFlow_Preferences extends SupportFlow {
 	 * Loads the page to change E-Mail notfication settings
 	 */
 	public function notification_setting_page() {
-		?>
-		<h2><?php _e( 'E-Mail Notifications', 'supportflow' ) ?></h2>
-		<p><?php _e( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual tickets.', 'supportflow' ) ?></p>
+		$columns = array(
+			'privilege' => __( 'Privilege', 'supportflow' ),
+			'type'      => __( 'Type', 'supportflow' ),
+			'status'    => __( 'Status', 'supportflow' ),
+		);
 
-		<div id="email_notification_table">
-			<?php
-			$email_notifications_table = new SupportFlow_Email_Notifications_Table( SupportFlow()->extend->email_notifications->get_notifications_settings( get_current_user_id() ) );
-			$email_notifications_table->prepare_items();
-			$email_notifications_table->display();
-			?>
-		</div>
-	<?php
+		$no_items = __( "You don't have <b>permission</b> to any tag/e-mail account, or maybe no tag/e-mail account exists yet. Please ask your administrator to give you permission to an e-mail account or tag.", 'supportflow' );
 
+		$data                  = array();
+		$notification_settings = SupportFlow()->extend->email_notifications->get_notifications_settings( get_current_user_id() );
+		foreach ( $notification_settings as $id => $notification_setting ) {
+			$identfier = json_encode( array(
+				'privilege_type' => $notification_setting['privilege_type'],
+				'privilege_id'   => $notification_setting['privilege_id'],
+			) );
+			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-email-notfication-identifier='" . $identfier . "' " . checked( $notification_setting['allowed'], true, false ) . '>';
+			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $notification_setting['allowed'] ? 'Subscribed' : 'Unsubscribed', 'supportflow' ) . "</label>";
+			$data[] = array(
+				'status'    => $status,
+				'privilege' => esc_html( $notification_setting['privilege'] ),
+				'type'      => $notification_setting['type'],
+			);
+		}
+
+		$email_notifications_table = new SupportFlow_Table();
+		$email_notifications_table->set_columns( $columns );
+		$email_notifications_table->set_no_items( $no_items );
+		$email_notifications_table->set_data( $data );
+
+		echo '<h2>' . __( 'E-Mail Notifications', 'supportflow' ) . '</h2>';
+		echo '<p>' . __( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual tickets.', 'supportflow' ) . '</p>';
+		echo '<div id="email_notification_table">';
+		$email_notifications_table->display();
+		echo '</div>';
 	}
-
 
 	/**
 	 * AJAX request to change user E-Mail notification settings
@@ -126,59 +145,3 @@ class SupportFlow_Preferences extends SupportFlow {
 }
 
 SupportFlow()->extend->preferences = new SupportFlow_Preferences();
-
-
-if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
-
-/**
- * Table to show existing preference with a option to change them
- */
-class SupportFlow_Email_Notifications_Table extends WP_List_Table {
-	protected $_data;
-
-	function __construct( $notification_settings ) {
-		parent::__construct( array( 'screen' => 'sf_user_email_notifications_table' ) );
-
-		$this->_data = array();
-		foreach ( $notification_settings as $id => $notification_setting ) {
-			$identfier = json_encode( array(
-				'privilege_type' => $notification_setting['privilege_type'],
-				'privilege_id'   => $notification_setting['privilege_id'],
-			) );
-			$status    = "<input type='checkbox' id='permission_$id' class='toggle_privilege' data-email-notfication-identifier='" . $identfier . "' " . checked( $notification_setting['allowed'], true, false ) . '>';
-			$status .= " <label for='permission_$id' class='privilege_status'> " . __( $notification_setting['allowed'] ? 'Subscribed' : 'Unsubscribed', 'supportflow' ) . "</label>";
-			$this->_data[] = array(
-				'status'    => $status,
-				'privilege' => esc_html( $notification_setting['privilege'] ),
-				'type'      => $notification_setting['type'],
-			);
-		}
-	}
-
-	function column_default( $item, $column_name ) {
-		return $item[$column_name];
-	}
-
-	function no_items() {
-		_e( "You don't have <b>permission</b> to any tag/e-mail account, or maybe no tag/e-mail account exists yet. Please ask your administrator to give you permission to an e-mail account or tag.", 'supportflow' );
-	}
-
-	function get_columns() {
-		return array(
-			'status'    => __( 'Status', 'supportflow' ),
-			'privilege' => __( 'Privilege', 'supportflow' ),
-			'type'      => __( 'Type', 'supportflow' ),
-		);
-	}
-
-	function prepare_items() {
-		$columns               = $this->get_columns();
-		$data                  = $this->_data;
-		$hidden                = array();
-		$sortable              = array();
-		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $data;
-	}
-}
