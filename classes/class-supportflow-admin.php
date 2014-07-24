@@ -156,8 +156,6 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function filter_views( $views ) {
-		global $wpdb;
-
 		$post_type     = SupportFlow()->post_type;
 		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array();
@@ -179,23 +177,46 @@ class SupportFlow_Admin extends SupportFlow {
 		$class    = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
 		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
 
-		// @todo Only show "Mine" if the user is an agent
-		$mine_args     = array(
-			'post_type' => SupportFlow()->post_type,
-			'author'    => get_current_user_id(),
-		);
 		$post_statuses = SupportFlow()->post_statuses;
 		array_pop( $post_statuses );
 		$post_statuses = "'" . implode( "','", array_map( 'sanitize_key', array_keys( $post_statuses ) ) ) . "'";
-		$my_posts      = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type=%s AND post_author=%d AND post_status IN ({$post_statuses})", SupportFlow()->post_type, get_current_user_id() ) );
-		$view_mine     = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
+
+		// @todo Only show "Mine" if the user is an agent
+		$mine_args = array(
+			'post_type' => SupportFlow()->post_type,
+			'author'    => get_current_user_id(),
+		);
+		$wp_query  = new WP_Query( array(
+			'post_type'      => SupportFlow()->post_type,
+			'author'         => get_current_user_id(),
+			'post_status'    => $post_statuses,
+			'posts_per_page' => 1,
+		) );
+
+		$my_posts  = $wp_query->found_posts;
+		$view_mine = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
+
+		$unassigned_args = array(
+			'post_type' => SupportFlow()->post_type,
+			'author'    => 0,
+		);
+		$wp_query        = new WP_Query( array(
+			'post_type'      => SupportFlow()->post_type,
+			'author'         => 0,
+			'post_status'    => $post_statuses,
+			'posts_per_page' => 1,
+		) );
+
+		$unassigned_posts = $wp_query->found_posts;
+		$view_unassigned  = '<a href="' . add_query_arg( $unassigned_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) ) . '</a>';
 
 		// Put 'All' and 'Mine' at the beginning of the array
 		array_shift( $views );
-		$views         = array_reverse( $views );
-		$views['mine'] = $view_mine;
-		$views['all']  = $view_all;
-		$views         = array_reverse( $views );
+		$views               = array_reverse( $views );
+		$views['unassigned'] = $view_unassigned;
+		$views['mine']       = $view_mine;
+		$views['all']        = $view_all;
+		$views               = array_reverse( $views );
 
 		// Remove private option from filter links as they are just private replies to ticket
 		unset( $views['private'] );
@@ -374,11 +395,24 @@ class SupportFlow_Admin extends SupportFlow {
 			$query->set( 'post_status', $status_slugs );
 		}
 
+		add_action( 'posts_clauses', array( $this, 'filter_author_clause' ), 10, 2 );
 
 		if ( isset( $_GET['email_account'] ) && ! empty( $_GET['email_account'] ) ) {
 			$query->set( 'meta_key', 'email_account' );
 			$query->set( 'meta_value', (int) $_GET['email_account'] );
 		}
+	}
+
+	/*
+	 * Show unassigned tickets when query author is 0
+	 */
+	public function filter_author_clause( $clauses, $query ) {
+
+		if ( isset( $query->query['author'] ) && 0 == $query->query['author'] ) {
+			$clauses['where'] .= ' AND post_author = 0 ';
+		}
+
+		return $clauses;
 	}
 
 	/**
