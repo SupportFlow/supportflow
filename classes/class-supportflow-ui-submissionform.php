@@ -18,11 +18,17 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 
 	public function shortcode_submissionform() {
 		?>
+		<style type="text/css">
+			.supportflow-message {
+				font-weight: bold;
+				color:       red;
+			}
+		</style>
 
 		<div class="supportflow-submissionform">
 
 			<?php if ( ! empty( $this->messages ) ) : ?>
-				<p class="supportflow-message" style="font-weight:bold;color:red;">
+				<p class="supportflow-message">
 					<?php foreach ( $this->messages as $message ) : ?>
 						<?php esc_html_e( $message ) ?>
 						<br />
