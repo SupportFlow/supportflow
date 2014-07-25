@@ -1131,7 +1131,7 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 			}
 
-			$reply = wp_filter_nohtml_kses( $reply );
+			$reply = wp_kses( $reply, wp_kses_allowed_html( 'data' ) );
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
