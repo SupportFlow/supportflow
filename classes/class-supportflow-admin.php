@@ -476,10 +476,55 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-recent-tickets', __( 'My recent tickets', 'supportflow' ), array( $this, 'meta_box_recent_tickets' ), SupportFlow()->post_type, 'side' );
 
 		if ( 'post.php' == $pagenow ) {
 			add_meta_box( 'supportflow-forward_conversation', __( 'Forward this conversation', 'supportflow' ), array( $this, 'meta_box_email_conversation' ), SupportFlow()->post_type, 'side' );
 		}
+	}
+
+	public function meta_box_recent_tickets() {
+		$statuses     = SupportFlow()->post_statuses;
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_tickets'] ) {
+				$status_slugs[] = $status;
+			}
+		}
+
+		$table = new SupportFlow_Table( '', false, false );
+
+		$args = array(
+			'post_type'   => SupportFlow()->post_type,
+			'post_parent' => 0,
+			'post_status' => $status_slugs,
+			'author'      => get_current_user_id(),
+			'numberposts' => 10,
+		);
+
+		$wp_query = new WP_Query( $args );
+		$tickets  = $wp_query->posts;
+
+		$no_items = __( 'No recent tickets found.', 'supportflow' );
+		$table->set_no_items( $no_items );
+
+		$table->set_columns( array(
+			'title' => __( 'Subject', 'supportflow' ),
+		) );
+
+		$data = array();
+		foreach ( $tickets as $ticket ) {
+			$post_date     = strtotime( $ticket->post_date );
+			$post_modified = strtotime( $ticket->post_modified );
+			$title         = '<b>' . esc_html( $ticket->post_title ) . '</b>';
+			$title         = "<a href='post.php?post=" . $ticket->ID . "&action=edit'>" . $title . "</a>";
+			$data[]        = array(
+				'title' => $title,
+			);
+		}
+		$table->set_data( $data );
+		$table->display();
 	}
 
 	public function meta_box_email_conversation() {
