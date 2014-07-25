@@ -247,7 +247,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
 		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true);
+		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$permissions      = array();
 		$user_permissions = array();
 
@@ -259,7 +259,7 @@ class SupportFlow_Permissions extends SupportFlow {
 
 		foreach ( $users as $user ) {
 			if ( ! $user->has_cap( 'manage_options' ) ) {
-				$permission = $this->get_user_permissions_data( $user->ID );
+				$permission             = $this->get_user_permissions_data( $user->ID );
 				$permissions[$user->ID] = $permission;
 			}
 		}
@@ -390,7 +390,7 @@ class SupportFlow_Permissions extends SupportFlow {
 				$allcaps["edit_others_posts"] = true;
 				$allcaps["edit_posts"]        = true;
 
-			// Allow if user is creating new ticket with permitted E-Mail account
+				// Allow if user is creating new ticket with permitted E-Mail account
 			} elseif (
 				'post.php' == $pagenow &&
 				isset ( $_REQUEST['action'], $_REQUEST['post_email_account'] ) &&
@@ -400,7 +400,7 @@ class SupportFlow_Permissions extends SupportFlow {
 				$allcaps["edit_others_posts"] = true;
 				$allcaps["edit_posts"]        = true;
 
-			// Disallow user access to ticket in other cases
+				// Disallow user access to ticket in other cases
 			} else {
 				$allcaps["edit_others_posts"] = false;
 				$allcaps["edit_posts"]        = false;
@@ -421,11 +421,11 @@ class SupportFlow_Permissions extends SupportFlow {
 			if ( 'post-new.php' != $pagenow && ( ! empty( $user_permissions['email_accounts'] ) || ! empty( $user_permissions['tags'] ) ) ) {
 				$allcaps["edit_posts"] = true;
 
-			// Allow creating new ticket if user have access to atleast one E-Mail account
+				// Allow creating new ticket if user have access to atleast one E-Mail account
 			} elseif ( 'post-new.php' == $pagenow && ! empty( $user_permissions['email_accounts'] ) ) {
 				$allcaps["edit_posts"] = true;
 
-			// Disallow in other cases
+				// Disallow in other cases
 			} else {
 				$allcaps["edit_posts"] = false;
 			}

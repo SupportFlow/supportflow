@@ -668,7 +668,7 @@ class SupportFlow {
 			'post_status'    => 'public',
 			'post_parent'    => $ticket_id,
 		);
-		$args = array_merge( $default_args, $args );
+		$args         = array_merge( $default_args, $args );
 
 		$query = new WP_Query( $args );
 		$count = $query->found_posts;

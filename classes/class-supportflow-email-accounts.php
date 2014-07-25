@@ -30,9 +30,9 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 		$existing_email_accounts = & $this->existing_email_accounts;
 		$existing_email_accounts = array();
-		foreach ($email_accounts as $uid => $email_account) {
+		foreach ( $email_accounts as $uid => $email_account ) {
 			if ( ! empty( $email_account ) ) {
-				$existing_email_accounts[ $uid ] = $email_account;
+				$existing_email_accounts[$uid] = $email_account;
 			}
 		}
 	}
@@ -65,7 +65,9 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 	/**
 	 * Return a single E-Mail account
+	 *
 	 * @param integer $id ID of E-Mail account
+	 *
 	 * @return null|array array containing E-Mail account on success else null
 	 */
 	function get_email_account( $id ) {
@@ -218,50 +220,67 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			<?php wp_nonce_field( 'add_email_account' ) ?>
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row"><label for="imap_host"><?php _e( 'IMAP Host:', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="imap_host"><?php _e( 'IMAP Host:', 'supportflow' ) ?></label></th>
 					<td>
 						<input type="text" required id="imap_host" name="imap_host" value="<?php echo esc_attr( isset( $_POST['imap_host'] ) ? $_POST['imap_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="imap_ssl"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="imap_ssl"><?php _e( 'IMAP Server supports SSL: ', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="checkbox" id="imap_ssl" name="imap_ssl" <?php echo checked( $imap_ssl_enabled ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="imap_port"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="imap_port"><?php _e( 'IMAP Port Number: ', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="number" required id="imap_port" name="imap_port" value="<?php echo esc_attr( isset( $_POST['imap_port'] ) ? $_POST['imap_port'] : '993' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="smtp_host"><?php _e( 'SMTP Host:', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="smtp_host"><?php _e( 'SMTP Host:', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="text" required id="smtp_host" name="smtp_host" value="<?php echo esc_attr( isset( $_POST['smtp_host'] ) ? $_POST['smtp_host'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="smtp_ssl"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="smtp_ssl"><?php _e( 'SMTP Server supports SSL: ', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="checkbox" id="smtp_ssl" name="smtp_ssl" <?php checked( $smtp_ssl_enabled ) ?> />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="smtp_port"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="smtp_port"><?php _e( 'SMTP Port Number: ', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="number" required id="smtp_port" name="smtp_port" value="<?php echo esc_attr( isset( $_POST['smtp_port'] ) ? $_POST['smtp_port'] : '465' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="username"><?php _e( 'Username:', 'supportflow' ) ?></label></th>
+					<th scope="row">
+						<label for="username"><?php _e( 'Username:', 'supportflow' ) ?></label>
+					</th>
 					<td>
 						<input type="text" required id="username" name="username" value="<?php echo esc_attr( isset( $_POST['username'] ) ? $_POST['username'] : '' ) ?>" />
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row"><label for="password"><?php _e( 'Password:', 'supportflow' ) ?></label></th>
-					<td><input type="password" required id="password" name="password" /></td>
+					<th scope="row">
+						<label for="password"><?php _e( 'Password:', 'supportflow' ) ?></label>
+					</th>
+					<td>
+						<input type="password" required id="password" name="password" />
+					</td>
 				</tr>
 			</table>
 			<?php submit_button( __( 'Add New Server', 'supportflow' ) ); ?>

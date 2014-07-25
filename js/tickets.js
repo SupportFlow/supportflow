@@ -29,11 +29,11 @@ jQuery(document).ready(function () {
 			return;
 		}
 	});
-	
+
 	// Submit post if user pressed Ctrl+Enter in reply content box
 	jQuery('#reply').keypress(function (event) {
-	    if (event.ctrlKey && event.keyCode == 10 && $(this).val() != '') {
-		$('#post').submit();
-	    }
+		if (event.ctrlKey && event.keyCode == 10 && $(this).val() != '') {
+			$('#post').submit();
+		}
 	});
 });

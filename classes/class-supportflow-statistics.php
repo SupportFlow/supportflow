@@ -150,7 +150,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_overall_stats() {
 		$statistics_table = new SupportFlow_Table();
-		$items = array();
+		$items            = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -186,7 +186,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_tag_stats() {
 		$statistics_table = new SupportFlow_Table();
-		$items = array();
+		$items            = array();
 
 		$statistics_table->set_columns( array(
 			'table_tag'    => __( 'Tag', 'supportflow' ),
@@ -195,7 +195,7 @@ class SupportFlow_Statistics extends SupportFlow {
 			'table_closed' => __( 'Closed tickets', 'supportflow' ),
 		) );
 
-		foreach ( get_terms(SupportFlow()->tags_tax, 'hide_empty=0' ) as $tag ) {
+		foreach ( get_terms( SupportFlow()->tags_tax, 'hide_empty=0' ) as $tag ) {
 			$items[] = $this->get_post_data_by_tag( $tag->slug, $tag->slug, $tag->name );
 		}
 
@@ -209,7 +209,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_30_days_stats() {
 		$statistics_table = new SupportFlow_Table();
-		$items = array();
+		$items            = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -240,7 +240,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_12_month_stats() {
 		$statistics_table = new SupportFlow_Table();
-		$items = array();
+		$items            = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -270,7 +270,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	public function show_5_year_stats() {
 		$statistics_table = new SupportFlow_Table();
-		$items = array();
+		$items            = array();
 
 		$statistics_table->set_columns( array(
 			'table_date'   => __( 'Date', 'supportflow' ),
@@ -296,9 +296,11 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Stats of post created on a particular date
-	 * @param array $post_date Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
-	 * @param integer $link_date Date in format used in filtering by WP in all tickets page. e.g. 19941205
-	 * @param string $link_value Value to show user of link in table
+	 *
+	 * @param array   $post_date  Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
+	 * @param integer $link_date  Date in format used in filtering by WP in all tickets page. e.g. 19941205
+	 * @param string  $link_value Value to show user of link in table
+	 *
 	 * @return array Tickets stats created on a particular date. This array is directly usable in table
 	 */
 	function get_post_data_by_date( $post_date = null, $link_date = null, $link_value = null ) {
@@ -314,9 +316,11 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Stats of post created of a particular tag
-	 * @param string $post_tag Slug of tag for which you want to get stats for
-	 * @param integer $link_tag Tag in format used in filtering by WP in all tickets page.
-	 * @param string $link_value Value to show user of link in table
+	 *
+	 * @param string  $post_tag   Slug of tag for which you want to get stats for
+	 * @param integer $link_tag   Tag in format used in filtering by WP in all tickets page.
+	 * @param string  $link_value Value to show user of link in table
+	 *
 	 * @return array Tickets stats created for a particular tag. This array is directly usable in table
 	 */
 	function get_post_data_by_tag( $post_tag = null, $link_tag = null, $link_value = null ) {
@@ -332,8 +336,10 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Get count of post created on a particular date with particular post status.
+	 *
 	 * @param string $post_status Post status you want to get count. Using `*` to get count of all post statuses
-	 * @param type $date Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
+	 * @param type   $date        Date in format like array('year'=>1994, 'month'=>12, 'day'=>5)
+	 *
 	 * @return integer Count of posts
 	 */
 	public function get_posts_count_by_date( $post_status = '*', $date = null ) {
@@ -356,8 +362,10 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Get count of post created of a particular tag with particular post status.
+	 *
 	 * @param string $post_status Post status you want to get count. Using `*` to get count of all post statuses
-	 * @param type $tag Slug of tag you want to get count of
+	 * @param type   $tag         Slug of tag you want to get count of
+	 *
 	 * @return integer Count of posts
 	 */
 	public function get_posts_count_by_tag( $post_status = '*', $tag = null ) {
@@ -381,9 +389,11 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Generate a link that shows matching tickets in all ticket page
-	 * @param integer $link_date Date in format used in filtering by WP in all tickets page. e.g. 19941205
-	 * @param string $post_status Post statuses that should be shown in all tickets page
-	 * @param string $link_value Value of hyperlink that should be shown to user
+	 *
+	 * @param integer $link_date   Date in format used in filtering by WP in all tickets page. e.g. 19941205
+	 * @param string  $post_status Post statuses that should be shown in all tickets page
+	 * @param string  $link_value  Value of hyperlink that should be shown to user
+	 *
 	 * @return string A hyperlink
 	 */
 	function get_post_link_by_date( $link_date = null, $post_status = null, $link_value = null ) {
@@ -400,9 +410,11 @@ class SupportFlow_Statistics extends SupportFlow {
 
 	/**
 	 * Generate a link that shows matching tickets in all ticket page
-	 * @param string $link_tag Slug of tag
+	 *
+	 * @param string $link_tag    Slug of tag
 	 * @param string $post_status Post statuses that should be shown in all tickets page
-	 * @param string $link_value Value of hyperlink that should be shown to user
+	 * @param string $link_value  Value of hyperlink that should be shown to user
+	 *
 	 * @return string A hyperlink
 	 */
 	function get_post_link_by_tag( $link_tag = null, $post_status = null, $link_value = null ) {

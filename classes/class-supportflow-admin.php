@@ -156,7 +156,7 @@ class SupportFlow_Admin extends SupportFlow {
 	 *
 	 */
 	public function filter_views( $views ) {
-		$post_type     = SupportFlow()->post_type;
+		$post_type    = SupportFlow()->post_type;
 		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array();
 
@@ -608,7 +608,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$notification_label       = 'Default';
 		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
 		$notification_dropdown    = '';
-		$notification_dropdown   .= '<select class="meta-item-dropdown">';
+		$notification_dropdown .= '<select class="meta-item-dropdown">';
 
 		if ( 'post-new.php' == $pagenow ) {
 			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
@@ -824,8 +824,8 @@ class SupportFlow_Admin extends SupportFlow {
 				__( "What's burning?", 'supportflow' ),
 				__( 'What do you need to get off your chest?', 'supportflow' ),
 			);
-			$rand        = array_rand( $placeholders );
-			$placeholder = $placeholders[$rand];
+			$rand         = array_rand( $placeholders );
+			$placeholder  = $placeholders[$rand];
 		}
 
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
@@ -1043,9 +1043,9 @@ class SupportFlow_Admin extends SupportFlow {
 				echo '<a href="' . esc_url( $filter_link ) . '">' . esc_html( $status_name ) . '</a>';
 				break;
 			case 'email':
-				$email_account_id       = get_post_meta( $ticket_id, 'email_account', true );
-				$email_accounts         = SupportFlow()->extend->email_accounts->get_email_accounts();
-				$args                   = array(
+				$email_account_id = get_post_meta( $ticket_id, 'email_account', true );
+				$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts();
+				$args             = array(
 					'post_type'     => SupportFlow()->post_type,
 					'email_account' => $email_account_id,
 				);
@@ -1083,7 +1083,8 @@ class SupportFlow_Admin extends SupportFlow {
 			return $pagenow;
 		} elseif ( 'post.php' == $pagenow && ! empty( $_GET['action'] ) && 'edit' == $_GET['action'] && ! empty( $_GET['post'] ) ) {
 			$the_post = get_post( absint( $_GET['post'] ) );
-			return (  is_a( $the_post, 'WP_Post' ) && $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
+
+			return ( is_a( $the_post, 'WP_Post' ) && $the_post->post_type == SupportFlow()->post_type ) ? $pagenow : false;
 		} else {
 			return false;
 		}
@@ -1096,8 +1097,8 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function action_save_post( $ticket_id ) {
 		$email_account_id = get_post_meta( $ticket_id, 'email_account', true );
-		$email_account = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
-		$ticket_lock   = ( null == $email_account && '' != $email_account );
+		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
+		$ticket_lock      = ( null == $email_account && '' != $email_account );
 
 		if ( SupportFlow()->post_type != get_post_type( $ticket_id ) ) {
 			return;
@@ -1133,7 +1134,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
-				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				$attachements = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
 				// Remove non-int attachment ID's from array
 				$attachements   = array_filter( $attachements, function ( $val ) {
 					return (string) (int) $val === (string) $val;
