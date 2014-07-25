@@ -10,7 +10,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  * Generates a table with minimal options
  */
 class SupportFlow_Table extends WP_List_Table {
-	protected $no_item_message;
+	protected $no_item_message = null;
 	protected $display_nav;
 	protected $display_col_headers;
 
@@ -50,10 +50,10 @@ class SupportFlow_Table extends WP_List_Table {
 	function no_items() {
 		$no_item_message = $this->no_item_message;
 
-		if ( $no_item_message ) {
-			echo $no_item_message;
-		} else {
+		if ( $no_item_message === null ) {
 			parent::no_items();
+		} else {
+			echo $no_item_message;
 		}
 	}
 
