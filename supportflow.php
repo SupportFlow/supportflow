@@ -242,8 +242,6 @@ class SupportFlow {
 			require_once( $this->plugin_dir . '/classes/class-supportflow-wp-cli.php' );
 		}
 
-		# TODO: Akismet plugin?
-
 		/** Admin *************************************************************/
 
 		// Quick admin check and load if needed
