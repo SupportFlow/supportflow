@@ -11,16 +11,18 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  */
 class SupportFlow_Table extends WP_List_Table {
 	protected $no_item_message;
+	protected $display_nav;
 
 	/**
 	 * @param string $table_class Class to be used by table
 	 */
-	function __construct( $table_class = '' ) {
+	function __construct( $table_class = '', $display_nav = true ) {
 		if ( $table_class ) {
 			parent::__construct( array( 'screen' => 'sf_statistics_table' ) );
 		} else {
 			parent::__construct();
 		}
+		$this->display_nav = $display_nav;
 	}
 
 	protected function column_default( $item, $column_name ) {
@@ -48,6 +50,12 @@ class SupportFlow_Table extends WP_List_Table {
 			echo $no_item_message;
 		} else {
 			parent::no_items();
+		}
+	}
+
+	function display_tablenav( $which ) {
+		if ( $this->display_nav ) {
+			parent::display_tablenav( $which );
 		}
 	}
 
