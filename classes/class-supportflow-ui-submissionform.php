@@ -37,7 +37,7 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 				<p>
 					<label for="fullname"><?php _e( 'Your Name', 'supportflow' ) ?>:</label>
 					<br />
-					<input type="text" required id="fullname" name="fullname" width="100%" />
+					<input type="text" required id="fullname" name="fullname" />
 				</p>
 
 				<p>
