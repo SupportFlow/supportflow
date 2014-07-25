@@ -662,12 +662,13 @@ class SupportFlow {
 	 * @todo support filtering to specific types or replier
 	 */
 	public function get_ticket_replies_count( $ticket_id, $args = array() ) {
-		$args = array(
+		$default_args = array(
 			'posts_per_page' => 1,
 			'post_type'      => $this->post_type,
 			'post_status'    => 'public',
 			'post_parent'    => $ticket_id,
 		);
+		$args = array_merge( $default_args, $args );
 
 		$query = new WP_Query( $args );
 		$count = $query->found_posts;
