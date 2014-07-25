@@ -950,8 +950,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 	/**
 	 * Modifications to the columns appearing in the All Tickets view
-	 *
-	 * @todo maybe add 'Created' column
 	 */
 	public function filter_manage_post_columns( $columns ) {
 
