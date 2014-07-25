@@ -16,6 +16,8 @@ class SupportFlow_Table extends WP_List_Table {
 
 	/**
 	 * @param string $table_class Class to be used by table
+	 * @param boolean $display_nav Show navigation area on header and footer of table. It is generally an empty area with some height
+	 * @param boolean $display_col_headers Show columns name on header and footer of table
 	 */
 	function __construct( $table_class = '', $display_nav = true, $display_col_headers = true ) {
 		if ( $table_class ) {
