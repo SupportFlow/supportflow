@@ -16,77 +16,116 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 		add_shortcode( 'supportflow_submissionform', array( $this, 'shortcode_submissionform' ) );
 	}
 
-	// TODO: Nonce, l10n, etc.
 	public function shortcode_submissionform() {
-		$html = '';
-
-		$html .= '<div class="supportflow-submissionform">';
-		$html .= '<form action="" method="POST">';
-
-		if ( ! empty( $this->messages ) ) {
-			foreach ( $this->messages as $message ) {
-				$html .= '<p class="supportflow-message" style="font-weight:bold;color:red;">' . $message . '</p>';
+		?>
+		<style type="text/css">
+			.supportflow-message {
+				font-weight: bold;
+				color:       red;
 			}
-		}
+		</style>
 
-		$html .= "<p>This is just an ugly form that's meant for testing. We'll probably want something like this in the final version but we can worry about that later.</p>";
-		$html .= '<p>Your Name: <input type="text" name="supportflow[name]" size="30" /></p>';
-		$html .= '<p>Your Email: <input type="text" name="supportflow[email]" size="30" /></p>';
-		$html .= '<p>Subject: <input type="text" name="supportflow[subject]" size="60" /></p>';
-		$html .= '<p>Message:</p>';
-		$html .= '<p><textarea name="supportflow[message]" cols="50" rows="10"></textarea></p>';
-		$html .= '<p><input type="submit" value="Submit" /></p>';
-		$html .= '</form>';
-		$html .= '</div>';
+		<div class="supportflow-submissionform">
 
-		return $html;
+			<?php if ( ! empty( $this->messages ) ) : ?>
+				<p class="supportflow-message">
+					<?php foreach ( $this->messages as $message ) : ?>
+						<?php esc_html_e( $message ) ?>
+						<br />
+					<?php endforeach; ?>
+				</p>
+			<?php endif; ?>
+
+			<form action="" method="POST">
+				<input type="hidden" name="action" value="sf_create_ticket" />
+				<?php wp_nonce_field( '_sf_create_ticket' ) ?>
+
+				<p>
+					<label for="fullname"><?php _e( 'Your Name', 'supportflow' ) ?>:</label>
+					<br />
+					<input type="text" required id="fullname" name="fullname" />
+				</p>
+
+				<p>
+					<label for="email"><?php _e( 'Your E-Mail', 'supportflow' ) ?>:</label>
+					<br />
+					<input type="email" required id="email" name="email" />
+				</p>
+
+				<p>
+					<label for="subject"><?php _e( 'Subject', 'supportflow' ) ?>:</label>
+					<br />
+					<input type="text" required id="subject" name="subject" />
+				</p>
+
+				<p>
+					<label for="message"><?php _e( 'Message', 'supportflow' ) ?>:</label>
+					<br />
+					<textarea required id="message" rows=5 name="message"></textarea>
+				</p>
+
+				<p>
+					<input type="submit" value="<?php _e( 'Submit', 'supportflow' ) ?>" />
+				</p>
+
+			</form>
+		</div>
+	<?php
 	}
 
 	public function action_init_handle_form_submission() {
-		if ( empty( $_POST['supportflow'] ) || ! is_array( $_POST['supportflow'] ) ) {
+
+		if (
+			! isset( $_POST['action'], $_POST['_wpnonce'] ) ||
+			! 'sf_create_ticket' == $_POST['action'] ||
+			! wp_verify_nonce( $_POST['_wpnonce'], '_sf_create_ticket' )
+		) {
 			return;
 		}
 
-		$_POST['supportflow'] = array_map( 'stripslashes', $_POST['supportflow'] );
-
-		if ( empty( $_POST['supportflow']['name'] ) ) {
-			$this->messages[] = 'The name field is required.';
+		if ( empty( $_POST['fullname'] ) ) {
+			$this->messages[] = __( 'The name field is required.', 'supportflow' );
 		}
 
-		if ( empty( $_POST['supportflow']['email'] ) ) {
-			$this->messages[] = 'The email field is required.';
-		} elseif ( ! is_email( $_POST['supportflow']['email'] ) ) {
-			$this->messages[] = 'Please enter a valid e-mail address.';
+		if ( empty( $_POST['email'] ) ) {
+			$this->messages[] = __( 'The email field is required.', 'supportflow' );
+
+		} elseif ( ! is_email( $_POST['email'] ) ) {
+			$this->messages[] = __( 'Please enter a valid e-mail address.', 'supportflow' );
 		}
 
-		if ( empty( $_POST['supportflow']['subject'] ) ) {
-			$this->messages[] = 'The subject field is required.';
+		if ( empty( $_POST['subject'] ) ) {
+			$this->messages[] = __( 'The subject field is required.', 'supportflow' );
 		}
 
-		if ( empty( $_POST['supportflow']['message'] ) ) {
-			$this->messages[] = 'You must enter a message.';
+		if ( empty( $_POST['message'] ) ) {
+			$this->messages[] = __( 'You must enter a message.', 'supportflow' );
 		}
 
 		if ( ! empty( $this->messages ) ) {
 			return;
 		}
 
+		// Load required file
+		require_once( SupportFlow()->plugin_dir . 'classes/class-supportflow-admin.php' );
+
 		$ticket_id = SupportFlow()->create_ticket(
 			array(
-				'subject'         => $_POST['supportflow']['subject'],
-				'message'         => $_POST['supportflow']['message'],
-				'requester_name'  => $_POST['supportflow']['name'],
-				'requester_email' => $_POST['supportflow']['email'],
+				'subject'            => $_POST['subject'],
+				'message'            => $_POST['message'],
+				'reply_author'       => $_POST['fullname'],
+				'reply_author_email' => $_POST['email'],
+				'respondent_email'   => array( $_POST['email'] ),
 			)
 		);
 
 		if ( is_wp_error( $ticket_id ) ) {
-			$this->messages[] = 'There was an error creating the ticket: ' . $ticket_id->get_error_message();
+			$this->messages[] = __( 'There is an unknown error while submitting the form. Please try again later.', 'supportflow' );
 
 			return;
 		}
 
-		$this->messages[] = 'Ticket (ticket) number ' . $ticket_id . ' created.';
+		$this->messages[] = __( 'Form submitted successfully', 'supportflow' );
 	}
 }
 

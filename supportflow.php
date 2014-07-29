@@ -418,7 +418,7 @@ class SupportFlow {
 			'reply_author_email' => '',
 			'status'             => key( $post_statuses ),
 			'assignee'           => - 1, // WordPress user ID or username of ticket assignee/owner
-			'email_account'      => 0,
+			'email_account'      => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );

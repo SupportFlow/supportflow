@@ -543,19 +543,21 @@ class SupportFlow_Admin extends SupportFlow {
 		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
 		$user_permissions = $user_permissions['email_accounts'];
 
-		if ( 'post-new.php' == $pagenow ) {
+		$email_account_id = get_post_meta( get_the_id(), 'email_account', true );
+
+		if ( '' == $email_account_id ) {
 			$email_account_dropdown = '<select class="meta-item-dropdown">';
-			foreach ( $email_accounts as $id => $email_account_id ) {
-				if ( empty( $email_account_id ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
+			foreach ( $email_accounts as $id => $email_account ) {
+				if ( empty( $email_account ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
 					continue;
 				}
-				$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account_id['username'] ) . '</option>';
+				$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';
 			}
 			$email_account_dropdown .= '</select>';
 
 			$email_account_keys  = array_keys( $email_accounts );
-			$email_account_id    = $email_account_keys[0];
-			$email_account_label = $email_accounts[$email_account_id]['username'];
+			$email_account_first = $email_account_keys[0];
+			$email_account_label = $email_accounts[$email_account_first]['username'];
 		}
 
 		// Get E-Mail notification settings
@@ -603,14 +605,14 @@ class SupportFlow_Admin extends SupportFlow {
 		<div id="minor-publishing">
 			<div id="misc-publishing-actions">
 
-				<?php if ( 'post-new.php' == $pagenow ) : ?>
+				<?php if ( '' == $email_account_id ) : ?>
 					<div class="misc-pub-section meta-item">
 						<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
 						<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
 						<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 							<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
 						</a>
-						<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_id ?>" type="hidden" />
+						<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_first ?>" type="hidden" />
 
 						<div class="meta-item-toggle-content hide-if-js">
 							<?php echo $email_account_dropdown ?>

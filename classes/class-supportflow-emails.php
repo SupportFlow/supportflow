@@ -43,6 +43,9 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
+		if ( '' == $email_account_id ) {
+			return;
+		}
 		$smtp_account     = $email_accounts[$email_account_id];
 
 		if ( empty( $agent_ids ) ) {
@@ -104,6 +107,9 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
+		if ( '' == $email_account_id ) {
+			return;
+		}
 		$smtp_account     = $email_accounts[$email_account_id];
 
 		// Don't email the person creating the reply, unless that's desired behavior
