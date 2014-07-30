@@ -259,8 +259,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$new_reply   = $all_replies[count( $all_replies ) - 1];
 
 		foreach ( $new_attachment_ids as $new_attachment_id ) {
-			// Associate the ticket ID as the parent to our new attachment
-			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $new_reply->ID, 'post_status' => 'inherit' ) );
+			// Save the attachment ID as post meta of reply
+			add_post_meta( $new_reply->ID, 'sf_attachments', $new_attachment_id );
 		}
 
 		// Store the original email ID so we don't accidentally dupe it

@@ -738,7 +738,7 @@ class SupportFlow {
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $reply_id ) );
+				add_post_meta( $reply_id, 'sf_attachments', $attachment_id );
 			}
 		}
 

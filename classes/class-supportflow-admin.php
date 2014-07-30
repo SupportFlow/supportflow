@@ -954,15 +954,11 @@ class SupportFlow_Admin extends SupportFlow {
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				echo $post_content;
-				$attachment_args = array(
-					'post_parent' => $reply->ID,
-					'post_type'   => 'attachment'
-				);
-				if ( $attachments = get_posts( $attachment_args ) ) {
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachments as $attachment ) {
-						$attachment_link = wp_get_attachment_url( $attachment->ID );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
+					foreach ( $attachment_ids as $attachment_id ) {
+						$attachment_link = wp_get_attachment_url( $attachment_id );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -992,15 +988,11 @@ class SupportFlow_Admin extends SupportFlow {
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				echo $post_content;
-				$attachment_args = array(
-					'post_parent' => $reply->ID,
-					'post_type'   => 'attachment'
-				);
-				if ( $attachments = get_posts( $attachment_args ) ) {
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachments as $attachment ) {
-						$attachment_link = wp_get_attachment_url( $attachment->ID );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
+					foreach ( $attachment_ids as $attachment_id ) {
+						$attachment_link = wp_get_attachment_url( $attachment_id );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
