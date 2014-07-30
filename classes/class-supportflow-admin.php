@@ -942,7 +942,6 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	public function display_ticket_replies() {
-
 		$private_replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) );
 
 		if ( ! empty( $private_replies ) ) {
