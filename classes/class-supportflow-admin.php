@@ -1195,7 +1195,9 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
-				$attachements = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				// Remove same attachment added more than once
+				$attachements   = array_unique($attachements);
 				// Remove non-int attachment ID's from array
 				$attachements   = array_filter( $attachements, function ( $val ) {
 					return (string) (int) $val === (string) $val;
