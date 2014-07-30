@@ -956,7 +956,7 @@ class SupportFlow_Admin extends SupportFlow {
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
+						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
@@ -990,7 +990,7 @@ class SupportFlow_Admin extends SupportFlow {
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = wp_get_attachment_url( $attachment_id );
+						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
 						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';

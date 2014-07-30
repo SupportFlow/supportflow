@@ -774,6 +774,7 @@ class SupportFlow {
 		if ( is_array( $attachment_ids ) ) {
 			foreach ( $attachment_ids as $attachment_id ) {
 				add_post_meta( $reply_id, 'sf_attachments', $attachment_id );
+				SupportFlow()->extend->attachments->insert_attachment_secret_key( $attachment_id );
 			}
 		}
 

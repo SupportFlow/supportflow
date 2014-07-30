@@ -261,6 +261,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		foreach ( $new_attachment_ids as $new_attachment_id ) {
 			// Save the attachment ID as post meta of reply
 			add_post_meta( $new_reply->ID, 'sf_attachments', $new_attachment_id );
+			SupportFlow()->extend->attachments->insert_attachment_secret_key( $new_attachment_id ) ;
 		}
 
 		// Store the original email ID so we don't accidentally dupe it
