@@ -476,14 +476,15 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
-		add_meta_box( 'supportflow-recent-tickets', __( 'My recent tickets', 'supportflow' ), array( $this, 'meta_box_recent_tickets' ), SupportFlow()->post_type, 'side' );
 
 		if ( 'post.php' == $pagenow ) {
+			add_meta_box( 'supportflow-other-respondents-tickets', __( 'Other tickets', 'supportflow' ), array( $this, 'meta_box_other_respondents_tickets' ), SupportFlow()->post_type, 'side' );
 			add_meta_box( 'supportflow-forward_conversation', __( 'Forward this conversation', 'supportflow' ), array( $this, 'meta_box_email_conversation' ), SupportFlow()->post_type, 'side' );
 		}
 	}
 
-	public function meta_box_recent_tickets() {
+	public function meta_box_other_respondents_tickets() {
+		$ticket_respondents = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'slugs' ) );
 		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array();
 
@@ -495,16 +496,28 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$table = new SupportFlow_Table( '', false, false );
 
-		$args = array(
-			'post_type'   => SupportFlow()->post_type,
-			'post_parent' => 0,
-			'post_status' => $status_slugs,
-			'author'      => get_current_user_id(),
-			'numberposts' => 10,
-		);
+		if ( empty( $ticket_respondents ) ) {
+			$tickets = array();
 
-		$wp_query = new WP_Query( $args );
-		$tickets  = $wp_query->posts;
+		} else {
+			$args = array(
+				'post_type'    => SupportFlow()->post_type,
+				'post_parent'  => 0,
+				'post_status'  => $status_slugs,
+				'numberposts'  => 10,
+				'post__not_in' => array( get_the_id() ),
+				'tax_query'    => array(
+					array(
+						'taxonomy' => SupportFlow()->respondents_tax,
+						'field'    => 'slug',
+						'terms'    => $ticket_respondents,
+					),
+				),
+			);
+
+			$wp_query = new WP_Query( $args );
+			$tickets  = $wp_query->posts;
+		}
 
 		$no_items = __( 'No recent tickets found.', 'supportflow' );
 		$table->set_no_items( $no_items );
