@@ -81,6 +81,9 @@ class SupportFlow_Admin extends SupportFlow {
 			wp_localize_script( 'supportflow-tickets', 'SFTickets', array(
 				'no_title_msg'      => __( 'You must need to specify the subject of the ticket', 'supportpress' ),
 				'no_respondent_msg' => __( 'You must need to add atleast one ticket respondent', 'supportpress' ),
+				'pagenow'           => $pagenow,
+				'send_msg'          => __( 'Send Message', 'supportflow' ),
+				'add_private_note'  => __( 'Add Private Note', 'supportflow' ),
 			) );
 		}
 

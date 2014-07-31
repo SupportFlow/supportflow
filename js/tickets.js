@@ -36,4 +36,15 @@ jQuery(document).ready(function () {
 			$('#post').submit();
 		}
 	});
+
+	// Toggle submit button text (Send Message/Add private note)
+	jQuery('#mark-private').change(function () {
+		if ('post.php' == SFTickets.pagenow) {
+			if (jQuery('#mark-private').prop('checked')) {
+				jQuery('#insert-reply').val(SFTickets.add_private_note);
+			} else {
+				jQuery('#insert-reply').val(SFTickets.send_msg);
+			}
+		}
+	});
 });
