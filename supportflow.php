@@ -560,6 +560,10 @@ class SupportFlow {
 			foreach ( $raw_respondents as $raw_respondent ) {
 				$respondents[] = $raw_respondent->name;
 			}
+		} elseif ( 'slugs' == $args['fields'] ) {
+			foreach ( $raw_respondents as $raw_respondent ) {
+				$respondents[] = $raw_respondent->slug;
+			}
 		}
 
 		return $respondents;
