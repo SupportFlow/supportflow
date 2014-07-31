@@ -748,7 +748,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		<div id="major-publishing-actions">
 			<div id="publishing-action">
-				<?php submit_button( $submit_text, 'save-button primary', 'save', false ); ?>
+				<?php submit_button( $submit_text, 'save-button primary', 'update-ticket', false ); ?>
 			</div>
 			<div class="clear"></div>
 		</div>
@@ -873,7 +873,7 @@ class SupportFlow_Admin extends SupportFlow {
 		} else {
 			$submit_text = __( 'Send Message', 'supportflow' );
 		}
-		submit_button( $submit_text, 'primary save-button', 'save', false, $submit_attr_array );
+		submit_button( $submit_text, 'primary save-button', 'insert-reply', false, $submit_attr_array );
 		echo '</div>';
 		echo '</div>';
 
