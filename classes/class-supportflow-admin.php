@@ -526,7 +526,8 @@ class SupportFlow_Admin extends SupportFlow {
 		$table->set_no_items( $no_items );
 
 		$table->set_columns( array(
-			'title' => __( 'Subject', 'supportflow' ),
+			'title'  => __( 'Subject', 'supportflow' ),
+			'status' => __( 'Status', 'supportflow' ),
 		) );
 
 		$data = array();
@@ -536,7 +537,8 @@ class SupportFlow_Admin extends SupportFlow {
 			$title         = '<b>' . esc_html( $ticket->post_title ) . '</b>';
 			$title         = "<a href='post.php?post=" . $ticket->ID . "&action=edit'>" . $title . "</a>";
 			$data[]        = array(
-				'title' => $title,
+				'title'  => $title,
+				'status' => $statuses[$ticket->post_status]['label'],
 			);
 		}
 		$table->set_data( $data );
