@@ -739,7 +739,7 @@ class SupportFlow_Admin extends SupportFlow {
 					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
 					</a>
-					<input name="post_email_notifications_override" class="meta-item-name" value="<?php $notification_id ?>" type="hidden" />
+					<input name="post_email_notifications_override" class="meta-item-name" value="<?php echo $notification_id ?>" type="hidden" />
 
 					<div class="meta-item-toggle-content hide-if-js">
 						<?php echo $notification_dropdown ?>
