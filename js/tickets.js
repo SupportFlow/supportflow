@@ -19,11 +19,13 @@ jQuery(document).ready(function () {
 	// Require title and atleast respondent before saving a ticket
 	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
+			jQuery('#subject').focus();
 			alert(SFTickets.no_title_msg);
 			event.preventDefault();
 			return;
 		}
 		if ('' == jQuery('#respondents').val()) {
+			jQuery('#respondents').focus();
 			alert(SFTickets.no_respondent_msg);
 			event.preventDefault();
 			return;
