@@ -261,6 +261,8 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 
+		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
+
 		do_action_ref_array( 'supportflow_after_setup_actions', array( &$this ) );
 	}
 
@@ -351,6 +353,13 @@ class SupportFlow {
 			$args['public'] = true;
 			register_post_status( $post_status, $args );
 		}
+	}
+
+	public function filter_wp_insert_post_data($data, $postarr) {
+		if ( 0 == $postarr['post_author'] ) {
+			$data['post_author'] = 0;
+		}
+		return $data;
 	}
 
 	/** Helper Functions ******************************************************/

@@ -583,6 +583,12 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Get post authors
 		$post_author_id = get_post( get_the_ID() )->post_author;
+
+		// WP change owner to current user if $post_author_id is 0 (returned when ticket is unassigned)
+		if ( 0 == $post_author_id ) {
+			$post_author_id = - 1;
+		}
+
 		if ( 0 < $post_author_id ) {
 			$post_author_label = get_userdata( $post_author_id )->data->user_nicename;
 		} else {
