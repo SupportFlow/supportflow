@@ -654,6 +654,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$notification_dropdown .= '</select>';
 
+		$close_ticket_label = __( 'Close ticket', 'supportflow' );
 
 		// Get submit button label
 		if ( 'post-new.php' == $pagenow ) {
@@ -752,6 +753,11 @@ class SupportFlow_Admin extends SupportFlow {
 		</div>
 
 		<div id="major-publishing-actions">
+		<?php if ( 'post.php' == $pagenow ) : ?>
+			<div id="delete-action">
+				<a class="submitdelete deletion" id="close-ticket-link" href="#"><?php echo $close_ticket_label ?></a>
+			</div>
+		<?php endif; ?>
 			<div id="publishing-action">
 				<?php submit_button( $submit_text, 'save-button primary', 'update-ticket', false ); ?>
 			</div>
