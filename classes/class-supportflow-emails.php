@@ -86,7 +86,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
 
-		self::mail( $agent_emails, $subject, $message, '', $attachments, $smtp_account );
+		self::mail( $agent_emails, $subject, $message,  'Content-Type: text/html', $attachments, $smtp_account );
 	}
 
 	/**
@@ -128,7 +128,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = stripslashes( $reply->post_content );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'respondent' );
 
-		$headers = '';
+		$headers =  "Content-Type: text/html\r\n";
 
 		if ( is_array( $cc ) && ! empty( $cc ) ) {
 			$headers .= "Cc: " . implode( ', ', $cc ) . "\r\n";
