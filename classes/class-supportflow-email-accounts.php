@@ -95,7 +95,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 		echo '</div>';
 
-		$this->insert_js_code();
+		$this->enqueue_script();
 	}
 
 	/*
@@ -289,52 +289,22 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	}
 
 	/*
-	 * Insert JS code required for form submission
+	 * Enqueue JS code required for form submission
 	 */
-	public function insert_js_code() {
-		$msg_title   = __( 'Are you sure want to delete this account?', 'supportflow' );
-		$form_action = "edit.php?post_type=" . SupportFlow()->post_type . "&page=" . $this->slug;
-		?>
-		<script type="text/javascript">
-			jQuery('.delete_email_account').click(function (e) {
-				e.preventDefault();
-				if (!confirm('<?php echo $msg_title ?>')) {
-					return;
-				}
+	public function enqueue_script() {
+		wp_enqueue_script(
+			'supportflow-email_accounts',
+			SupportFlow()->plugin_url . 'js/email_accounts.js',
+			array( 'jquery' )
+		);
 
-				var account_key = jQuery(this).data('account-id');
-				var form = '<form method="POST" id="remove_email_account" action="<?php echo $form_action ?>">' +
-					'<input type="hidden" name="action" value="delete" />' +
-					'<?php wp_nonce_field( 'delete_email_account'  ) ?>' +
-					'<input type="hidden" name="account_id" value=' + account_key + ' />' +
-					'</form>';
+		wp_localize_script( 'supportflow-email_accounts', 'SFEmailAccounts', array(
+			'sure_delete_account'        => __( 'Are you sure want to delete this account?', 'supportflow' ),
+			'post_type'                  => SupportFlow()->post_type,
+			'slug'                       => $this->slug,
+			'delete_email_account_nonce' => wp_nonce_field( 'delete_email_account', '_wpnonce', true, false ),
 
-				jQuery('body').append(form);
-				jQuery('#remove_email_account').submit();
-			});
-
-
-			jQuery('#add_new_email_account #imap_ssl').change(function () {
-				if (this.checked) {
-					// Change to default IMAP SSL port on enabling SSL
-					jQuery('#add_new_email_account #imap_port').val('993');
-				} else {
-					// Change to default IMAP non-SSL port on disabling SSL
-					jQuery('#add_new_email_account #imap_port').val('143');
-				}
-			});
-
-			jQuery('#add_new_email_account #smtp_ssl').change(function () {
-				if (this.checked) {
-					// Change to default SMTP SSL port on enabling SSL
-					jQuery('#add_new_email_account #smtp_port').val('465');
-				} else {
-					// Change to default SMTP non-SSL port on disabling SSL
-					jQuery('#add_new_email_account #smtp_port').val('25');
-				}
-			});
-		</script>
-	<?php
+		) );
 	}
 
 	/**
