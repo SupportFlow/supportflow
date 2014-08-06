@@ -17,8 +17,15 @@ class SupportFlow_Dashboard extends SupportFlow {
 
 	function action_wp_dashboard_setup() {
 		if ( current_user_can( 'edit_posts' ) ) {
-
-			wp_enqueue_script( 'supportflow-dashboard', SupportFlow()->plugin_url . 'js/dashboard.js', array( 'jquery' ) );
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				wp_enqueue_script(
+					'supportflow-dashboard',
+					SupportFlow()->plugin_url . 'js/dashboard.js',
+					array( 'jquery' )
+				);
+			} else {
+				SupportFlow()->enqueue_scripts();
+			}
 			wp_enqueue_style( 'supportflow-dashboard', SupportFlow()->plugin_url . 'css/dashboard.css', array(), SupportFlow()->version );
 
 			wp_add_dashboard_widget(

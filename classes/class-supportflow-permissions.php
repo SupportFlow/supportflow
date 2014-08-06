@@ -118,13 +118,18 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Enqueue JS code required by class
 	 */
 	public function enqueue_script() {
-		wp_enqueue_script(
-			'supportflow-permissions',
-			SupportFlow()->plugin_url . 'js/permissions.js',
-			array( 'jquery' )
-		);
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$handle = 'supportflow-permissions';
+			wp_enqueue_script(
+				$handle,
+				SupportFlow()->plugin_url . 'js/permissions.js',
+				array( 'jquery' )
+			);
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
 
-		wp_localize_script( 'supportflow-permissions', 'SFPermissions', array(
+		wp_localize_script( $handle, 'SFPermissions', array(
 			'_get_user_permissions_nonce' => wp_create_nonce( 'get_user_permissions' ),
 			'changing_status'             => __( 'Changing status, please wait.', 'supportflow' ),
 			'_set_user_permission_nonce'  => wp_create_nonce( 'set_user_permission' ),

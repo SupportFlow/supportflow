@@ -114,13 +114,18 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Enqueue JS code required by statistics page
 	 */
 	function enqueue_script() {
-		wp_enqueue_script(
-			'supportflow-statistics',
-			SupportFlow()->plugin_url . 'js/statistics.js',
-			array( 'jquery' )
-		);
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$handle = 'supportflow-statistics';
+			wp_enqueue_script(
+				$handle,
+				SupportFlow()->plugin_url . 'js/statistics.js',
+				array( 'jquery' )
+			);
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
 
-		wp_localize_script( 'supportflow-statistics', 'SFStatistics', array(
+		wp_localize_script( $handle, 'SFStatistics', array(
 			'expand'   => __( 'Expand', 'supportflow' ),
 			'collapse' => __( 'Collapse', 'supportflow' ),
 		) );
