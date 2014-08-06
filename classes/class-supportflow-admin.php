@@ -9,6 +9,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 	function __construct() {
 		add_action( 'wp_ajax_sf_forward_conversation', array( $this, 'action_wp_ajax_sf_email_conversation' ) );
+		add_filter( 'heartbeat_received', array( $this, 'filter_heartbeat_received' ), 10, 2 );
+		add_action( 'wp_ajax_ticket_attachment_upload', array( $this, 'action_wp_ajax_ticket_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 	}
 
@@ -82,6 +84,11 @@ class SupportFlow_Admin extends SupportFlow {
 				'no_title_msg'      => __( 'You must need to specify the subject of the ticket', 'supportpress' ),
 				'no_respondent_msg' => __( 'You must need to add atleast one ticket respondent', 'supportpress' ),
 			) );
+
+			wp_enqueue_script( 'supportflow-auto-save', SupportFlow()->plugin_url . 'js/auto_save.js', array( 'jquery', 'heartbeat' ) );
+			wp_localize_script( 'supportflow-auto-save', 'SFAutoSave', array(
+				'ticket_id' => get_the_ID(),
+			) );
 		}
 
 		if ( 'post.php' == $pagenow ) {
@@ -126,6 +133,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		_e( 'Successfully sented E-Mails', 'supportflow' );
 		exit;
+
 	}
 
 	/**
@@ -151,6 +159,36 @@ class SupportFlow_Admin extends SupportFlow {
 
 		return $messages;
 	}
+
+	public function filter_heartbeat_received( $response, $data ) {
+		if (
+			isset( $data['supportflow-autosave'] ) &&
+			is_array( $data['supportflow-autosave'] ) &&
+			isset( $data['supportflow-autosave']['ticket_id'] ) &&
+			current_user_can( 'edit_post', (int) $data['supportflow-autosave']['ticket_id'] )
+		) {
+			// Save data received from client to the database as post meta
+
+			$ticket_id = (int) $data['supportflow-autosave']['ticket_id'];
+			unset( $data['supportflow-autosave']['ticket_id'] );
+
+			if ( 'auto-draft' == get_post_status( $ticket_id ) ) {
+				wp_update_post( array( 'ID' => $ticket_id, 'post_status' => 'draft' ) );
+			}
+
+			foreach ( $data['supportflow-autosave'] as $element_id => $element_value ) {
+				update_post_meta( $ticket_id, "_sf_autosave_$element_id", $element_value );
+			}
+
+			echo $data['supportflow-autosave']['post_title'];
+			if ( ! empty( $data['supportflow-autosave']['post_title'] ) ) {
+				wp_update_post( array( 'ID' => $ticket_id, 'post_title' => $data['supportflow-autosave']['post_title'] ) );
+			}
+		}
+
+		return $response;
+	}
+
 
 	/**
 	 *
@@ -565,7 +603,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$notification_label       = 'Default';
 		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
 		$notification_dropdown    = '';
-		$notification_dropdown   .= '<select class="meta-item-dropdown">';
+		$notification_dropdown .= '<select class="meta-item-dropdown">';
 
 		if ( 'post-new.php' == $pagenow ) {
 			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
@@ -706,7 +744,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$placeholder = __( 'What is your conversation about?', 'supportflow' );
 		echo '<h4>' . __( 'Subject', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="subject" name="post_title" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
+		echo '<input type="text" id="subject" name="post_title" class="sf_autosave" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Please describe what this ticket is about in several words', 'supportflow' ) . '</p>';
 
 	}
@@ -716,12 +754,16 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function meta_box_respondents() {
 
-		$respondents        = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
-		$respondents_string = implode( ', ', $respondents );
-		$respondents_string .= empty( $respondents_string ) ? '' : ', ';
 		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
+		if ( 'draft' == get_post_status( get_the_ID() ) ) {
+			$respondents_string = get_post_meta( get_the_ID(), '_sf_autosave_respondents', true );
+		} else {
+			$respondents        = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
+			$respondents_string = implode( ', ', $respondents );
+			$respondents_string .= empty( $respondents_string ) ? '' : ', ';
+		}
 		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="respondents" name="respondents" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
+		echo '<input type="text" id="respondents" name="respondents" class="sf_autosave" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
 	}
 
@@ -729,12 +771,14 @@ class SupportFlow_Admin extends SupportFlow {
 	 * Add a form element where you can choose cc and bcc receiver of reply
 	 */
 	public function meta_box_cc_bcc() {
+		$cc_value = esc_attr( get_post_meta( get_the_ID(), '_sf_autosave_cc', true ) );
+		$bcc      = esc_attr( get_post_meta( get_the_ID(), '_sf_autosave_bcc', true ) );
 		?>
 		<p class="description"> <?php _e( "Please add all the E-Mail ID's seperated by comma.", 'supportflow' ) ?></p>
 		<h4 class="inline"><?php _e( "CC: ", 'supportflow' ) ?></h4>
-		<input type="text" id="cc" name="cc" />
+		<input type="text" class="sf_autosave" id="cc" name="cc" value="<?php echo $cc_value ?>" />
 		<h4 class="inline"> <?php _e( "BCC: ", 'supportflow' ) ?></h4>
-		<input type="text" id="bcc" name="bcc" />
+		<input type="text" class="sf_autosave" id="bcc" name="bcc" value="<?php echo $bcc ?>" />
 	<?php
 	}
 
@@ -794,7 +838,8 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</select></div>';
 
 		echo '<div id="ticket-reply-box">';
-		echo "<textarea id='reply' name='reply' $disabled_attr class='ticket-reply' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
+		echo "<textarea id='reply' name='reply' $disabled_attr class='ticket-reply sf_autosave' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
+		echo esc_html( get_post_meta( get_the_ID(), '_sf_autosave_reply', true ) );
 		echo "</textarea>";
 
 		echo '<div id="message-tools">';
