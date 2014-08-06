@@ -11,7 +11,7 @@ SupportFlow is a web based help desk software. It allows teams to manage support
 == Description ==
 SupportFlow is a web based help desk software. SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
 
-###Few of its features are:
+###A few of its features are:
 
 + Allow agents to create/reply tickets using web interface.
 
