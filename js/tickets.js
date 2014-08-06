@@ -19,21 +19,39 @@ jQuery(document).ready(function () {
 	// Require title and atleast respondent before saving a ticket
 	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
+			jQuery('#subject').focus();
 			alert(SFTickets.no_title_msg);
 			event.preventDefault();
 			return;
 		}
 		if ('' == jQuery('#respondents').val()) {
+			jQuery('#respondents').focus();
 			alert(SFTickets.no_respondent_msg);
 			event.preventDefault();
 			return;
 		}
 	});
-	
+
 	// Submit post if user pressed Ctrl+Enter in reply content box
 	jQuery('#reply').keypress(function (event) {
-	    if (event.ctrlKey && event.keyCode == 10 && $(this).val() != '') {
-		$('#post').submit();
-	    }
+		if (event.ctrlKey && event.keyCode == 10 && $(this).val() != '') {
+			$('#post').submit();
+		}
+	});
+
+	// Toggle submit button text (Send Message/Add private note)
+	jQuery('#mark-private').change(function () {
+		if ('post.php' == SFTickets.pagenow) {
+			if (jQuery('#mark-private').prop('checked')) {
+				jQuery('#insert-reply').val(SFTickets.add_private_note);
+			} else {
+				jQuery('#insert-reply').val(SFTickets.send_msg);
+			}
+		}
+	});
+
+	// Close ticket wehen close ticket button is submitted
+	jQuery('#close-ticket-submit').click(function (event) {
+		jQuery("#post meta-item input[name='post_status']").val('sf_closed');
 	});
 });

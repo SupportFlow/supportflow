@@ -261,6 +261,8 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 
+		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
+
 		do_action_ref_array( 'supportflow_after_setup_actions', array( &$this ) );
 	}
 
@@ -351,6 +353,13 @@ class SupportFlow {
 			$args['public'] = true;
 			register_post_status( $post_status, $args );
 		}
+	}
+
+	public function filter_wp_insert_post_data($data, $postarr) {
+		if ( 0 == $postarr['post_author'] ) {
+			$data['post_author'] = 0;
+		}
+		return $data;
 	}
 
 	/** Helper Functions ******************************************************/
@@ -560,6 +569,10 @@ class SupportFlow {
 			foreach ( $raw_respondents as $raw_respondent ) {
 				$respondents[] = $raw_respondent->name;
 			}
+		} elseif ( 'slugs' == $args['fields'] ) {
+			foreach ( $raw_respondents as $raw_respondent ) {
+				$respondents[] = $raw_respondent->slug;
+			}
 		}
 
 		return $respondents;
@@ -662,12 +675,13 @@ class SupportFlow {
 	 * @todo support filtering to specific types or replier
 	 */
 	public function get_ticket_replies_count( $ticket_id, $args = array() ) {
-		$args = array(
+		$default_args = array(
 			'posts_per_page' => 1,
 			'post_type'      => $this->post_type,
 			'post_status'    => 'public',
 			'post_parent'    => $ticket_id,
 		);
+		$args         = array_merge( $default_args, $args );
 
 		$query = new WP_Query( $args );
 		$count = $query->found_posts;
@@ -809,6 +823,24 @@ class SupportFlow {
 
 		return $emails;
 	}
+
+	/**
+	 * Sanitize reply content. It allows basic HTML tag like <a>, <b>,...
+	 * Apart from this allow embedding code using <code> tag
+	 *
+	 * @param string $reply Reply to be sanitized
+	 * @return string Sanitized reply
+	 */
+	public function sanitize_ticket_reply( $reply ) {
+		$reply = preg_replace_callback( '~<code>(.*?)</code>~is', create_function( '$arr',
+			'return "<code>" . esc_html( $arr[1] ) . "</code>";'
+		), $reply );
+
+		$reply = wp_kses( $reply, wp_kses_allowed_html( 'post' ) );
+
+		return $reply;
+	}
+
 }
 
 /**

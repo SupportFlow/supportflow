@@ -138,7 +138,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		require_once ABSPATH . 'wp-admin/includes/admin.php';
 
 		$new_attachment_ids = array();
-		$k = 0;
+		$k                  = 0;
 
 		if ( isset( $email->structure->parts ) ) {
 			foreach ( $email->structure->parts as $email_part ) {
@@ -230,6 +230,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			}
 		}
 		$respondents[] = $reply_author_email;
+
+		$message = SupportFlow()->sanitize_ticket_reply( $message );
 
 		if ( $ticket_id ) {
 			$reply_args = array(

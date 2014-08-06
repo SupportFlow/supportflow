@@ -29,14 +29,14 @@ class SupportFlow_Preferences extends SupportFlow {
 	}
 
 	public function enqueue_scripts() {
-		wp_enqueue_script('supportflow-preferences', SupportFlow()->plugin_url . 'js/preferences.js', array( 'jquery' ) );
-		wp_localize_script('supportflow-preferences', 'SFPreferences', array (
-		    'changing_state' => __( 'Changing status, please wait.', 'supportflow' ),
-		    'set_email_notfication_nonce' => wp_create_nonce( 'set_email_notfication' ),
-		    'failed_changing_state' => __( 'Failed changing state. Old state is reverted', 'supportflow' ),
-		    'subscribed' => __( 'Subscribed', 'supportflow' ),
-		    'unsubscribed' => __( 'Unsubscribed', 'supportflow' ),
-		));
+		wp_enqueue_script( 'supportflow-preferences', SupportFlow()->plugin_url . 'js/preferences.js', array( 'jquery' ) );
+		wp_localize_script( 'supportflow-preferences', 'SFPreferences', array(
+			'changing_state'              => __( 'Changing status, please wait.', 'supportflow' ),
+			'set_email_notfication_nonce' => wp_create_nonce( 'set_email_notfication' ),
+			'failed_changing_state'       => __( 'Failed changing state. Old state is reverted', 'supportflow' ),
+			'subscribed'                  => __( 'Subscribed', 'supportflow' ),
+			'unsubscribed'                => __( 'Unsubscribed', 'supportflow' ),
+		) );
 	}
 
 	public function preferences_page() {
@@ -57,7 +57,7 @@ class SupportFlow_Preferences extends SupportFlow {
 			'update_signature' == $_POST['action'] &&
 			wp_verify_nonce( $_POST['_wpnonce'], 'update_signature' )
 		) {
-			$signature         = wp_kses( $_POST['update_signature_value'], array() );
+			$signature    = wp_kses( $_POST['update_signature_value'], array() );
 			$sign_updated = true;
 			update_user_meta( get_current_user_id(), 'sf_user_signature', $signature );
 		} else {
