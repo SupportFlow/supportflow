@@ -580,7 +580,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$current_status_label = $post_statuses[$current_status_id]['label'];
 
-
 		// Get post authors
 		$post_author_id = get_post( get_the_ID() )->post_author;
 
@@ -759,9 +758,9 @@ class SupportFlow_Admin extends SupportFlow {
 		</div>
 
 		<div id="major-publishing-actions">
-		<?php if ( 'post.php' == $pagenow ) : ?>
+		<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
 			<div id="delete-action">
-				<a class="submitdelete deletion" id="close-ticket-link" href="#"><?php echo $close_ticket_label ?></a>
+				<?php submit_button( $close_ticket_label, '', 'close-ticket-submit', false, array( 'id' => 'close-ticket-submit' ) ); ?>
 			</div>
 		<?php endif; ?>
 			<div id="publishing-action">

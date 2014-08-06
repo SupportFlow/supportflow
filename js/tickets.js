@@ -50,22 +50,8 @@ jQuery(document).ready(function () {
 		}
 	});
 
-	// Close ticket wehen close ticket link is clicked
-	jQuery('#close-ticket-link').click(function (event) {
-		event.preventDefault();
-
-		var form = '';
-		form += '<form name="post" action="post.php" method="post" id="close_ticket_form">';
-
-		form += '<input type="hidden" name="_wpnonce" value="' + jQuery('#post #_wpnonce').val() + '" />';
-		form += '<input type="hidden" name="_wp_http_referer" value="' + jQuery("#post input[name='_wp_http_referer']").val() + '" />';
-		form += '<input type="hidden" name="action" value="editpost" />';
-		form += '<input type="hidden" name="post_ID" value="' + jQuery('#post #post_ID').val() + '" />';
-		form += '<input type="hidden" name="post_status" value="sf_closed" />';
-
-		form += '</form>';
-
-		jQuery('body').append(form);
-		jQuery('#close_ticket_form').submit();
+	// Close ticket wehen close ticket button is submitted
+	jQuery('#close-ticket-submit').click(function (event) {
+		jQuery("#post meta-item input[name='post_status']").val('sf_closed');
 	});
 });
