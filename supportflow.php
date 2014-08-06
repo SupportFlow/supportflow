@@ -785,6 +785,25 @@ class SupportFlow {
 	}
 
 	/**
+	 *
+	 * Enqueue minfied and concatenated version all the scripts required by SupportFlow
+	 * Doesn't add localisation data to it
+	 *
+	 * @return string Handle of enqueued script
+	 */
+	public function enqueue_scripts() {
+		$handle = 'supportflow-minified-scripts';
+
+		wp_enqueue_script(
+			$handle,
+			SupportFlow()->plugin_url . 'js/supportflow.min.js',
+			array( 'jquery', 'jquery-ui-autocomplete' )
+		);
+
+		return $handle;
+	}
+
+	/**
 	 * Get the special capability given a string
 	 */
 	public function get_cap( $cap ) {
