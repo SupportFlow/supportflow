@@ -1,0 +1,12 @@
+{
+  "name": "SupportFlow",
+  "dependencies": {
+    "grunt-contrib-uglify": "^0.5.1",
+    "grunt": "^0.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VarunAgw/supportflow.git"
+  },
+  "homepage": "https://github.com/VarunAgw/supportflow"
+}
