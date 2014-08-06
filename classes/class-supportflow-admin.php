@@ -481,7 +481,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
 
 		if ( 'post.php' == $pagenow ) {
-			add_meta_box( 'supportflow-other-respondents-tickets', __( 'Other tickets', 'supportflow' ), array( $this, 'meta_box_other_respondents_tickets' ), SupportFlow()->post_type, 'side' );
+			add_meta_box( 'supportflow-other-respondents-tickets', __( 'User\'s Recent Tickets', 'supportflow' ), array( $this, 'meta_box_other_respondents_tickets' ), SupportFlow()->post_type, 'side' );
 			add_meta_box( 'supportflow-forward_conversation', __( 'Forward this conversation', 'supportflow' ), array( $this, 'meta_box_email_conversation' ), SupportFlow()->post_type, 'side' );
 		}
 	}
