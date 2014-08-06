@@ -29,8 +29,18 @@ class SupportFlow_Preferences extends SupportFlow {
 	}
 
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'supportflow-preferences', SupportFlow()->plugin_url . 'js/preferences.js', array( 'jquery' ) );
-		wp_localize_script( 'supportflow-preferences', 'SFPreferences', array(
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$handle = 'supportflow-preferences';
+			wp_enqueue_script(
+				$handle,
+				SupportFlow()->plugin_url . 'js/preferences.js',
+				array( 'jquery' )
+			);
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
+
+		wp_localize_script( $handle, 'SFPreferences', array(
 			'changing_state'              => __( 'Changing status, please wait.', 'supportflow' ),
 			'set_email_notfication_nonce' => wp_create_nonce( 'set_email_notfication' ),
 			'failed_changing_state'       => __( 'Failed changing state. Old state is reverted', 'supportflow' ),

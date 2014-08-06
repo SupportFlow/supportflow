@@ -292,13 +292,18 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Enqueue JS code required for form submission
 	 */
 	public function enqueue_script() {
-		wp_enqueue_script(
-			'supportflow-email_accounts',
-			SupportFlow()->plugin_url . 'js/email_accounts.js',
-			array( 'jquery' )
-		);
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$handle = 'supportflow-email_accounts';
+			wp_enqueue_script(
+				$handle,
+				SupportFlow()->plugin_url . 'js/email_accounts.js',
+				array( 'jquery' )
+			);
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
 
-		wp_localize_script( 'supportflow-email_accounts', 'SFEmailAccounts', array(
+		wp_localize_script( $handle, 'SFEmailAccounts', array(
 			'sure_delete_account'        => __( 'Are you sure want to delete this account?', 'supportflow' ),
 			'post_type'                  => SupportFlow()->post_type,
 			'slug'                       => $this->slug,
