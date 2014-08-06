@@ -823,6 +823,17 @@ class SupportFlow {
 
 		return $emails;
 	}
+
+	public function sanitize_ticket_reply( $reply ) {
+		$reply = preg_replace_callback( '~<code>(.*?)</code>~is', create_function( '$arr',
+			'return "<code>" . esc_html( $arr[1] ) . "</code>";'
+		), $reply );
+
+		$reply = wp_kses( $reply, wp_kses_allowed_html( 'post' ) );
+
+		return $reply;
+	}
+
 }
 
 /**

@@ -231,12 +231,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 		$respondents[] = $reply_author_email;
 
-		$message = preg_replace_callback( '~<code>(.*?)</code>~is', function ( $arr ) {
-			return '<code>' . esc_html( $arr[1] ) . '</code>';
-
-		}, $reply );
-
-		$message = wp_kses( $message, wp_kses_allowed_html( 'post' ) );
+		$message = SupportFlow()->sanitize_ticket_reply( $message );
 
 		if ( $ticket_id ) {
 			$reply_args = array(
