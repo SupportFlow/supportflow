@@ -355,10 +355,11 @@ class SupportFlow {
 		}
 	}
 
-	public function filter_wp_insert_post_data($data, $postarr) {
+	public function filter_wp_insert_post_data( $data, $postarr ) {
 		if ( 0 == $postarr['post_author'] ) {
 			$data['post_author'] = 0;
 		}
+
 		return $data;
 	}
 
@@ -848,6 +849,7 @@ class SupportFlow {
 	 * Apart from this allow embedding code using <code> tag
 	 *
 	 * @param string $reply Reply to be sanitized
+	 *
 	 * @return string Sanitized reply
 	 */
 	public function sanitize_ticket_reply( $reply ) {

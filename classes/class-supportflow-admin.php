@@ -550,8 +550,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 	public function meta_box_other_respondents_tickets() {
 		$ticket_respondents = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'slugs' ) );
-		$statuses     = SupportFlow()->post_statuses;
-		$status_slugs = array_keys($statuses);
+		$statuses           = SupportFlow()->post_statuses;
+		$status_slugs       = array_keys( $statuses );
 
 		$table = new SupportFlow_Table( '', false, false );
 
@@ -816,11 +816,11 @@ class SupportFlow_Admin extends SupportFlow {
 		</div>
 
 		<div id="major-publishing-actions">
-		<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
-			<div id="delete-action">
-				<?php submit_button( $close_ticket_label, '', 'close-ticket-submit', false, array( 'id' => 'close-ticket-submit' ) ); ?>
-			</div>
-		<?php endif; ?>
+			<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
+				<div id="delete-action">
+					<?php submit_button( $close_ticket_label, '', 'close-ticket-submit', false, array( 'id' => 'close-ticket-submit' ) ); ?>
+				</div>
+			<?php endif; ?>
 			<div id="publishing-action">
 				<?php submit_button( $submit_text, 'save-button primary', 'update-ticket', false ); ?>
 			</div>
