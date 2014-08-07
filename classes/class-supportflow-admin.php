@@ -140,8 +140,10 @@ class SupportFlow_Admin extends SupportFlow {
 
 	}
 
-	/*
+	/**
 	 * Add random characters to attachment uploaded through SupportFlow web UI
+	 *
+	 * @todo Conversion to a better way to determine if attachment if uploaded through SF web UI rather than HTTP referer
 	 */
 	function action_add_attachment( $attachment_id ) {
 		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
