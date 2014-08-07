@@ -10,6 +10,7 @@ module.exports = function (grunt) {
 		'js/statistics.js',
 		'js/ticket_attachments.js',
 		'js/tickets.js',
+		'js/auto_save.js',
 	];
 	var css_files = [
 		'css/admin.css',
