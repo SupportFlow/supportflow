@@ -12,6 +12,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_filter( 'heartbeat_received', array( $this, 'filter_heartbeat_received' ), 10, 2 );
 		add_action( 'wp_ajax_ticket_attachment_upload', array( $this, 'action_wp_ajax_ticket_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'add_attachment', array( $this, 'action_add_attachment' ) );
 	}
 
 	public function setup_actions() {
@@ -168,6 +169,39 @@ class SupportFlow_Admin extends SupportFlow {
 		_e( 'Successfully sented E-Mails', 'supportflow' );
 		exit;
 
+	}
+
+	/**
+	 * Add random characters to attachment uploaded through SupportFlow web UI
+	 *
+	 * @todo Conversion to a better way to determine if attachment if uploaded through SF web UI rather than HTTP referer
+	 */
+	function action_add_attachment( $attachment_id ) {
+		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
+			return;
+		}
+
+		$post_type = SupportFlow()->post_type;
+		$referer   = $_SERVER['HTTP_REFERER'];
+
+		$url  = parse_url( $referer );
+		$path = $url['scheme'] . '://' . $url['host'] . $url['path'];
+		parse_str( $url['query'], $query );
+
+		// Check if referred by SupportFlow ticket page
+		if ( admin_url( 'post-new.php' ) == $path ) {
+			if ( empty( $query['post_type'] ) || $query['post_type'] != $post_type ) {
+				return;
+			}
+		} elseif ( admin_url( 'post.php' ) == $path ) {
+			if ( empty( $query['post'] ) || get_post_type( (int) $query['post'] ) != $post_type ) {
+				return;
+			}
+		} else {
+			return;
+		}
+
+		SupportFlow()->extend->attachments->secure_attachment_file( $attachment_id );
 	}
 
 	/**
@@ -973,7 +1007,6 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	public function display_ticket_replies() {
-
 		$private_replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) );
 
 		if ( ! empty( $private_replies ) ) {
@@ -985,15 +1018,11 @@ class SupportFlow_Admin extends SupportFlow {
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				echo $post_content;
-				$attachment_args = array(
-					'post_parent' => $reply->ID,
-					'post_type'   => 'attachment'
-				);
-				if ( $attachments = get_posts( $attachment_args ) ) {
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachments as $attachment ) {
-						$attachment_link = wp_get_attachment_url( $attachment->ID );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
+					foreach ( $attachment_ids as $attachment_id ) {
+						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -1023,15 +1052,11 @@ class SupportFlow_Admin extends SupportFlow {
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				echo $post_content;
-				$attachment_args = array(
-					'post_parent' => $reply->ID,
-					'post_type'   => 'attachment'
-				);
-				if ( $attachments = get_posts( $attachment_args ) ) {
+				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachments as $attachment ) {
-						$attachment_link = wp_get_attachment_url( $attachment->ID );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( $attachment->post_title ) . '</a></li>';
+					foreach ( $attachment_ids as $attachment_id ) {
+						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
+						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}
@@ -1235,7 +1260,9 @@ class SupportFlow_Admin extends SupportFlow {
 
 			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
 			if ( ! empty( $_POST['reply-attachments'] ) ) {
-				$attachements = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
+				// Remove same attachment added more than once
+				$attachements   = array_unique($attachements);
 				// Remove non-int attachment ID's from array
 				$attachements   = array_filter( $attachements, function ( $val ) {
 					return (string) (int) $val === (string) $val;
