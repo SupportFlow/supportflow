@@ -9,7 +9,6 @@ class SupportFlow_Attachments extends SupportFlow {
 
 	function __construct() {
 		add_action( 'init', array( $this, 'action_init_download_attachment' ) );
-		add_filter( 'wp_handle_upload_prefilter', array( $this, 'filter_wp_handle_upload_prefilter' ) );
 	}
 
 	public function action_init_download_attachment() {
@@ -39,16 +38,6 @@ class SupportFlow_Attachments extends SupportFlow {
 
 		readfile( $file );
 		exit;
-	}
-
-	/*
-	 * Adds some random characters to attachments to prevent direct access by guessing name
-	 */
-	public function filter_wp_handle_upload_prefilter( $file ) {
-		$file_parts   = pathinfo( $file['name'] );
-		$file['name'] = $file_parts['filename'] . '_' . wp_generate_password( 5, false ) . '.' . $file_parts['extension'];
-
-		return $file;
 	}
 
 	public function insert_attachment_secret_key( $attachment_id ) {
@@ -99,6 +88,25 @@ class SupportFlow_Attachments extends SupportFlow {
 		return home_url() . '/?sf_download_attachment=' . $attachment_secret;
 	}
 
+	/**
+	 * Sufffix random characters to attachment to prevent direct access to it by guessing URL
+	 *
+	 * @param int $attachment_id ID of attachment
+	 * @return boolean True on success else false
+	 */
+	public function secure_attachment_file( $attachment_id ) {
+
+		$file       = get_attached_file( $attachment_id );
+		$file_parts = pathinfo( $file );
+		$file_new   = $file_parts['dirname'] . '/' . $file_parts['filename'] . '_' . wp_generate_password( 5, false ) . '.' . $file_parts['extension'];
+
+		if ( rename( $file, $file_new ) ) {
+			update_attached_file( $attachment_id, $file_new );
+			return true;
+		} else {
+			return false;;
+		}
+	}
 }
 
 SupportFlow()->extend->attachments = new SupportFlow_Attachments();

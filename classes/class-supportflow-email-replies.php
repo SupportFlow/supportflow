@@ -172,6 +172,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 					if ( is_wp_error( $upload_result ) ) {
 						WP_CLI::warning( $upload_result->get_error_message() );
 					} else {
+						SupportFlow()->extend->attachments->secure_attachment_file( $upload_result );
 						$new_attachment_ids[] = $upload_result;
 					}
 

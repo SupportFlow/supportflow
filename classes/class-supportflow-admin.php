@@ -12,6 +12,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_filter( 'heartbeat_received', array( $this, 'filter_heartbeat_received' ), 10, 2 );
 		add_action( 'wp_ajax_ticket_attachment_upload', array( $this, 'action_wp_ajax_ticket_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
+		add_action( 'add_attachment', array( $this, 'action_add_attachment' ) );
 	}
 
 	public function setup_actions() {
@@ -137,6 +138,37 @@ class SupportFlow_Admin extends SupportFlow {
 		_e( 'Successfully sented E-Mails', 'supportflow' );
 		exit;
 
+	}
+
+	/*
+	 * Add random characters to attachment uploaded through SupportFlow web UI
+	 */
+	function action_add_attachment( $attachment_id ) {
+		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
+			return;
+		}
+
+		$post_type = SupportFlow()->post_type;
+		$referer   = $_SERVER['HTTP_REFERER'];
+
+		$url  = parse_url( $referer );
+		$path = $url['scheme'] . '://' . $url['host'] . $url['path'];
+		parse_str( $url['query'], $query );
+
+		// Check if referred by SupportFlow ticket page
+		if ( admin_url( 'post-new.php' ) == $path ) {
+			if ( empty( $query['post_type'] ) || $query['post_type'] != $post_type ) {
+				return;
+			}
+		} elseif ( admin_url( 'post.php' ) == $path ) {
+			if ( empty( $query['post'] ) || get_post_type( (int) $query['post'] ) != $post_type ) {
+				return;
+			}
+		} else {
+			return;
+		}
+
+		SupportFlow()->extend->attachments->secure_attachment_file( $attachment_id );
 	}
 
 	/**
