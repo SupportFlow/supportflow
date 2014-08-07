@@ -146,7 +146,7 @@ class SupportFlow {
 
 		/** Version ***********************************************************/
 
-		$this->version = '0.1-alpha'; // SupportFlow version
+		$this->version = '0.2'; // SupportFlow version
 
 		/** Paths *************************************************************/
 
@@ -260,6 +260,7 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
+		add_action( 'init', array( $this, 'action_init_upgrade' ) );
 
 		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
 
@@ -353,6 +354,40 @@ class SupportFlow {
 			$args['public'] = true;
 			register_post_status( $post_status, $args );
 		}
+	}
+
+	/**
+	 * Upgrade database records on update of plugin
+	 *
+	 * @since 0.3
+	 */
+	public function action_init_upgrade() {
+		$code_version = $this->version;
+		$db_version   = get_option( 'sf_version' );
+
+		if ( 0 == version_compare( $code_version, $db_version ) ) {
+			return;
+		}
+
+		// New installation or 0.1 or 0.2
+		if ( ! $db_version ) {
+
+			// Earlier reply ID were stored as post_parent of attachment. Now attachment ID's are stored as post meta of reply
+			$attachments = get_posts( array(
+				'post_type'           => 'attachment',
+				'post_status'         => 'inherit',
+				'post_parent__not_in' => array( '0' ),
+				'posts_per_page'      => - 1,
+
+			) );
+			foreach ( $attachments as $attachment ) {
+				add_post_meta( $attachment->post_parent, 'sf_attachments', $attachment->ID );
+				wp_update_post( array( 'ID' => $attachment->ID, 'post_parent' => 0 ) );
+			}
+		}
+
+		// Update db_version to latest one
+		update_option( 'sf_version', $this->version );
 	}
 
 	public function filter_wp_insert_post_data($data, $postarr) {
@@ -738,7 +773,8 @@ class SupportFlow {
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $reply_id ) );
+				add_post_meta( $reply_id, 'sf_attachments', $attachment_id );
+				SupportFlow()->extend->attachments->insert_attachment_secret_key( $attachment_id );
 			}
 		}
 
