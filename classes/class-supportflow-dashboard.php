@@ -23,10 +23,14 @@ class SupportFlow_Dashboard extends SupportFlow {
 					SupportFlow()->plugin_url . 'js/dashboard.js',
 					array( 'jquery' )
 				);
+				wp_enqueue_style(
+					'supportflow-dashboard',
+					SupportFlow()->plugin_url . 'css/dashboard.css'
+				);
 			} else {
 				SupportFlow()->enqueue_scripts();
+				SupportFlow()->enqueue_styles();
 			}
-			wp_enqueue_style( 'supportflow-dashboard', SupportFlow()->plugin_url . 'css/dashboard.css', array(), SupportFlow()->version );
 
 			wp_add_dashboard_widget(
 				'sf_recent_tickets',

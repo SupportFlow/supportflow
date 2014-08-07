@@ -819,6 +819,23 @@ class SupportFlow {
 	}
 
 	/**
+	 *
+	 * Enqueue minfied and concatenated version all the styles required by SupportFlow
+	 *
+	 * @return string Handle of enqueued style
+	 */
+	public function enqueue_styles() {
+		$handle = 'supportflow-minified-styles';
+
+		wp_enqueue_style(
+			$handle,
+			SupportFlow()->plugin_url . 'css/supportflow.min.css'
+		);
+
+		return $handle;
+	}
+
+	/**
 	 * Get the special capability given a string
 	 */
 	public function get_cap( $cap ) {

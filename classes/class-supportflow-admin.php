@@ -64,7 +64,14 @@ class SupportFlow_Admin extends SupportFlow {
 		global $pagenow;
 		$script_debugging = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 
-		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
+		if ( $script_debugging ) {
+			wp_enqueue_style(
+				'supportflow-admin',
+				SupportFlow()->plugin_url . 'css/admin.css'
+			);
+		} else {
+			SupportFlow()->enqueue_styles();
+		}
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
