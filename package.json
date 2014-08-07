@@ -1,6 +1,6 @@
 {
 	"name"        : "SupportFlow",
-	"dependencies": {
+	"devDependencies": {
 		"grunt-contrib-uglify": "^0.5.1",
 		"grunt"               : "^0.4.5"
 	},
