@@ -161,12 +161,12 @@ class SupportFlow {
 
 		/** Identifiers *******************************************************/
 
-		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_thread' ); // Retained sf_thread for backward compatiblity with old versions
+		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_ticket' );
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
 		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
-		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_thread' ); // Retained sf_thread for backward compatiblity with old versions
+		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
 
 		$this->email_term_prefix = 'sf-';
 
@@ -362,6 +362,8 @@ class SupportFlow {
 	 * @since 0.3
 	 */
 	public function action_init_upgrade() {
+		global $wpdb;
+
 		$code_version = $this->version;
 		$db_version   = get_option( 'sf_version' );
 
@@ -384,6 +386,10 @@ class SupportFlow {
 				add_post_meta( $attachment->post_parent, 'sf_attachments', $attachment->ID );
 				wp_update_post( array( 'ID' => $attachment->ID, 'post_parent' => 0 ) );
 			}
+
+			// Migrate all posts with post type sf_thread to sf_ticket
+			$db_prefix = $wpdb->prefix;
+			$wpdb->update( "{$db_prefix}posts", array( 'post_type' => 'sf_ticket' ), array( 'post_type' => 'sf_shread' ) );
 		}
 
 		// Update db_version to latest one
