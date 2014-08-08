@@ -95,7 +95,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 
 		echo '</div>';
 
-		$this->enqueue_script();
+		$this->insert_script();
 	}
 
 	/*
@@ -291,7 +291,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	/*
 	 * Enqueue JS code required for form submission
 	 */
-	public function enqueue_script() {
+	public function insert_script() {
 		if ( SupportFlow()->script_dev ) {
 			$handle = SupportFlow()->enqueue_script( 'supportflow-email_accounts', 'email_accounts.js' );
 		} else {

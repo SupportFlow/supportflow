@@ -28,7 +28,7 @@ class SupportFlow_Preferences extends SupportFlow {
 
 	}
 
-	public function enqueue_scripts() {
+	public function insert_scripts() {
 		if ( SupportFlow()->script_dev ) {
 			$handle = SupportFlow()->enqueue_script( 'supportflow-preferences', 'preferences.js' );
 		} else {
@@ -47,7 +47,7 @@ class SupportFlow_Preferences extends SupportFlow {
 	public function preferences_page() {
 		echo '<div class="wrap">';
 
-		$this->enqueue_scripts();
+		$this->insert_scripts();
 
 		$this->user_ticket_signature_page();
 		echo '<br />';

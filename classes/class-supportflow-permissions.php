@@ -72,7 +72,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	}
 
 	public function permissions_page() {
-		$this->enqueue_script();
+		$this->insert_script();
 		?>
 		<div class="wrap">
 		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2>
@@ -117,7 +117,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	/*
 	 * Enqueue JS code required by class
 	 */
-	public function enqueue_script() {
+	public function insert_script() {
 		if ( SupportFlow()->script_dev ) {
 			$handle = SupportFlow()->enqueue_script( 'supportflow-permissions', 'permissions.js' );
 		} else {

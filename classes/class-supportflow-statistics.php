@@ -37,7 +37,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	public function statistics_page() {
 		// Add JS and CSS code required by page
 		$this->insert_css_code();
-		$this->enqueue_script();
+		$this->insert_script();
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Statistics', 'supportflow' ) ?></h2>
@@ -113,7 +113,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	/*
 	 * Enqueue JS code required by statistics page
 	 */
-	function enqueue_script() {
+	function insert_script() {
 		if ( SupportFlow()->script_dev ) {
 			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
 		} else {
