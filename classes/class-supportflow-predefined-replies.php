@@ -40,13 +40,8 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		global $pagenow;
 
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-				$handle = 'supportflow-predefined-replies';
-				wp_enqueue_script(
-					$handle,
-					SupportFlow()->plugin_url . 'js/predefined-replies.js',
-					array( 'jquery' )
-				);
+			if ( SupportFlow()->script_dev ) {
+				$handle = SupportFlow()->enqueue_script( 'supportflow-predefined-replies', 'predefined-replies.js' );
 			} else {
 				$handle = SupportFlow()->enqueue_scripts();
 			}

@@ -63,13 +63,9 @@ class SupportFlow_Admin extends SupportFlow {
 	 */
 	public function action_admin_enqueue_scripts() {
 		global $pagenow;
-		$script_debugging = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 
-		if ( $script_debugging ) {
-			wp_enqueue_style(
-				'supportflow-admin',
-				SupportFlow()->plugin_url . 'css/admin.css'
-			);
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_style( 'supportflow-admin', 'admin.css' );
 		} else {
 			SupportFlow()->enqueue_styles();
 		}
@@ -77,15 +73,11 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
 
-			if ( $script_debugging ) {
-				$respondents_autocomplete_handle = 'supportflow-respondents-autocomplete';
-				$ticket_attachment_handle        = 'supportflow-ticket-attachments';
-				$supportflow_tickets_handle      = 'supportflow-tickets';
-				$auto_save_handle                = 'supportflow-auto-save';
-				wp_enqueue_script( $respondents_autocomplete_handle, SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery' ) );
-				wp_enqueue_script( $ticket_attachment_handle, SupportFlow()->plugin_url . 'js/ticket_attachments.js', array( 'jquery' ) );
-				wp_enqueue_script( $supportflow_tickets_handle, SupportFlow()->plugin_url . 'js/tickets.js', array( 'jquery' ) );
-				wp_enqueue_script( $auto_save_handle, SupportFlow()->plugin_url . 'js/auto_save.js', array( 'jquery', 'heartbeat' ) );
+			if ( SupportFlow()->script_dev ) {
+				$respondents_autocomplete_handle = SupportFlow()->enqueue_script( 'supportflow-respondents-autocomplete', 'respondents-autocomplete.js' );
+				$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
+				$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
+				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
 			} else {
 				$handle
 					= $respondents_autocomplete_handle
@@ -121,9 +113,8 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		if ( 'post.php' == $pagenow ) {
-			if ( $script_debugging ) {
-				$email_conversation_handle = 'supportflow-email-conversation';
-				wp_enqueue_script( $email_conversation_handle, SupportFlow()->plugin_url . 'js/email_conversation.js', array( 'jquery' ) );
+			if ( SupportFlow()->script_dev ) {
+				$email_conversation_handle = SupportFlow()->enqueue_script( 'supportflow-email-conversation', 'email_conversation.js' );
 			} else {
 				$email_conversation_handle = SupportFlow()->enqueue_scripts();
 			}

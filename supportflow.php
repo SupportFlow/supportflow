@@ -903,15 +903,12 @@ class SupportFlow {
 	 * @return string Handle of enqueued script
 	 */
 	public function enqueue_scripts() {
-		$handle = 'supportflow-minified-scripts';
 
-		wp_enqueue_script(
-			$handle,
-			SupportFlow()->plugin_url . 'js/supportflow.min.js',
+		return $this->enqueue_script(
+			'supportflow-minified-scripts',
+			'supportflow.min.js',
 			array( 'jquery', 'jquery-ui-autocomplete', 'heartbeat' )
 		);
-
-		return $handle;
 	}
 
 	/**
@@ -921,14 +918,11 @@ class SupportFlow {
 	 * @return string Handle of enqueued style
 	 */
 	public function enqueue_styles() {
-		$handle = 'supportflow-minified-styles';
 
-		wp_enqueue_style(
-			$handle,
-			SupportFlow()->plugin_url . 'css/supportflow.min.css'
+		return $this->enqueue_style(
+			'supportflow-minified-styles',
+			'supportflow.min.css'
 		);
-
-		return $handle;
 	}
 
 	/**

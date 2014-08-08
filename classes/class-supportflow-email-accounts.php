@@ -292,13 +292,8 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Enqueue JS code required for form submission
 	 */
 	public function enqueue_script() {
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$handle = 'supportflow-email_accounts';
-			wp_enqueue_script(
-				$handle,
-				SupportFlow()->plugin_url . 'js/email_accounts.js',
-				array( 'jquery' )
-			);
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-email_accounts', 'email_accounts.js' );
 		} else {
 			$handle = SupportFlow()->enqueue_scripts();
 		}

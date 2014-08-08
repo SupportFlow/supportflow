@@ -29,13 +29,8 @@ class SupportFlow_Preferences extends SupportFlow {
 	}
 
 	public function enqueue_scripts() {
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$handle = 'supportflow-preferences';
-			wp_enqueue_script(
-				$handle,
-				SupportFlow()->plugin_url . 'js/preferences.js',
-				array( 'jquery' )
-			);
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-preferences', 'preferences.js' );
 		} else {
 			$handle = SupportFlow()->enqueue_scripts();
 		}

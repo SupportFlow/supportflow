@@ -17,16 +17,9 @@ class SupportFlow_Dashboard extends SupportFlow {
 
 	function action_wp_dashboard_setup() {
 		if ( current_user_can( 'edit_posts' ) ) {
-			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-				wp_enqueue_script(
-					'supportflow-dashboard',
-					SupportFlow()->plugin_url . 'js/dashboard.js',
-					array( 'jquery' )
-				);
-				wp_enqueue_style(
-					'supportflow-dashboard',
-					SupportFlow()->plugin_url . 'css/dashboard.css'
-				);
+			if ( SupportFlow()->script_dev ) {
+				SupportFlow()->enqueue_script( 'supportflow-dashboard', 'dashboard.js' );
+				SupportFlow()->enqueue_style( 'supportflow-dashboard', 'dashboard.css' );
 			} else {
 				SupportFlow()->enqueue_scripts();
 				SupportFlow()->enqueue_styles();

@@ -114,13 +114,8 @@ class SupportFlow_Statistics extends SupportFlow {
 	 * Enqueue JS code required by statistics page
 	 */
 	function enqueue_script() {
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$handle = 'supportflow-statistics';
-			wp_enqueue_script(
-				$handle,
-				SupportFlow()->plugin_url . 'js/statistics.js',
-				array( 'jquery' )
-			);
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'statistics.js' );
 		} else {
 			$handle = SupportFlow()->enqueue_scripts();
 		}

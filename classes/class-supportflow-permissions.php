@@ -118,13 +118,8 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Enqueue JS code required by class
 	 */
 	public function enqueue_script() {
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$handle = 'supportflow-permissions';
-			wp_enqueue_script(
-				$handle,
-				SupportFlow()->plugin_url . 'js/permissions.js',
-				array( 'jquery' )
-			);
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-permissions', 'permissions.js' );
 		} else {
 			$handle = SupportFlow()->enqueue_scripts();
 		}
