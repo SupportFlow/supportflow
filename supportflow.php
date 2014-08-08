@@ -794,6 +794,8 @@ class SupportFlow {
 		add_post_meta( $reply_id, 'reply_author', esc_sql( $details['reply_author'] ) );
 		add_post_meta( $reply_id, 'reply_author_email', esc_sql( $details['reply_author_email'] ) );
 
+		// Empty autosaved reply
+		delete_post_meta( $ticket_id, '_sf_autosave_reply' );
 
 		// Adding a ticket reply updates the post modified time for the ticket
 		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
