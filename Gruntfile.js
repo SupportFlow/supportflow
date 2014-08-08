@@ -7,7 +7,7 @@ module.exports = function (grunt) {
 		'js/permissions.js',
 		'js/predefined-replies.js',
 		'js/preferences.js',
-		'js/respondents-autocomplete.js',
+		'js/customers-autocomplete.js',
 		'js/ticket_attachments.js',
 		'js/tickets.js',
 		'js/auto_save.js',
