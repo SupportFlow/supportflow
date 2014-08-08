@@ -23,15 +23,15 @@ class SupportFlow_JSON_API extends SupportFlow {
 			'html'       => '',
 		);
 		switch ( $response['api-action'] ) {
-			case 'get-respondents':
-				$search_for         = sanitize_text_field( isset( $_REQUEST['respondents'] ) ? $_REQUEST['respondents'] : '' );
-				$respondent_matches = SupportFlow()->get_respondents( array( 'search' => $search_for ) );
-				if ( is_wp_error( $respondent_matches ) ) {
-					$response['message'] = $respondent_matches->get_error_message();
+			case 'get-customers':
+				$search_for         = sanitize_text_field( isset( $_REQUEST['customers'] ) ? $_REQUEST['customers'] : '' );
+				$customer_matches = SupportFlow()->get_customers( array( 'search' => $search_for ) );
+				if ( is_wp_error( $customer_matches ) ) {
+					$response['message'] = $customer_matches->get_error_message();
 				} else {
 					$response['query']       = $search_for;
 					$response['status']      = "ok";
-					$response['respondents'] = $respondent_matches;
+					$response['customers'] = $customer_matches;
 				}
 
 				break;

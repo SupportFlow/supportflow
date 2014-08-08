@@ -72,12 +72,12 @@ class SupportFlow_UI_Widget extends SupportFlow {
 	public function render_all_tickets_html() {
 		$user = wp_get_current_user();
 
-		$tickets = SupportFlow()->get_tickets( array( 'respondent_email' => $user->user_email ) );
+		$tickets = SupportFlow()->get_tickets( array( 'customer_email' => $user->user_email ) );
 
 		if ( empty( $tickets ) ) {
 			$output = '<div class="ticket notickets">' . __( 'No open tickets.', 'supportflow' ) . '</div>';
 		} else {
-			$output = '<ul id="respondent-tickets">';
+			$output = '<ul id="customer-tickets">';
 			foreach ( $tickets as $ticket ) {
 				$output .= '<li id="ticket-' . $ticket->ID . '">';
 				$output .= '<h4 class="ticket-title">' . get_the_title( $ticket->ID ) . '</h4>';

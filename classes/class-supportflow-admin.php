@@ -73,8 +73,9 @@ class SupportFlow_Admin extends SupportFlow {
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
 
+
 			if ( SupportFlow()->script_dev ) {
-				$respondents_autocomplete_handle = SupportFlow()->enqueue_script( 'supportflow-respondents-autocomplete', 'respondents-autocomplete.js' );
+				$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'respondents-autocomplete.js' );
 				$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
 				$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
 				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
@@ -87,7 +88,7 @@ class SupportFlow_Admin extends SupportFlow {
 					= SupportFlow()->enqueue_scripts();
 			}
 
-			wp_localize_script( $respondents_autocomplete_handle, 'SFRespondentsAc', array(
+			wp_localize_script( $customers_autocomplete_handle, 'SFCustomersAc', array(
 				'ajax_url' => add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) )
 			) );
 
@@ -100,7 +101,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 			wp_localize_script( $supportflow_tickets_handle, 'SFTickets', array(
 				'no_title_msg'      => __( 'You must need to specify the subject of the ticket', 'supportpress' ),
-				'no_respondent_msg' => __( 'You must need to add atleast one ticket respondent', 'supportpress' ),
+				'no_customer_msg'   => __( 'You must need to add atleast one customer', 'supportpress' ),
 				'pagenow'           => $pagenow,
 				'send_msg'          => __( 'Send Message', 'supportflow' ),
 				'add_private_note'  => __( 'Add Private Note', 'supportflow' ),
@@ -563,31 +564,31 @@ class SupportFlow_Admin extends SupportFlow {
 			return;
 		}
 
-		$respondents_box = 'tagsdiv-' . SupportFlow()->respondents_tax;
+		$customers_box = 'tagsdiv-' . SupportFlow()->customers_tax;
 		remove_meta_box( 'submitdiv', SupportFlow()->post_type, 'side' );
-		remove_meta_box( $respondents_box, SupportFlow()->post_type, 'side' );
+		remove_meta_box( $customers_box, SupportFlow()->post_type, 'side' );
 		remove_meta_box( 'slugdiv', SupportFlow()->post_type, 'normal' );
 
 		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
-		add_meta_box( 'supportflow-respondents', __( 'Respondents', 'supportflow' ), array( $this, 'meta_box_respondents' ), SupportFlow()->post_type, 'normal' );
+		add_meta_box( 'supportflow-customers', __( 'Customers', 'supportflow' ), array( $this, 'meta_box_customers' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-replies', __( 'Replies', 'supportflow' ), array( $this, 'meta_box_replies' ), SupportFlow()->post_type, 'normal' );
 
 		if ( 'post.php' == $pagenow ) {
-			add_meta_box( 'supportflow-other-respondents-tickets', __( 'User\'s Recent Tickets', 'supportflow' ), array( $this, 'meta_box_other_respondents_tickets' ), SupportFlow()->post_type, 'side' );
+			add_meta_box( 'supportflow-other-customers-tickets', __( 'User\'s Recent Tickets', 'supportflow' ), array( $this, 'meta_box_other_customers_tickets' ), SupportFlow()->post_type, 'side' );
 			add_meta_box( 'supportflow-forward_conversation', __( 'Forward this conversation', 'supportflow' ), array( $this, 'meta_box_email_conversation' ), SupportFlow()->post_type, 'side' );
 		}
 	}
 
-	public function meta_box_other_respondents_tickets() {
-		$ticket_respondents = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'slugs' ) );
-		$statuses           = SupportFlow()->post_statuses;
-		$status_slugs       = array_keys( $statuses );
+	public function meta_box_other_customers_tickets() {
+		$ticket_customers = SupportFlow()->get_ticket_customers( get_the_ID(), array( 'fields' => 'slugs' ) );
+		$statuses         = SupportFlow()->post_statuses;
+		$status_slugs     = array_keys($statuses);
 
 		$table = new SupportFlow_Table( '', false, false );
 
-		if ( empty( $ticket_respondents ) ) {
+		if ( empty( $ticket_customers ) ) {
 			$tickets = array();
 
 		} else {
@@ -599,9 +600,9 @@ class SupportFlow_Admin extends SupportFlow {
 				'post__not_in' => array( get_the_id() ),
 				'tax_query'    => array(
 					array(
-						'taxonomy' => SupportFlow()->respondents_tax,
+						'taxonomy' => SupportFlow()->customers_tax,
 						'field'    => 'slug',
-						'terms'    => $ticket_respondents,
+						'terms'    => $ticket_customers,
 					),
 				),
 			);
@@ -874,21 +875,21 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	/**
-	 * Add a form element where the user can change the respondents
+	 * Add a form element where the user can change the customers
 	 */
-	public function meta_box_respondents() {
+	public function meta_box_customers() {
 
 		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
 		if ( 'draft' == get_post_status( get_the_ID() ) ) {
-			$respondents_string = get_post_meta( get_the_ID(), '_sf_autosave_respondents', true );
+			$customers_string = get_post_meta( get_the_ID(), '_sf_autosave_customers', true );
 		} else {
-			$respondents        = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'emails' ) );
-			$respondents_string = implode( ', ', $respondents );
-			$respondents_string .= empty( $respondents_string ) ? '' : ', ';
+			$customers        = SupportFlow()->get_ticket_customers( get_the_ID(), array( 'fields' => 'emails' ) );
+			$customers_string = implode( ', ', $customers );
+			$customers_string .= empty( $customers_string ) ? '' : ', ';
 		}
-		echo '<h4>' . __( 'Respondent(s)', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="respondents" name="respondents" class="sf_autosave" placeholder="' . $placeholder . '" value="' . esc_attr( $respondents_string ) . '" autocomplete="off" />';
-		echo '<p class="description">' . __( 'Enter each respondent email address, separated with a comma', 'supportflow' ) . '</p>';
+		echo '<h4>' . __( 'Customer(s)', 'supportflow' ) . '</h4>';
+		echo '<input type="text" id="customers" name="customers" class="sf_autosave" placeholder="' . $placeholder . '" value="' . esc_attr( $customers_string ) . '" autocomplete="off" />';
+		echo '<p class="description">' . __( 'Enter each customer email address, separated with a comma', 'supportflow' ) . '</p>';
 	}
 
 	/**
@@ -1075,7 +1076,7 @@ class SupportFlow_Admin extends SupportFlow {
 			'updated'     => __( 'Updated', 'supportflow' ),
 			'title'       => __( 'Subject', 'supportflow' ),
 			'sf_excerpt'  => __( 'Excerpt', 'supportflow' ),
-			'respondents' => __( 'Respondents', 'supportflow' ),
+			'customers' => __( 'Customers', 'supportflow' ),
 			'status'      => __( 'Status', 'supportflow' ),
 			'author'      => __( 'Agent', 'supportflow' ),
 			'sf_replies'  => '<span title="' . __( 'Reply count', 'supportflow' ) . '" class="comment-grey-bubble"></span>',
@@ -1132,22 +1133,22 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 				echo $first_reply;
 				break;
-			case 'respondents':
-				$respondents = SupportFlow()->get_ticket_respondents( $ticket_id, array( 'fields' => 'emails' ) );
-				if ( empty( $respondents ) ) {
+			case 'customers':
+				$customers = SupportFlow()->get_ticket_customers( $ticket_id, array( 'fields' => 'emails' ) );
+				if ( empty( $customers ) ) {
 					echo '—';
 					break;
 				}
-				foreach ( $respondents as $key => $respondent_email ) {
+				foreach ( $customers as $key => $customer_email ) {
 					$args              = array(
-						SupportFlow()->respondents_tax => SupportFlow()->get_email_hash( $respondent_email ),
+						SupportFlow()->customers_tax => SupportFlow()->get_email_hash( $customer_email ),
 						'post_type'                    => SupportFlow()->post_type,
 					);
-					$respondent_photo  = get_avatar( $respondent_email, 16 );
-					$respondent_link   = '<a class="respondent_link" href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $respondent_email . '</a>';
-					$respondents[$key] = $respondent_photo . '&nbsp;' . $respondent_link;
+					$customer_photo  = get_avatar( $customer_email, 16 );
+					$customer_link   = '<a class="customer_link" href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $customer_email . '</a>';
+					$customers[$key] = $customer_photo . '&nbsp;' . $customer_link;
 				}
-				echo implode( '<br />', $respondents );
+				echo implode( '<br />', $customers );
 				break;
 			case 'status':
 				$post_status = get_post_status( $ticket_id );
@@ -1209,7 +1210,7 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	/**
-	 * When a ticket is saved or updated, make sure we save the respondent
+	 * When a ticket is saved or updated, make sure we save the customer
 	 * and new reply data
 	 */
 	public function action_save_post( $ticket_id ) {
@@ -1221,9 +1222,9 @@ class SupportFlow_Admin extends SupportFlow {
 			return;
 		}
 
-		if ( isset( $_POST['respondents'] ) ) {
-			$respondents = array_map( 'sanitize_email', explode( ',', $_POST['respondents'] ) );
-			SupportFlow()->update_ticket_respondents( $ticket_id, $respondents );
+		if ( isset( $_POST['customers'] ) ) {
+			$customers = array_map( 'sanitize_email', explode( ',', $_POST['customers'] ) );
+			SupportFlow()->update_ticket_customers( $ticket_id, $customers );
 		}
 
 		if ( isset( $_POST['post_email_account'] ) && is_numeric( $_POST['post_email_account'] ) && '' == $email_account_id ) {

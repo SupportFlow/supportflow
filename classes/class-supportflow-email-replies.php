@@ -217,20 +217,20 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$ticket_id = SupportFlow()->get_ticket_from_secret( $matches[1] );
 		}
 
-		// Add anyone else that was in the 'to' or 'cc' fields as respondents
-		$respondents = array();
+		// Add anyone else that was in the 'to' or 'cc' fields as customers
+		$customers = array();
 		$fields      = array( 'to', 'cc' );
 		foreach ( $fields as $field ) {
 			if ( ! empty( $email->headers->$field ) ) {
 				foreach ( $email->headers->$field as $recipient ) {
 					$email_address = $recipient->mailbox . '@' . $recipient->host;
 					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address && strcasecmp( $email_address, $to ) != 0 ) {
-						$respondents[] = $email_address;
+						$customers[] = $email_address;
 					}
 				}
 			}
 		}
-		$respondents[] = $reply_author_email;
+		$customers[] = $reply_author_email;
 
 		$message = SupportFlow()->sanitize_ticket_reply( $message );
 
@@ -239,7 +239,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'reply_author'       => $reply_author,
 				'reply_author_email' => $reply_author_email,
 			);
-			SupportFlow()->update_ticket_respondents( $ticket_id, $respondents, true );
+			SupportFlow()->update_ticket_customers( $ticket_id, $customers, true );
 			SupportFlow()->add_ticket_reply( $ticket_id, $message, $reply_args );
 
 		} else {
@@ -249,7 +249,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				'reply_author'       => $reply_author,
 				'reply_author_email' => $reply_author_email,
 				'message'            => $message,
-				'respondent_email'   => $respondents,
+				'customer_email'   => $customers,
 				'email_account'      => $email_account_id,
 			);
 

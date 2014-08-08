@@ -164,7 +164,7 @@ class SupportFlow {
 
 		$this->post_type                = apply_filters( 'supportflow_thread_post_type', 'sf_ticket' );
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
-		$this->respondents_tax          = apply_filters( 'supportflow_respondents_taxonomy', 'sf_respondent' );
+		$this->customers_tax          = apply_filters( 'supportflow_customers_taxonomy', 'sf_customer' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
 		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
 		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
@@ -311,16 +311,15 @@ class SupportFlow {
 			'assign_terms' => 'manage_options',
 		);
 
-		$args_respondents_tax = array(
-			'label'             => __( 'Respondents', 'supportflow' ),
+		$args_customers_tax = array(
+			'label'             => __( 'Customers', 'supportflow' ),
 			'labels'            => array(
-				'search_items' => __( 'Search Respondents', 'supportflow' ),
-				'edit_item'    => __( 'Edit Respondent', 'supportflow' ),
-				'update_item'  => __( 'Update Respondent', 'supportflow' ),
-				'add_new_item' => __( 'Add New Respondent', 'supportflow' ),
+				'search_items' => __( 'Search Customers', 'supportflow' ),
+				'edit_item'    => __( 'Edit Customer', 'supportflow' ),
+				'update_item'  => __( 'Update Customer', 'supportflow' ),
+				'add_new_item' => __( 'Add New Customer', 'supportflow' ),
 			),
-			'public'            => true,
-			'show_in_nav_menus' => true,
+			'public'            => false,
 			'rewrite'           => false,
 			'capabilities'      => $capabilities,
 		);
@@ -339,7 +338,7 @@ class SupportFlow {
 			'capabilities'      => $capabilities,
 		);
 
-		register_taxonomy( $this->respondents_tax, $this->post_type, $args_respondents_tax );
+		register_taxonomy( $this->customers_tax, $this->post_type, $args_customers_tax );
 		register_taxonomy( $this->tags_tax, $this->post_type, $args_tags_tax );
 	}
 
@@ -364,6 +363,7 @@ class SupportFlow {
 	 */
 	public function action_init_upgrade() {
 		global $wpdb;
+		$db_prefix = $wpdb->prefix;
 
 		$code_version = $this->version;
 		$db_version   = get_option( 'sf_version' );
@@ -389,8 +389,10 @@ class SupportFlow {
 			}
 
 			// Migrate all posts with post type sf_thread to sf_ticket
-			$db_prefix = $wpdb->prefix;
 			$wpdb->update( "{$db_prefix}posts", array( 'post_type' => 'sf_ticket' ), array( 'post_type' => 'sf_thread' ) );
+
+			// Migrate all terms with taxonomy sf_respondent to sf_customer
+			$wpdb->update( "{$db_prefix}term_taxonomy", array( 'taxonomy' => 'sf_customer' ), array( 'taxonomy' => 'sf_respondent' ) );
 		}
 
 		// Update db_version to latest one
@@ -464,8 +466,8 @@ class SupportFlow {
 			'subject'            => '',
 			'message'            => '',
 			'date'               => '',
-			'respondent_id'      => 0, // If the requester has a WordPress account (ID or username)
-			'respondent_email'   => array(), // And an e-mail address
+			'customer_id'      => 0, // If the requester has a WordPress account (ID or username)
+			'customer_email'   => array(), // And an e-mail address
 			'reply_author'       => '',
 			'reply_author_email' => '',
 			'status'             => key( $post_statuses ),
@@ -493,9 +495,9 @@ class SupportFlow {
 			return $ticket_id;
 		}
 
-		// Assign the respondent(s)
-		if ( ! empty( $args['respondent_email'] ) ) {
-			$this->update_ticket_respondents( $ticket_id, $args['respondent_email'] );
+		// Assign the customer(s)
+		if ( ! empty( $args['customer_email'] ) ) {
+			$this->update_ticket_customers( $ticket_id, $args['customer_email'] );
 		}
 
 		if ( is_numeric( $args['email_account'] ) ) {
@@ -503,11 +505,11 @@ class SupportFlow {
 		}
 
 		// If there was a message, add it to the ticket
-		if ( ! empty( $args['message'] ) && ! empty( $args['respondent_email'] ) ) {
+		if ( ! empty( $args['message'] ) && ! empty( $args['customer_email'] ) ) {
 			$reply_details = array(
 				'reply_author'       => $args['reply_author'],
 				'reply_author_email' => $args['reply_author_email'],
-				'user_id'            => $args['respondent_id'],
+				'user_id'            => $args['customer_id'],
 			);
 			$this->add_ticket_reply( $ticket_id, $args['message'], $reply_details );
 		}
@@ -516,7 +518,7 @@ class SupportFlow {
 	}
 
 	/**
-	 * @todo This should produce an object with ticket details, respondents, and replies
+	 * @todo This should produce an object with ticket details, customers, and replies
 	 */
 	public function get_ticket( $ticket_id ) {
 
@@ -524,12 +526,12 @@ class SupportFlow {
 	}
 
 	/**
-	 * @todo This should produce a series of ticket objects with respondents, replies, etc.
+	 * @todo This should produce a series of ticket objects with customers, replies, etc.
 	 */
 	public function get_tickets( $args = array() ) {
 
 		$defaults = array(
-			'respondent_email' => '',
+			'customer_email' => '',
 			'post_status'      => '',
 			'orderby'          => 'modified',
 		);
@@ -540,12 +542,12 @@ class SupportFlow {
 			$ticket_args['post_status'] = array_keys( $this->post_statuses );
 		}
 
-		if ( ! empty( $args['respondent_email'] ) ) {
+		if ( ! empty( $args['customer_email'] ) ) {
 			$ticket_args['tax_query'] = array(
 				array(
-					'taxonomy' => $this->respondents_tax,
+					'taxonomy' => $this->customers_tax,
 					'field'    => 'slug',
-					'terms'    => $this->get_email_hash( $args['respondent_email'] ),
+					'terms'    => $this->get_email_hash( $args['customer_email'] ),
 				),
 			);
 		}
@@ -562,11 +564,11 @@ class SupportFlow {
 	}
 
 	/**
-	 * Get respondents matching $query
+	 * Get customers matching $query
 	 *
 	 * @param string $query partial email address to search for
 	 */
-	public function get_respondents( $args = array() ) {
+	public function get_customers( $args = array() ) {
 
 		$defaults = array(
 			'search' => '',
@@ -581,7 +583,7 @@ class SupportFlow {
 			'name__like' => $args['search'],
 			'number'     => $args['number'],
 		);
-		$matches   = get_terms( $this->respondents_tax, $term_args );
+		$matches   = get_terms( $this->customers_tax, $term_args );
 
 		if ( ! $matches ) {
 			return array();
@@ -591,67 +593,67 @@ class SupportFlow {
 	}
 
 	/**
-	 * Get a ticket's respondents
+	 * Get a ticket's customers
 	 *
 	 * @todo support retrieving more fields
 	 */
-	public function get_ticket_respondents( $ticket_id, $args = array() ) {
+	public function get_ticket_customers( $ticket_id, $args = array() ) {
 
 		$default_args = array(
 			'fields' => 'all', // 'all', 'emails'
 		);
 		$args         = array_merge( $default_args, $args );
 
-		$raw_respondents = wp_get_object_terms( $ticket_id, $this->respondents_tax );
-		if ( is_wp_error( $raw_respondents ) ) {
+		$raw_customers = wp_get_object_terms( $ticket_id, $this->customers_tax );
+		if ( is_wp_error( $raw_customers ) ) {
 			return array();
 		}
 
-		$respondents = array();
+		$customers = array();
 		if ( 'emails' == $args['fields'] ) {
-			foreach ( $raw_respondents as $raw_respondent ) {
-				$respondents[] = $raw_respondent->name;
+			foreach ( $raw_customers as $raw_customer ) {
+				$customers[] = $raw_customer->name;
 			}
 		} elseif ( 'slugs' == $args['fields'] ) {
-			foreach ( $raw_respondents as $raw_respondent ) {
-				$respondents[] = $raw_respondent->slug;
+			foreach ( $raw_customers as $raw_customer ) {
+				$customers[] = $raw_customer->slug;
 			}
 		}
 
-		return $respondents;
+		return $customers;
 	}
 
 	/**
-	 * Update a ticket's respondents
+	 * Update a ticket's customers
 	 *
 	 * @param int   $ticket_id
-	 * @param array $respondents An array of email addresses
+	 * @param array $customers An array of email addresses
 	 * @param bool  $append      Whether or not to append these email addresses to any existing addresses
 	 */
-	public function update_ticket_respondents( $ticket_id, $respondents, $append = false ) {
+	public function update_ticket_customers( $ticket_id, $customers, $append = false ) {
 
-		if ( is_string( $respondents ) ) {
-			$respondents = array( $respondents );
+		if ( is_string( $customers ) ) {
+			$customers = array( $customers );
 		}
 
 		$term_ids = array();
-		foreach ( $respondents as $dirty_respondent ) {
-			if ( empty( $dirty_respondent ) ) {
+		foreach ( $customers as $dirty_customer ) {
+			if ( empty( $dirty_customer ) ) {
 				continue;
 			}
 			// Create a term if it doesn't yet exist
-			$email = ( is_array( $dirty_respondent ) ) ? $dirty_respondent['user_email'] : $dirty_respondent;
-			if ( $term = get_term_by( 'name', $email, $this->respondents_tax ) ) {
+			$email = ( is_array( $dirty_customer ) ) ? $dirty_customer['user_email'] : $dirty_customer;
+			if ( $term = get_term_by( 'name', $email, $this->customers_tax ) ) {
 				$term_ids[] = (int) $term->term_id;
 			} else {
-				$term       = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $this->get_email_hash( $email ) ) );
+				$term       = wp_insert_term( $email, $this->customers_tax, array( 'slug' => $this->get_email_hash( $email ) ) );
 				if ( ! is_wp_error( $term ) ) {
 					$term_ids[] = $term['term_id'];
 				}
 
 			}
 		}
-		wp_set_object_terms( $ticket_id, $term_ids, $this->respondents_tax, $append );
+		wp_set_object_terms( $ticket_id, $term_ids, $this->customers_tax, $append );
 	}
 
 	/**
