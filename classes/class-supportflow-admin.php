@@ -81,7 +81,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
 			} else {
 				$handle
-					= $respondents_autocomplete_handle
+					= $customers_autocomplete_handle
 					= $ticket_attachment_handle
 					= $supportflow_tickets_handle
 					= $auto_save_handle
