@@ -89,8 +89,6 @@
 	font-size:      1.7em;
 	padding-left:   8px;
 	padding-right:  8px;
-	padding-top:    12px;
-	padding-bottom: 10px;
 	line-height:    100%;
 	height:         1.7em;
 }
@@ -99,6 +97,7 @@
 	width:     100%;
 	padding:   8px;
 	font-size: 1.2em;
+	height:     2.6em;
 }
 
 #supportflow-cc-bcc.postbox input {
