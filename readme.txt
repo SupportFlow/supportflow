@@ -1,8 +1,8 @@
 === SupportFlow ===
 Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
-Tested up to: 3.9.1
-Stable tag: 0.2
+Tested up to: 3.9.2
+Stable tag: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,17 @@ Now you are ready to use SupportFlow.
 Just add **[supportflow_submissionform]** shortcode to the post you want to add SupportFlow form to.
 
 == Changelog ==
+
+= 0.3 =
+* Auto-saving tickets
+* Recently created tickets widget in dashboard
+* Ticket assigned to current agent widget in dashboard
+* Other tickets by the customer in view ticket page
+* Allow agents to add signature in ticket
+* Allowing basic HTML in replies
+* Easy creation of support form using [supportflow_submissionform] shortcode
+* Securely saving attachments
+* Fixed bugs
 
 = 0.2 =
 * Fix nonce and escaping bugs.
