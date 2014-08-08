@@ -75,13 +75,13 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 			if ( SupportFlow()->script_dev ) {
-				$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'respondents-autocomplete.js' );
+				$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'customers-autocomplete.js' );
 				$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
 				$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
 				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
 			} else {
 				$handle
-					= $respondents_autocomplete_handle
+					= $customers_autocomplete_handle
 					= $ticket_attachment_handle
 					= $supportflow_tickets_handle
 					= $auto_save_handle
