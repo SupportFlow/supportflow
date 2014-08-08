@@ -115,12 +115,11 @@ class SupportFlow_Statistics extends SupportFlow {
 	 */
 	function enqueue_script() {
 		if ( SupportFlow()->script_dev ) {
-			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'statistics.js' );
+			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
 		} else {
 			$handle = SupportFlow()->enqueue_scripts();
 		}
-
-		wp_localize_script( $handle, 'SFStatistics', array(
+		wp_localize_script( $handle, 'SFToggleLinks', array(
 			'expand'   => __( 'Expand', 'supportflow' ),
 			'collapse' => __( 'Collapse', 'supportflow' ),
 		) );

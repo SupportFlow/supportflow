@@ -18,12 +18,17 @@ class SupportFlow_Dashboard extends SupportFlow {
 	function action_wp_dashboard_setup() {
 		if ( current_user_can( 'edit_posts' ) ) {
 			if ( SupportFlow()->script_dev ) {
-				SupportFlow()->enqueue_script( 'supportflow-dashboard', 'dashboard.js' );
+				$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
 				SupportFlow()->enqueue_style( 'supportflow-dashboard', 'dashboard.css' );
 			} else {
-				SupportFlow()->enqueue_scripts();
+				$handle = SupportFlow()->enqueue_scripts();
 				SupportFlow()->enqueue_styles();
 			}
+
+			wp_localize_script( $handle, 'SFToggleLinks', array(
+				'expand'   => __( 'Expand', 'supportflow' ),
+				'collapse' => __( 'Collapse', 'supportflow' ),
+			) );
 
 			wp_add_dashboard_widget(
 				'sf_recent_tickets',

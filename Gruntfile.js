@@ -1,14 +1,13 @@
 module.exports = function (grunt) {
 	// supportflow-user-widget.js and widget.css are left for now as feature is not completed
 	var js_files = [
-		'js/dashboard.js',
+		'js/toggle-links.js',
 		'js/email_accounts.js',
 		'js/email_conversation.js',
 		'js/permissions.js',
 		'js/predefined-replies.js',
 		'js/preferences.js',
 		'js/respondents-autocomplete.js',
-		'js/statistics.js',
 		'js/ticket_attachments.js',
 		'js/tickets.js',
 		'js/auto_save.js',
