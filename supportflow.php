@@ -319,8 +319,7 @@ class SupportFlow {
 				'update_item'  => __( 'Update Respondent', 'supportflow' ),
 				'add_new_item' => __( 'Add New Respondent', 'supportflow' ),
 			),
-			'public'            => true,
-			'show_in_nav_menus' => true,
+			'public'            => false,
 			'rewrite'           => false,
 			'capabilities'      => $capabilities,
 		);
