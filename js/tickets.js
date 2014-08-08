@@ -52,6 +52,6 @@ jQuery(document).ready(function () {
 
 	// Close ticket wehen close ticket button is submitted
 	jQuery('#close-ticket-submit').click(function (event) {
-		jQuery("#post meta-item input[name='post_status']").val('sf_closed');
+		jQuery("#post .meta-item input[name='post_status']").val('sf_closed');
 	});
 });
