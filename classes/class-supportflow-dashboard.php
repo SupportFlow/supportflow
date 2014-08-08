@@ -17,13 +17,8 @@ class SupportFlow_Dashboard extends SupportFlow {
 
 	function action_wp_dashboard_setup() {
 		if ( current_user_can( 'edit_posts' ) ) {
-			if ( SupportFlow()->script_dev ) {
-				$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
-				SupportFlow()->enqueue_style( 'supportflow-dashboard', 'dashboard.css' );
-			} else {
-				$handle = SupportFlow()->enqueue_scripts();
-				SupportFlow()->enqueue_styles();
-			}
+			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
+			SupportFlow()->enqueue_style( 'supportflow-dashboard', 'dashboard.css' );
 
 			wp_localize_script( $handle, 'SFToggleLinks', array(
 				'expand'   => __( 'Expand', 'supportflow' ),

@@ -40,11 +40,7 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		global $pagenow;
 
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			if ( SupportFlow()->script_dev ) {
-				$handle = SupportFlow()->enqueue_script( 'supportflow-predefined-replies', 'predefined-replies.js' );
-			} else {
-				$handle = SupportFlow()->enqueue_scripts();
-			}
+			$handle = SupportFlow()->enqueue_script( 'supportflow-predefined-replies', 'predefined-replies.js' );
 
 			wp_localize_script( $handle, 'SFPredefinedReplies', array(
 				'message' => __( 'Are you sure want to proceed? It will replace your existing content.', 'supportflow' ),

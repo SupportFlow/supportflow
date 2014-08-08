@@ -29,11 +29,7 @@ class SupportFlow_Preferences extends SupportFlow {
 	}
 
 	public function insert_scripts() {
-		if ( SupportFlow()->script_dev ) {
-			$handle = SupportFlow()->enqueue_script( 'supportflow-preferences', 'preferences.js' );
-		} else {
-			$handle = SupportFlow()->enqueue_scripts();
-		}
+		$handle = SupportFlow()->enqueue_script( 'supportflow-preferences', 'preferences.js' );
 
 		wp_localize_script( $handle, 'SFPreferences', array(
 			'changing_state'              => __( 'Changing status, please wait.', 'supportflow' ),

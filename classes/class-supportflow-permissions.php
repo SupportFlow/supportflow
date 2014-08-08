@@ -118,11 +118,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	 * Enqueue JS code required by class
 	 */
 	public function insert_script() {
-		if ( SupportFlow()->script_dev ) {
-			$handle = SupportFlow()->enqueue_script( 'supportflow-permissions', 'permissions.js' );
-		} else {
-			$handle = SupportFlow()->enqueue_scripts();
-		}
+		$handle = SupportFlow()->enqueue_script( 'supportflow-permissions', 'permissions.js' );
 
 		wp_localize_script( $handle, 'SFPermissions', array(
 			'_get_user_permissions_nonce' => wp_create_nonce( 'get_user_permissions' ),

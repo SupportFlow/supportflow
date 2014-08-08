@@ -292,11 +292,7 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 	 * Enqueue JS code required for form submission
 	 */
 	public function insert_script() {
-		if ( SupportFlow()->script_dev ) {
-			$handle = SupportFlow()->enqueue_script( 'supportflow-email_accounts', 'email_accounts.js' );
-		} else {
-			$handle = SupportFlow()->enqueue_scripts();
-		}
+		$handle = SupportFlow()->enqueue_script( 'supportflow-email_accounts', 'email_accounts.js' );
 
 		wp_localize_script( $handle, 'SFEmailAccounts', array(
 			'sure_delete_account'        => __( 'Are you sure want to delete this account?', 'supportflow' ),
