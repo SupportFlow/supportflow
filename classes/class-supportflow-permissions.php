@@ -44,7 +44,6 @@ class SupportFlow_Permissions extends SupportFlow {
 
 	public function action_admin_menu() {
 		$this->slug = 'sf_permissions';
-
 		add_submenu_page(
 			'edit.php?post_type=' . SupportFlow()->post_type,
 			__( 'Permissions', 'supportflow' ),
@@ -73,6 +72,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	}
 
 	public function permissions_page() {
+		$this->insert_script();
 		?>
 		<div class="wrap">
 		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2>
@@ -111,73 +111,27 @@ class SupportFlow_Permissions extends SupportFlow {
 		<div id="user_permissions_table">
 			<?php $this->show_permissions_table( $this->get_user_permissions( 0 ) ) ?>
 		</div>
-		<script type="text/javascript">
-			jQuery(document).ready(function () {
-				jQuery('.permission_filters').change(function () {
-					var user_id = jQuery('#change_user option:selected').data('user-id');
-					var status = jQuery('#change_status option:selected').data('status');
-					jQuery.ajax(ajaxurl, {
-						type   : 'post',
-						data   : {
-							action                     : 'get_user_permissions',
-							user_id                    : user_id,
-							status                     : status,
-							_get_user_permissions_nonce: '<?php echo wp_create_nonce( 'get_user_permissions' ) ?>',
-						},
-						success: function (content) {
-							jQuery('#user_permissions_table').html(content);
-						},
-					});
-				});
-
-				jQuery(document).on('change', '.toggle_privilege', function () {
-					var checkbox = jQuery(this);
-					var checkbox_label = checkbox.siblings('.privilege_status');
-					var permission_identifier = checkbox.data('permission-identifier');
-
-					var allowed = checkbox.prop('checked');
-					var user_id = permission_identifier.user_id;
-					var privilege_type = permission_identifier.privilege_type;
-					var privilege_id = permission_identifier.privilege_id;
-
-					checkbox_label.html('<?php _e( 'Changing status, please wait.', 'supportflow' ) ?>');
-					checkbox.prop('disabled', true);
-
-					jQuery.ajax(ajaxurl, {
-						type    : 'post',
-						data    : {
-							action                    : 'set_user_permission',
-							user_id                   : user_id,
-							privilege_type            : privilege_type,
-							privilege_id              : privilege_id,
-							allowed                   : allowed,
-							_set_user_permission_nonce: '<?php echo wp_create_nonce( 'set_user_permission' ) ?>',
-						},
-						success : function (content) {
-							if (1 != content) {
-								checkbox.prop('checked', !checkbox.prop('checked'));
-								alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
-							}
-						},
-						error   : function () {
-							checkbox.prop('checked', !checkbox.prop('checked'));
-							alert('<?php _e( 'Failed changing state. Old state is reverted', 'supportflow' ) ?>');
-						},
-						complete: function () {
-							var allowed = checkbox.prop('checked');
-							if (true == allowed) {
-								checkbox_label.html('<?php _e( 'Allowed', 'supportflow' ) ?>');
-							} else {
-								checkbox_label.html('<?php _e( 'Not Allowed', 'supportflow' ) ?>');
-							}
-							checkbox.prop('disabled', false);
-						},
-					});
-				});
-			});
-		</script>
 	<?php
+	}
 
+	/*
+	 * Enqueue JS code required by class
+	 */
+	public function insert_script() {
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-permissions', 'permissions.js' );
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
+
+		wp_localize_script( $handle, 'SFPermissions', array(
+			'_get_user_permissions_nonce' => wp_create_nonce( 'get_user_permissions' ),
+			'changing_status'             => __( 'Changing status, please wait.', 'supportflow' ),
+			'_set_user_permission_nonce'  => wp_create_nonce( 'set_user_permission' ),
+			'failed_changing_status'      => __( 'Failed changing state. Old state is reverted.', 'supportflow' ),
+			'allowed'                     => __( 'Allowed', 'supportflow' ),
+			'not_allowed'                 => __( 'Not allowed', 'supportflow' ),
+		) );
 	}
 
 	public function action_wp_ajax_get_user_permissions() {

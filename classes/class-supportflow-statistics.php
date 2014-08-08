@@ -37,7 +37,7 @@ class SupportFlow_Statistics extends SupportFlow {
 	public function statistics_page() {
 		// Add JS and CSS code required by page
 		$this->insert_css_code();
-		$this->insert_js_code();
+		$this->insert_script();
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Statistics', 'supportflow' ) ?></h2>
@@ -111,37 +111,18 @@ class SupportFlow_Statistics extends SupportFlow {
 	}
 
 	/*
-	 * Add JS code required by statistics page
+	 * Enqueue JS code required by statistics page
 	 */
-	function insert_js_code() {
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function () {
-				// Close all the different stat tables and toggle the status of clicked stat table
-				jQuery('.toggle-link').click(function (event) {
-					var current = jQuery(this).siblings('.toggle-content').css('display');
-					jQuery('.toggle-content').hide(500);
-					jQuery('.toggle-link').prop('title', 'Expand');
-					if ('none' == current) {
-						jQuery(this).siblings('.toggle-content').show(500);
-						jQuery(this).prop('title', 'Collapse');
-					}
-					event.preventDefault();
-				});
-
-				// Set different type of statistics link title at page load
-				jQuery(jQuery('.toggle-content')).each(function () {
-					if ('none' == jQuery(this).css('display')) {
-						jQuery(this).siblings('.toggle-link').prop('title', 'Expand');
-					} else {
-						jQuery(this).siblings('.toggle-link').prop('title', 'Collapse');
-					}
-
-					jQuery('.toggle-content').first().show(500);
-				});
-			});
-		</script>
-	<?php
+	function insert_script() {
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-statistics', 'toggle-links.js' );
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
+		wp_localize_script( $handle, 'SFToggleLinks', array(
+			'expand'   => __( 'Expand', 'supportflow' ),
+			'collapse' => __( 'Collapse', 'supportflow' ),
+		) );
 	}
 
 	/*

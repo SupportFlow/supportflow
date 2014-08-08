@@ -28,9 +28,14 @@ class SupportFlow_Preferences extends SupportFlow {
 
 	}
 
-	public function enqueue_scripts() {
-		wp_enqueue_script( 'supportflow-preferences', SupportFlow()->plugin_url . 'js/preferences.js', array( 'jquery' ) );
-		wp_localize_script( 'supportflow-preferences', 'SFPreferences', array(
+	public function insert_scripts() {
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_script( 'supportflow-preferences', 'preferences.js' );
+		} else {
+			$handle = SupportFlow()->enqueue_scripts();
+		}
+
+		wp_localize_script( $handle, 'SFPreferences', array(
 			'changing_state'              => __( 'Changing status, please wait.', 'supportflow' ),
 			'set_email_notfication_nonce' => wp_create_nonce( 'set_email_notfication' ),
 			'failed_changing_state'       => __( 'Failed changing state. Old state is reverted', 'supportflow' ),
@@ -42,7 +47,7 @@ class SupportFlow_Preferences extends SupportFlow {
 	public function preferences_page() {
 		echo '<div class="wrap">';
 
-		$this->enqueue_scripts();
+		$this->insert_scripts();
 
 		$this->user_ticket_signature_page();
 		echo '<br />';
@@ -107,7 +112,7 @@ class SupportFlow_Preferences extends SupportFlow {
 			);
 		}
 
-		$email_notifications_table = new SupportFlow_Table();
+		$email_notifications_table = new SupportFlow_Table( 'sf_email_accounts_table' );
 		$email_notifications_table->set_columns( $columns );
 		$email_notifications_table->set_no_items( $no_items );
 		$email_notifications_table->set_data( $data );

@@ -152,6 +152,7 @@ class SupportFlow {
 
 		// Setup some base path and URL information
 		$this->file       = __FILE__;
+		$this->script_dev = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 		$this->basename   = apply_filters( 'supportflow_plugin_basenname', plugin_basename( $this->file ) );
 		$this->plugin_dir = apply_filters( 'supportflow_plugin_dir_path', plugin_dir_path( $this->file ) );
 		$this->plugin_url = apply_filters( 'supportflow_plugin_dir_url', plugin_dir_url( $this->file ) );
@@ -396,10 +397,11 @@ class SupportFlow {
 		update_option( 'sf_version', $this->version );
 	}
 
-	public function filter_wp_insert_post_data($data, $postarr) {
+	public function filter_wp_insert_post_data( $data, $postarr ) {
 		if ( 0 == $postarr['post_author'] ) {
 			$data['post_author'] = 0;
 		}
+
 		return $data;
 	}
 
@@ -841,6 +843,89 @@ class SupportFlow {
 	}
 
 	/**
+	 * SupportFlow alternate of wp_enqueue_script() to increase code reuse and save time. Enqueue a JS script
+	 *
+	 * @param string      $handle    Name of the script.
+	 * @param string      $file_name Path to the script "/plugins/supportflow/js/ is automatically prefixed to it.
+	 *                               Example: 'attachment.js'.
+	 * @param array       $deps      Optional. An array of registered handles this script depends on. Default array( 'jquery' )
+	 * @param string|bool $ver       Optional. String specifying the script version number.
+	 *                               If true current version of SupportFlow will be append to it.
+	 *                               Set false to prevent any version added to it or a string for a particular version of choice
+	 * @param bool        $in_footer Optional. Whether to enqueue the script before </head> or before </body>.
+	 *                               Default 'false'. Accepts 'false' or 'true'.
+	 *
+	 * @return string     Handle of enqueued script
+	 */
+	public function enqueue_script( $handle, $file_name, $dependencies = array( 'jquery' ), $version = true, $in_footer = false ) {
+		if ( true === $version ) {
+			$version = $this->version;
+		}
+		$src = SupportFlow()->plugin_url . "js/$file_name";
+
+		wp_enqueue_script( $handle, $src, $dependencies, $version, $in_footer );
+
+		return $handle;
+	}
+
+	/**
+	 * SupportFlow alternate of wp_enqueue_script() to increase code reuse and save time. Enqueue a CSS stylesheet
+	 *
+	 * @param string      $handle    Name of the stylesheet.
+	 * @param string      $file_name Path to the stylesheet "/plugins/supportflow/css/ is automatically prefixed to it.
+	 *                               Example: 'attachment.js'.
+	 * @param array       $deps      Optional. An array of registered handles this script depends on.
+	 * @param string|bool $ver       Optional. String specifying the script version number.
+	 *                               If true current version of SupportFlow will be append to it.
+	 *                               Set false to prevent any version added to it or a string for a particular version of choice
+	 * @param string      $media     Optional. The media for which this stylesheet has been defined.
+	 *                               Default 'all'. Accepts 'all', 'aural', 'braille', 'handheld', 'projection', 'print',
+	 *                               'screen', 'tty', or 'tv'.
+	 *
+	 * @return string     Handle of enqueued style
+	 */
+	public function enqueue_style( $handle, $file_name, $dependencies = array(), $version = true, $media = 'all' ) {
+		if ( true === $version ) {
+			$version = $this->version;
+		}
+		$src = SupportFlow()->plugin_url . "css/$file_name";
+
+		wp_enqueue_style( $handle, $src, $dependencies, $version, $media );
+
+		return $handle;
+	}
+
+	/**
+	 *
+	 * Enqueue minfied and concatenated version all the scripts required by SupportFlow
+	 * Doesn't add localisation data to it
+	 *
+	 * @return string Handle of enqueued script
+	 */
+	public function enqueue_scripts() {
+
+		return $this->enqueue_script(
+			'supportflow-minified-scripts',
+			'supportflow.min.js',
+			array( 'jquery', 'jquery-ui-autocomplete', 'heartbeat' )
+		);
+	}
+
+	/**
+	 *
+	 * Enqueue minfied and concatenated version all the styles required by SupportFlow
+	 *
+	 * @return string Handle of enqueued style
+	 */
+	public function enqueue_styles() {
+
+		return $this->enqueue_style(
+			'supportflow-minified-styles',
+			'supportflow.min.css'
+		);
+	}
+
+	/**
 	 * Get the special capability given a string
 	 */
 	public function get_cap( $cap ) {
@@ -871,6 +956,7 @@ class SupportFlow {
 	 * Apart from this allow embedding code using <code> tag
 	 *
 	 * @param string $reply Reply to be sanitized
+	 *
 	 * @return string Sanitized reply
 	 */
 	public function sanitize_ticket_reply( $reply ) {

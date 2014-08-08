@@ -40,10 +40,15 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		global $pagenow;
 
 		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-predefined-replies', SupportFlow()->plugin_url . 'js/predefined-replies.js', array( 'jquery' ) );
-			$message = __( 'Are you sure want to proceed? It will replace your existing content.', 'supportflow' );
-			wp_localize_script( 'supportflow-predefined-replies', 'SFPredefinedReplies', array( 'message' => $message ) );
+			if ( SupportFlow()->script_dev ) {
+				$handle = SupportFlow()->enqueue_script( 'supportflow-predefined-replies', 'predefined-replies.js' );
+			} else {
+				$handle = SupportFlow()->enqueue_scripts();
+			}
 
+			wp_localize_script( $handle, 'SFPredefinedReplies', array(
+				'message' => __( 'Are you sure want to proceed? It will replace your existing content.', 'supportflow' ),
+			) );
 		}
 	}
 

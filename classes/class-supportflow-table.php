@@ -21,7 +21,7 @@ class SupportFlow_Table extends WP_List_Table {
 	 */
 	function __construct( $table_class = '', $display_nav = true, $display_col_headers = true ) {
 		if ( $table_class ) {
-			parent::__construct( array( 'screen' => 'sf_statistics_table' ) );
+			parent::__construct( array( 'screen' => $table_class ) );
 		} else {
 			parent::__construct();
 		}

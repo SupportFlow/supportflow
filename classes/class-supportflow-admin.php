@@ -64,24 +64,41 @@ class SupportFlow_Admin extends SupportFlow {
 	public function action_admin_enqueue_scripts() {
 		global $pagenow;
 
-		wp_enqueue_style( 'supportflow-admin', SupportFlow()->plugin_url . 'css/admin.css', array(), SupportFlow()->version );
-		if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+		if ( SupportFlow()->script_dev ) {
+			$handle = SupportFlow()->enqueue_style( 'supportflow-admin', 'admin.css' );
+		} else {
+			SupportFlow()->enqueue_styles();
+		}
+
+		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
 
-			wp_enqueue_script( 'supportflow-ticket-attachments', SupportFlow()->plugin_url . 'js/ticket_attachments.js', array( 'jquery' ) );
-			wp_enqueue_script( 'supportflow-respondents-autocomplete', SupportFlow()->plugin_url . 'js/respondents-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
-			wp_enqueue_script( 'supportflow-tickets', SupportFlow()->plugin_url . 'js/tickets.js', array( 'jquery' ) );
+			if ( SupportFlow()->script_dev ) {
+				$respondents_autocomplete_handle = SupportFlow()->enqueue_script( 'supportflow-respondents-autocomplete', 'respondents-autocomplete.js' );
+				$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
+				$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
+				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
+			} else {
+				$handle
+					= $respondents_autocomplete_handle
+					= $ticket_attachment_handle
+					= $supportflow_tickets_handle
+					= $auto_save_handle
+					= SupportFlow()->enqueue_scripts();
+			}
 
-			$ajaxurl = add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) );
+			wp_localize_script( $respondents_autocomplete_handle, 'SFRespondentsAc', array(
+				'ajax_url' => add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) )
+			) );
 
-			wp_localize_script( 'supportflow-respondents-autocomplete', 'SFRespondentsAc', array( 'ajax_url' => $ajaxurl ) );
-			wp_localize_script( 'supportflow-ticket-attachments', 'SFTicketAttachments', array(
+			wp_localize_script( $ticket_attachment_handle, 'SFTicketAttachments', array(
 				'frame_title'       => __( 'Attach files', 'supportflow' ),
 				'button_title'      => __( 'Insert as attachment', 'supportflow' ),
 				'remove_attachment' => __( 'Remove', 'supportflow' ),
 				'sure_remove'       => __( 'Are you sure want to remove this attachment?', 'supportflow' ),
 			) );
-			wp_localize_script( 'supportflow-tickets', 'SFTickets', array(
+
+			wp_localize_script( $supportflow_tickets_handle, 'SFTickets', array(
 				'no_title_msg'      => __( 'You must need to specify the subject of the ticket', 'supportpress' ),
 				'no_respondent_msg' => __( 'You must need to add atleast one ticket respondent', 'supportpress' ),
 				'pagenow'           => $pagenow,
@@ -89,18 +106,23 @@ class SupportFlow_Admin extends SupportFlow {
 				'add_private_note'  => __( 'Add Private Note', 'supportflow' ),
 			) );
 
-			wp_enqueue_script( 'supportflow-auto-save', SupportFlow()->plugin_url . 'js/auto_save.js', array( 'jquery', 'heartbeat' ) );
-			wp_localize_script( 'supportflow-auto-save', 'SFAutoSave', array(
+			wp_localize_script( $auto_save_handle, 'SFAutoSave', array(
 				'ticket_id' => get_the_ID(),
 			) );
+
 		}
 
 		if ( 'post.php' == $pagenow ) {
-			wp_enqueue_script( 'supportflow-email-conversation', SupportFlow()->plugin_url . 'js/email_conversation.js', array( 'jquery' ) );
-			wp_localize_script( 'supportflow-email-conversation', 'SFEmailConversation', array(
+			if ( SupportFlow()->script_dev ) {
+				$email_conversation_handle = SupportFlow()->enqueue_script( 'supportflow-email-conversation', 'email_conversation.js' );
+			} else {
+				$email_conversation_handle = SupportFlow()->enqueue_scripts();
+			}
+
+			wp_localize_script( $email_conversation_handle, 'SFEmailConversation', array(
 				'post_id'                   => get_the_ID(),
-				'sending_emails'            => __( 'Please wait while sending E-Mail(s)', 'supportpress' ),
-				'failed_sending'            => __( 'Failed sending E-Mails', 'supportpress' ),
+				'sending_emails'            => __( 'Please wait while sending E-Mail(s)', 'supportflow' ),
+				'failed_sending'            => __( 'Failed sending E-Mails', 'supportflow' ),
 				'_email_conversation_nonce' => wp_create_nonce( 'sf_email_conversation' ),
 			) );
 		}
@@ -560,8 +582,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 	public function meta_box_other_respondents_tickets() {
 		$ticket_respondents = SupportFlow()->get_ticket_respondents( get_the_ID(), array( 'fields' => 'slugs' ) );
-		$statuses     = SupportFlow()->post_statuses;
-		$status_slugs = array_keys($statuses);
+		$statuses           = SupportFlow()->post_statuses;
+		$status_slugs       = array_keys( $statuses );
 
 		$table = new SupportFlow_Table( '', false, false );
 
@@ -826,11 +848,11 @@ class SupportFlow_Admin extends SupportFlow {
 		</div>
 
 		<div id="major-publishing-actions">
-		<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
-			<div id="delete-action">
-				<?php submit_button( $close_ticket_label, '', 'close-ticket-submit', false, array( 'id' => 'close-ticket-submit' ) ); ?>
-			</div>
-		<?php endif; ?>
+			<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
+				<div id="delete-action">
+					<?php submit_button( $close_ticket_label, '', 'close-ticket-submit', false, array( 'id' => 'close-ticket-submit' ) ); ?>
+				</div>
+			<?php endif; ?>
 			<div id="publishing-action">
 				<?php submit_button( $submit_text, 'save-button primary', 'update-ticket', false ); ?>
 			</div>
