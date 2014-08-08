@@ -389,7 +389,7 @@ class SupportFlow {
 
 			// Migrate all posts with post type sf_thread to sf_ticket
 			$db_prefix = $wpdb->prefix;
-			$wpdb->update( "{$db_prefix}posts", array( 'post_type' => 'sf_ticket' ), array( 'post_type' => 'sf_shread' ) );
+			$wpdb->update( "{$db_prefix}posts", array( 'post_type' => 'sf_ticket' ), array( 'post_type' => 'sf_thread' ) );
 		}
 
 		// Update db_version to latest one
