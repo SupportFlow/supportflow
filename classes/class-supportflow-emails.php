@@ -21,9 +21,9 @@ class SupportFlow_Emails extends SupportFlow {
 			return;
 		}
 
-		// When a new reply is added to a ticket, notify the respondents and the agents
+		// When a new reply is added to a ticket, notify the customers and the agents
 		add_action( 'supportflow_ticket_reply_added', array( $this, 'notify_agents_ticket_replies' ) );
-		add_action( 'supportflow_ticket_reply_added', array( $this, 'notify_respondents_ticket_replies' ), 10, 3 );
+		add_action( 'supportflow_ticket_reply_added', array( $this, 'notify_customers_ticket_replies' ), 10, 3 );
 	}
 
 	/**
@@ -93,17 +93,17 @@ class SupportFlow_Emails extends SupportFlow {
 	}
 
 	/**
-	 * When a new reply is added to the ticket, notify all of the respondents on the ticket
+	 * When a new reply is added to the ticket, notify all of the customers on the ticket
 	 */
-	public function notify_respondents_ticket_replies( $reply_id, $cc = array(), $bcc = array() ) {
-		// Respondents shouldn't receive private replies
+	public function notify_customers_ticket_replies( $reply_id, $cc = array(), $bcc = array() ) {
+		// Customers shouldn't receive private replies
 		$reply = get_post( $reply_id );
 		if ( ! $reply || 'private' == $reply->post_status ) {
 			return;
 		}
 
 		$ticket      = SupportFlow()->get_ticket( $reply->post_parent );
-		$respondents = SupportFlow()->get_ticket_respondents( $ticket->ID, array( 'fields' => 'emails' ) );
+		$customers = SupportFlow()->get_ticket_customers( $ticket->ID, array( 'fields' => 'emails' ) );
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
@@ -115,14 +115,14 @@ class SupportFlow_Emails extends SupportFlow {
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
 			$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
-			$key                = array_search( $reply_author_email, $respondents );
+			$key                = array_search( $reply_author_email, $customers );
 			if ( false !== $key ) {
-				unset( $respondents[$key] );
+				unset( $customers[$key] );
 			}
 		}
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
-		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'respondent' );
+		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
 		$attachments = array();
 		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
@@ -132,7 +132,7 @@ class SupportFlow_Emails extends SupportFlow {
 		}
 
 		$message = stripslashes( $reply->post_content );
-		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'respondent' );
+		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
 
 		$headers = "Content-Type: text/html\r\n";
 
@@ -148,7 +148,7 @@ class SupportFlow_Emails extends SupportFlow {
 			$headers .= "Bcc: $bcc\r\n";
 		}
 
-		self::mail( $respondents, $subject, $message, $headers, $attachments, $smtp_account );
+		self::mail( $customers, $subject, $message, $headers, $attachments, $smtp_account );
 	}
 
 	/**

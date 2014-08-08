@@ -124,8 +124,8 @@ EOB
 				continue;
 			}
 
-			// Add the respondent to the ticket
-			SupportFlow()->update_ticket_respondents( $ticket_id, $old_ticket->email );
+			// Add the customer to the ticket
+			SupportFlow()->update_ticket_customers( $ticket_id, $old_ticket->email );
 
 			// Get the ticket's messages and import those too
 			$old_messages  = (array) $spdb->get_results( $spdb->prepare( "SELECT * FROM $spdb->messages WHERE ticket_id=%d", $old_ticket->ticket_id ) );

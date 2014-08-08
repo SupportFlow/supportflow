@@ -16,7 +16,7 @@ jQuery(document).ready(function () {
 		event.preventDefault();
 	});
 
-	// Require title and atleast respondent before saving a ticket
+	// Require title and atleast customer before saving a ticket
 	jQuery('.save-button').click(function (event) {
 		if ('' == jQuery('#subject').val()) {
 			jQuery('#subject').focus();
@@ -24,9 +24,9 @@ jQuery(document).ready(function () {
 			event.preventDefault();
 			return;
 		}
-		if ('' == jQuery('#respondents').val()) {
-			jQuery('#respondents').focus();
-			alert(SFTickets.no_respondent_msg);
+		if ('' == jQuery('#customers').val()) {
+			jQuery('#customers').focus();
+			alert(SFTickets.no_customer_msg);
 			event.preventDefault();
 			return;
 		}

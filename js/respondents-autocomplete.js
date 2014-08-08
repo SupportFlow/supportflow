@@ -2,9 +2,9 @@ jQuery(document).ready(function ($) {
 
 	var getSearchTerm = function () {
 
-		// Input of the Respondents field can contain multiple addresses,
+		// Input of the Customers field can contain multiple addresses,
 		// we only want to search on the last address
-		var resps = $('#respondents').val().replace(" ", '').split(",");
+		var resps = $('#customers').val().replace(" ", '').split(",");
 
 		if ($.isArray(resps) && resps.length > 1) {
 			var search_for = resps.pop();
@@ -13,16 +13,16 @@ jQuery(document).ready(function ($) {
 			search_for = resps[0];
 		}
 
-		return { "respondents": search_for, "api-action": 'get-respondents' };
+		return { "customers": search_for, "api-action": 'get-customers' };
 
 	}
 
-	$('#respondents').autocomplete({
+	$('#customers').autocomplete({
 
 		source   : function (req, response) {
 
 			$.ajax({
-				url     : SFRespondentsAc.ajax_url,
+				url     : SFCustomersAc.ajax_url,
 				dataType: 'json',
 				data    : getSearchTerm(),
 				success : function (data) {
@@ -30,12 +30,12 @@ jQuery(document).ready(function ($) {
 						response(false);
 						return false;
 					}
-					response($.map(data.respondents, function (item) {
+					response($.map(data.customers, function (item) {
 
 						// normaliz input
-						var resps = $('#respondents').val().split(' ').join('').split(",");
+						var resps = $('#customers').val().split(' ').join('').split(",");
 
-						// remove partial respondent
+						// remove partial customer
 						resps.pop();
 
 						// Check if e-mail id already exists
@@ -47,7 +47,7 @@ jQuery(document).ready(function ($) {
 							// make it a string
 							var retval = resps.join(", ") + ", ";
 
-							// return those respondents!
+							// return those customers!
 							return {
 								label: item.name,
 								value: retval

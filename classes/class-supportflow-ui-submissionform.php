@@ -115,7 +115,7 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 				'message'            => $_POST['message'],
 				'reply_author'       => $_POST['fullname'],
 				'reply_author_email' => $_POST['email'],
-				'respondent_email'   => array( $_POST['email'] ),
+				'customer_email'   => array( $_POST['email'] ),
 			)
 		);
 

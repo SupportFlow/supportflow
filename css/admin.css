@@ -2,7 +2,7 @@
 	color: #BC0B0B;
 }
 
-.respondent_link {
+.customer_link {
 	white-space:    pre;
 	vertical-align: top;
 }
@@ -30,13 +30,13 @@
 }
 
 #supportflow-subject.postbox,
-#supportflow-respondents.postbox {
+#supportflow-customers.postbox {
 	border:     none;
 	background: none;
 }
 
 #supportflow-subject.postbox .inside,
-#supportflow-respondents.postbox .inside {
+#supportflow-customers.postbox .inside {
 	padding: 0;
 }
 
@@ -44,8 +44,8 @@
 #supportflow-details h3.hndle,
 #supportflow-subject .handlediv,
 #supportflow-subject h3.hndle,
-#supportflow-respondents .handlediv,
-#supportflow-respondents h3.hndle,
+#supportflow-customers .handlediv,
+#supportflow-customers h3.hndle,
 #supportflow-replies .handlediv,
 #supportflow-replies h3.hndle {
 	display: none;
@@ -73,7 +73,7 @@
 }
 
 #supportflow-subject h4,
-#supportflow-respondents h4,
+#supportflow-customers h4,
 #supportflow-replies h4 {
 	font-family:   Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
 	font-size:     13px;
@@ -95,7 +95,7 @@
 	height:         1.7em;
 }
 
-#supportflow-respondents.postbox input {
+#supportflow-customers.postbox input {
 	width:     100%;
 	padding:   8px;
 	font-size: 1.2em;
