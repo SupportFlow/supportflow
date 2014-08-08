@@ -152,6 +152,7 @@ class SupportFlow {
 
 		// Setup some base path and URL information
 		$this->file       = __FILE__;
+		$this->script_dev = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 		$this->basename   = apply_filters( 'supportflow_plugin_basenname', plugin_basename( $this->file ) );
 		$this->plugin_dir = apply_filters( 'supportflow_plugin_dir_path', plugin_dir_path( $this->file ) );
 		$this->plugin_url = apply_filters( 'supportflow_plugin_dir_url', plugin_dir_url( $this->file ) );
