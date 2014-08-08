@@ -643,7 +643,10 @@ class SupportFlow {
 				$term_ids[] = (int) $term->term_id;
 			} else {
 				$term       = wp_insert_term( $email, $this->respondents_tax, array( 'slug' => $this->get_email_hash( $email ) ) );
-				$term_ids[] = $term['term_id'];
+				if ( ! is_wp_error( $term ) ) {
+					$term_ids[] = $term['term_id'];
+				}
+
 			}
 		}
 		wp_set_object_terms( $ticket_id, $term_ids, $this->respondents_tax, $append );
