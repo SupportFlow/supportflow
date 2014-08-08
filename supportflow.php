@@ -363,6 +363,7 @@ class SupportFlow {
 	 */
 	public function action_init_upgrade() {
 		global $wpdb;
+		$db_prefix = $wpdb->prefix;
 
 		$code_version = $this->version;
 		$db_version   = get_option( 'sf_version' );
@@ -388,8 +389,10 @@ class SupportFlow {
 			}
 
 			// Migrate all posts with post type sf_thread to sf_ticket
-			$db_prefix = $wpdb->prefix;
 			$wpdb->update( "{$db_prefix}posts", array( 'post_type' => 'sf_ticket' ), array( 'post_type' => 'sf_thread' ) );
+
+			// Migrate all terms with taxonomy sf_respondent to sf_customer
+			$wpdb->update( "{$db_prefix}term_taxonomy", array( 'taxonomy' => 'sf_customer' ), array( 'taxonomy' => 'sf_respondent' ) );
 		}
 
 		// Update db_version to latest one
