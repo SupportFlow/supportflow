@@ -17,7 +17,7 @@ jQuery(document).ready(function () {
 		});
 	});
 
-	jQuery(document).on('change', '.toggle_privilege', function () {
+	jQuery(document).on('change', '.sf_user_permissions_table .toggle_privilege', function () {
 		var checkbox = jQuery(this);
 		var checkbox_label = checkbox.siblings('.privilege_status');
 		var permission_identifier = checkbox.data('permission-identifier');

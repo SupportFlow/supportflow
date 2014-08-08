@@ -112,7 +112,7 @@ class SupportFlow_Preferences extends SupportFlow {
 			);
 		}
 
-		$email_notifications_table = new SupportFlow_Table();
+		$email_notifications_table = new SupportFlow_Table( 'sf_email_accounts_table' );
 		$email_notifications_table->set_columns( $columns );
 		$email_notifications_table->set_no_items( $no_items );
 		$email_notifications_table->set_data( $data );
