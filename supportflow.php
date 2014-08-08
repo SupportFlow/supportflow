@@ -842,6 +842,59 @@ class SupportFlow {
 	}
 
 	/**
+	 * SupportFlow alternate of wp_enqueue_script() to increase code reuse and save time. Enqueue a JS script
+	 *
+	 * @param string      $handle    Name of the script.
+	 * @param string      $file_name Path to the script "/plugins/supportflow/js/ is automatically prefixed to it.
+	 *                               Example: 'attachment.js'.
+	 * @param array       $deps      Optional. An array of registered handles this script depends on. Default array( 'jquery' )
+	 * @param string|bool $ver       Optional. String specifying the script version number.
+	 *                               If true current version of SupportFlow will be append to it.
+	 *                               Set false to prevent any version added to it or a string for a particular version of choice
+	 * @param bool        $in_footer Optional. Whether to enqueue the script before </head> or before </body>.
+	 *                               Default 'false'. Accepts 'false' or 'true'.
+	 *
+	 * @return string     Handle of enqueued script
+	 */
+	public function enqueue_script( $handle, $file_name, $dependencies = array( 'jquery' ), $version = true, $in_footer = false ) {
+		if ( true === $version ) {
+			$version = $this->version;
+		}
+		$src = SupportFlow()->plugin_url . "js/$file_name";
+
+		wp_enqueue_script( $handle, $src, $dependencies, $version, $in_footer );
+
+		return $handle;
+	}
+
+	/**
+	 * SupportFlow alternate of wp_enqueue_script() to increase code reuse and save time. Enqueue a CSS stylesheet
+	 *
+	 * @param string      $handle    Name of the stylesheet.
+	 * @param string      $file_name Path to the stylesheet "/plugins/supportflow/css/ is automatically prefixed to it.
+	 *                               Example: 'attachment.js'.
+	 * @param array       $deps      Optional. An array of registered handles this script depends on.
+	 * @param string|bool $ver       Optional. String specifying the script version number.
+	 *                               If true current version of SupportFlow will be append to it.
+	 *                               Set false to prevent any version added to it or a string for a particular version of choice
+	 * @param string      $media     Optional. The media for which this stylesheet has been defined.
+	 *                               Default 'all'. Accepts 'all', 'aural', 'braille', 'handheld', 'projection', 'print',
+	 *                               'screen', 'tty', or 'tv'.
+	 *
+	 * @return string     Handle of enqueued style
+	 */
+	public function enqueue_style( $handle, $file_name, $dependencies = array(), $version = true, $media = 'all' ) {
+		if ( true === $version ) {
+			$version = $this->version;
+		}
+		$src = SupportFlow()->plugin_url . "css/$file_name";
+
+		wp_enqueue_style( $handle, $src, $dependencies, $version, $media );
+
+		return $handle;
+	}
+
+	/**
 	 *
 	 * Enqueue minfied and concatenated version all the scripts required by SupportFlow
 	 * Doesn't add localisation data to it
