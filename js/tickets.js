@@ -58,7 +58,7 @@ jQuery(document).ready(function () {
 	// Show quoted text	
 	jQuery('.sf_toggle_quoted_text').click(function (event) {
 		event.preventDefault();
-		$(this).parent().html($(this).data('quoted_text'))
+		jQuery(this).parent().html(jQuery(this).data('quoted_text'))
 	});
 
 });
