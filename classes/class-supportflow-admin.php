@@ -64,29 +64,15 @@ class SupportFlow_Admin extends SupportFlow {
 	public function action_admin_enqueue_scripts() {
 		global $pagenow;
 
-		if ( SupportFlow()->script_dev ) {
-			$handle = SupportFlow()->enqueue_style( 'supportflow-admin', 'admin.css' );
-		} else {
-			SupportFlow()->enqueue_styles();
-		}
+		$handle = SupportFlow()->enqueue_style( 'supportflow-admin', 'admin.css' );
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
 
-
-			if ( SupportFlow()->script_dev ) {
-				$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'customers-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
-				$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
-				$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
-				$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
-			} else {
-				$handle
-					= $customers_autocomplete_handle
-					= $ticket_attachment_handle
-					= $supportflow_tickets_handle
-					= $auto_save_handle
-					= SupportFlow()->enqueue_scripts();
-			}
+			$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'customers-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
+			$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
+			$supportflow_tickets_handle      = SupportFlow()->enqueue_script( 'supportflow-tickets', 'tickets.js' );
+			$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
 
 			wp_localize_script( $customers_autocomplete_handle, 'SFCustomersAc', array(
 				'ajax_url' => add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) )
@@ -114,11 +100,7 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		if ( 'post.php' == $pagenow ) {
-			if ( SupportFlow()->script_dev ) {
-				$email_conversation_handle = SupportFlow()->enqueue_script( 'supportflow-email-conversation', 'email_conversation.js' );
-			} else {
-				$email_conversation_handle = SupportFlow()->enqueue_scripts();
-			}
+			$email_conversation_handle = SupportFlow()->enqueue_script( 'supportflow-email-conversation', 'email_conversation.js' );
 
 			wp_localize_script( $email_conversation_handle, 'SFEmailConversation', array(
 				'post_id'                   => get_the_ID(),
