@@ -34,7 +34,7 @@ jQuery(document).ready(function () {
 
 	// Submit post if user pressed Ctrl+Enter in reply content box
 	jQuery('#reply').keypress(function (event) {
-		if (event.ctrlKey && event.keyCode == 10 && $(this).val() != '') {
+		if (event.ctrlKey && ( event.keyCode == 10 || event.keyCode == 13 ) && $(this).val() != '') {
 			$('#post').submit();
 		}
 	});
