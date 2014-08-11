@@ -1009,6 +1009,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
+				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1043,6 +1044,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
+				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1275,6 +1277,29 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->add_ticket_reply( $ticket_id, $reply, $reply_args );
 		}
 
+	}
+
+	/**
+	 * Hide quoted content in a message and display a link to show it.
+	 * Line startings with ">" sign are considered quoted content
+	 */
+	public function hide_quoted_text( $text ) {
+
+		$ws     = '\s'; // Whitespace ( matches \r\n\t\f )
+		$gt     = '&gt;'; // Greater than sign
+		$br     = "<{$ws}*br[^>]*>"; // BR tag
+		$non_br = "<(\s|/)*(?:(?!br( |>)).)*[^>]>"; // Any tag other than BR
+
+		$regex = "(^|$br)($non_br|$ws)*$gt(.*?)($br(?!($non_br|$ws)*$gt)|$)";
+
+		$res = preg_replace_callback( "~$regex~is", function ( $matches ) {
+			$match    = esc_attr( $matches[0] );
+			$show_msg = __( 'Show quoted content', 'supportflow' );
+
+			return "<span><a href='' class='sf_toggle_quoted_text' data-quoted_text='$match'><br />$show_msg</a><br /></span>";
+		}, $text );
+
+		return $res;
 	}
 }
 
