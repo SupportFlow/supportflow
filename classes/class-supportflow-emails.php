@@ -103,6 +103,7 @@ class SupportFlow_Emails extends SupportFlow {
 			$content      = str_replace( "\n", "\n> ", $content );
 			$message .= "\n\n$heading\n>$content";
 		}
+		$message = wpautop( $message );
 
 		self::mail( $agent_emails, $subject, $message, 'Content-Type: text/html', $attachments, $smtp_account );
 	}
@@ -148,6 +149,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = stripslashes( $reply->post_content );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
+		$message = wpautop( $message );
 
 		// Insert last second reply as quoted text
 		$replies = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'numberposts' => 2, ) );
