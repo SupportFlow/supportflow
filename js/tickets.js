@@ -61,4 +61,6 @@ jQuery(document).ready(function ($) {
 		$(this).parent().html($(this).data('quoted_text'))
 	});
 
+	// Auto-resize height of reply text box
+	$('#reply').autosize();
 });
