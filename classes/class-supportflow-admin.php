@@ -1292,14 +1292,21 @@ class SupportFlow_Admin extends SupportFlow {
 
 		$regex = "(^|$br)($non_br|$ws)*$gt(.*?)($br(?!($non_br|$ws)*$gt)|$)";
 
-		$res = preg_replace_callback( "~$regex~is", function ( $matches ) {
-			$match    = esc_attr( $matches[0] );
-			$show_msg = __( 'Show quoted content', 'supportflow' );
-
-			return "<span><a href='' class='sf_toggle_quoted_text' data-quoted_text='$match'><br />$show_msg</a><br /></span>";
-		}, $text );
+		$res = preg_replace_callback( "~$regex~is", array( $this, 'hide_quoted_text_regex_callback' ), $text );
 
 		return $res;
+	}
+
+	/**
+	 * Just a function used by hide_quoted_text() for its regex callback
+	 * Anonymous function are not used as they unavailable in PHP 5.2.x
+	 * create_function() is not used as it it not readable
+	 */
+	protected function hide_quoted_text_regex_callback( $matches ) {
+		$match    = esc_attr( $matches[0] );
+		$show_msg = __( 'Show quoted content', 'supportflow' );
+
+		return "<span><a href='' class='sf_toggle_quoted_text' data-quoted_text='$match'><br />$show_msg</a><br /></span>";
 	}
 }
 
