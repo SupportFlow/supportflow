@@ -89,6 +89,21 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
 
+		// Insert last second reply as quoted text
+		$replies = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'numberposts' => 2, ) );
+		if ( ! empty( $replies[1] ) ) {
+			$quoted_reply = $replies[1];
+			$reply_author = get_post_meta( $quoted_reply->ID, 'reply_author', true );
+			if ( empty( $reply_author ) ) {
+				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
+			}
+			$time_stamp   = $ticket->post_date_gmt;
+			$heading      = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
+			$content      = '> ' . stripslashes( $quoted_reply->post_content );
+			$content      = str_replace( "\n", "\n> ", $content );
+			$message .= "\n\n$heading\n>$content";
+		}
+
 		self::mail( $agent_emails, $subject, $message, 'Content-Type: text/html', $attachments, $smtp_account );
 	}
 
@@ -133,6 +148,21 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = stripslashes( $reply->post_content );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
+
+		// Insert last second reply as quoted text
+		$replies = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'numberposts' => 2, ) );
+		if ( ! empty( $replies[1] ) ) {
+			$quoted_reply = $replies[1];
+			$reply_author = get_post_meta( $quoted_reply->ID, 'reply_author', true );
+			if ( empty( $reply_author ) ) {
+				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
+			}
+			$time_stamp   = $ticket->post_date_gmt;
+			$heading      = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
+			$content      = '> ' . stripslashes( $quoted_reply->post_content );
+			$content      = str_replace( "\n", "\n> ", $content );
+			$message .= "\n\n$heading\n>$content";
+		}
 
 		$headers = "Content-Type: text/html\r\n";
 
