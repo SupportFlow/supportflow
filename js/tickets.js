@@ -54,4 +54,11 @@ jQuery(document).ready(function () {
 	jQuery('#close-ticket-submit').click(function (event) {
 		jQuery("#post .meta-item input[name='post_status']").val('sf_closed');
 	});
+
+	// Show quoted text	
+	jQuery('.sf_toggle_quoted_text').click(function (event) {
+		event.preventDefault();
+		jQuery(this).parent().html(jQuery(this).data('quoted_text'))
+	});
+
 });
