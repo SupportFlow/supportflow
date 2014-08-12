@@ -1,14 +1,14 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
 
 	// Send elements with class sf_autosave to the server for autosave
-	jQuery('.sf_autosave').keyup(function () {
+	$('.sf_autosave').keyup(function () {
 
 		var autosave_data = {};
 		autosave_data['ticket_id'] = SFAutoSave.ticket_id;
 
-		jQuery('.sf_autosave').each(function () {
-			element_key = jQuery(this).attr('name');
-			element_value = jQuery(this).val();
+		$('.sf_autosave').each(function () {
+			element_key = $(this).attr('name');
+			element_value = $(this).val();
 			autosave_data[element_key] = element_value
 		});
 

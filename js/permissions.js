@@ -1,9 +1,9 @@
-jQuery(document).ready(function () {
-	jQuery('.permission_filters').change(function () {
-		var user_id = jQuery('#change_user option:selected').data('user-id');
-		var status = jQuery('#change_status option:selected').data('status');
+jQuery(document).ready(function ($) {
+	$('.permission_filters').change(function () {
+		var user_id = $('#change_user option:selected').data('user-id');
+		var status = $('#change_status option:selected').data('status');
 
-		jQuery.ajax(ajaxurl, {
+		$.ajax(ajaxurl, {
 			type   : 'post',
 			data   : {
 				action                     : 'get_user_permissions',
@@ -12,13 +12,13 @@ jQuery(document).ready(function () {
 				_get_user_permissions_nonce: SFPermissions._get_user_permissions_nonce,
 			},
 			success: function (content) {
-				jQuery('#user_permissions_table').html(content);
+				$('#user_permissions_table').html(content);
 			},
 		});
 	});
 
-	jQuery(document).on('change', '.sf_user_permissions_table .toggle_privilege', function () {
-		var checkbox = jQuery(this);
+	$(document).on('change', '.sf_user_permissions_table .toggle_privilege', function () {
+		var checkbox = $(this);
 		var checkbox_label = checkbox.siblings('.privilege_status');
 		var permission_identifier = checkbox.data('permission-identifier');
 
@@ -30,7 +30,7 @@ jQuery(document).ready(function () {
 		checkbox_label.html(SFPermissions.changing_status);
 		checkbox.prop('disabled', true);
 
-		jQuery.ajax(ajaxurl, {
+		$.ajax(ajaxurl, {
 			type    : 'post',
 			data    : {
 				action                    : 'set_user_permission',
