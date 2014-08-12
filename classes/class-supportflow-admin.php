@@ -68,7 +68,6 @@ class SupportFlow_Admin extends SupportFlow {
 
 		if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ) ) ) {
 			wp_enqueue_media();
-			wp_enqueue_script( 'supportflow-jquery-autosize', SupportFlow()->plugin_url . "js/jquery.autosize.min.js", array( 'jquery' ), '1.18.9' );
 
 			$customers_autocomplete_handle   = SupportFlow()->enqueue_script( 'supportflow-customers-autocomplete', 'customers-autocomplete.js', array( 'jquery', 'jquery-ui-autocomplete' ) );
 			$ticket_attachment_handle        = SupportFlow()->enqueue_script( 'supportflow-ticket-attachments', 'ticket_attachments.js' );
