@@ -922,7 +922,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
 		$ticket_lock       = ( null == $email_account && '' != $email_account_id );
-		$disabled_attr     = $ticket_lock ? 'disabled' : '';
+		$disabled_attr     = disabled( $ticket_lock, true, false );
 		$submit_attr_array = $ticket_lock ? array( 'disabled' => 'true' ) : array();
 
 		if ( $ticket_lock ) {
