@@ -949,6 +949,22 @@ class SupportFlow {
 		return $reply;
 	}
 
+	public static function action_cron_schedules( $schedules ) {
+		$schedules['five_minutes'] = array(
+			'interval' => 5 * MINUTE_IN_SECONDS,
+			'display'  => __( 'Five Minutes', 'supportflow' )
+		);
+
+		return $schedules;
+	}
+
+	public static function action_register_activation_hook() {
+		wp_schedule_event( time(), 'five_minutes', 'sf_cron_retrieve_email_replies' );
+	}
+
+	public static function action_register_deactivation_hook() {
+		wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
+	}
 }
 
 /**
@@ -966,21 +982,9 @@ function SupportFlow() {
 	return SupportFlow::instance();
 }
 
-add_filter( 'cron_schedules', function ( $schedules ) {
-	$schedules['five_minutes'] = array(
-		'interval' => 5 * MINUTE_IN_SECONDS,
-		'display'  => __( 'Five Minutes', 'supportflow' )
-	);
-
-	return $schedules;
-} );
-
-register_activation_hook( __FILE__, function () {
-	wp_schedule_event( time(), 'five_minutes', 'sf_cron_retrieve_email_replies' );
-} );
-
-register_deactivation_hook( __FILE__, function () {
-	wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
-} );
-
 add_action( 'plugins_loaded', 'SupportFlow' );
+
+// Related to cron
+add_filter( 'cron_schedules', 'SupportFlow::action_cron_schedules' );
+register_activation_hook( __FILE__, 'SupportFlow::action_register_activation_hook' );
+register_deactivation_hook( __FILE__, 'SupportFlow::action_register_deactivation_hook' );
