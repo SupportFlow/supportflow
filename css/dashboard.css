@@ -6,18 +6,18 @@
 	height: 10px;
 }
 
-#sf_recent_tickets .tablenav {
+#sf_last_updated_tickets .tablenav {
 	height: 0px;
 }
 
-#sf_recent_tickets .two_day_old {
+#sf_last_updated_tickets .two_day_old {
 	color: #DF1111;
 }
 
-#sf_recent_tickets .one_two_day_old {
+#sf_last_updated_tickets .one_two_day_old {
 	color: #BD8A2C;
 }
 
-#sf_recent_tickets .one_day_old {
+#sf_last_updated_tickets .one_day_old {
 
 }

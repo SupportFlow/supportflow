@@ -26,9 +26,9 @@ class SupportFlow_Dashboard extends SupportFlow {
 			) );
 
 			wp_add_dashboard_widget(
-				'sf_recent_tickets',
-				__( "Recent tickets", 'supportflow' ),
-				array( $this, 'action_sf_recent_tickets' )
+				'sf_last_updated_tickets',
+				__( "Last Updated tickets", 'supportflow' ),
+				array( $this, 'sf_last_updated_tickets' )
 			);
 
 			wp_add_dashboard_widget(
@@ -52,7 +52,7 @@ class SupportFlow_Dashboard extends SupportFlow {
 	}
 
 
-	function action_sf_recent_tickets() {
+	function sf_last_updated_tickets() {
 		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array();
 
