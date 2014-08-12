@@ -166,7 +166,6 @@ class SupportFlow {
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->customers_tax          = apply_filters( 'supportflow_customers_taxonomy', 'sf_customer' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
 		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
 
 		$this->email_term_prefix = 'sf-';
