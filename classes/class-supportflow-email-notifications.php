@@ -42,7 +42,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 		}
 
 		// Load all tags and E-Mail accounts
-		$tags                  = get_terms( 'sf_tags', 'hide_empty=0' );
+		$tags                  = get_terms( SupportFlow()->tags_tax, 'hide_empty=0' );
 		$email_accounts        = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$notification_settings = array();
 
@@ -102,7 +102,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 				if ( ! in_array( $slug, $email_notifications['tags'] ) && $allowed_only ) {
 					continue;
 				}
-				$tag                     = get_term_by( 'slug', $slug, 'sf_tags' );
+				$tag                     = get_term_by( 'slug', $slug, SupportFlow()->tags_tax );
 				$notification_settings[] = array(
 					'user_id'        => $user->ID,
 					'privilege_type' => 'tags',
@@ -164,7 +164,7 @@ class SupportFlow_Email_Notifications extends SupportFlow {
 	 * @return type array
 	 */
 	public function get_notified_user( $ticket_id ) {
-		$tags                         = wp_get_post_terms( $ticket_id, 'sf_tags', array( 'fields' => 'slugs' ) );
+		$tags                         = wp_get_post_terms( $ticket_id, SupportFlow()->tags_tax, array( 'fields' => 'slugs' ) );
 		$email_account                = get_post_meta( $ticket_id, 'email_account', true );
 		$email_notifications_override = get_post_meta( $ticket_id, 'email_notifications_override', true );
 

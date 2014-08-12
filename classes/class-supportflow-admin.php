@@ -321,7 +321,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Filter to specify tag
 		$tax_slug = SupportFlow()->tags_tax;
-		$terms    = get_terms( 'sf_tags', array( 'hide_empty' => false ) );
+		$terms    = get_terms( SupportFlow()->tags_tax, array( 'hide_empty' => false ) );
 
 		echo "<select name='" . esc_attr( $tax_slug ) . "' id='" . esc_attr( $tax_slug ) . "' class='postform'>";
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
@@ -896,7 +896,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => 'sf_predefs' ) );
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type ) );
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
