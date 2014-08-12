@@ -58,23 +58,32 @@ class SupportFlow_Preferences extends SupportFlow {
 			'update_signature' == $_POST['action'] &&
 			wp_verify_nonce( $_POST['_wpnonce'], 'update_signature' )
 		) {
-			$signature    = wp_kses( $_POST['update_signature_value'], array() );
-			$sign_updated = true;
+			$signature = wp_kses( $_POST['update_signature_value'], array() );
 			update_user_meta( get_current_user_id(), 'sf_user_signature', $signature );
+
+			$insert_signature_default = isset( $_REQUEST['insert_signature_default'] ) && 'on' == $_REQUEST['insert_signature_default'];
+			update_user_meta( get_current_user_id(), 'sf_insert_signature_default', $insert_signature_default );
+
+			$sign_updated = true;
 		} else {
-			$signature = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
+			$signature                = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
+			$insert_signature_default = (boolean) get_user_meta( get_current_user_id(), 'sf_insert_signature_default', true );
 		}
 
 		?>
 		<h2><?php _e( 'My signature', 'supportflow' ) ?></h2>
 		<p><?php _e( 'Please enter your signature you wish to add to your ticket reply. To remove signature clear the text box and then update it. Note: It will be automatically appended at the end of your ticket replies', 'supportflow' ) ?></p>
-		<?php if ( isset( $sign_updated ) && $sign_updated ) {
+		<?php if ( ! empty( $sign_updated ) ) {
 			echo '<h3>' . __( 'Signature updated successfully.', 'supportflow' ) . '</h3>';
 		} ?>
 		<form id="update_signature" method="POST">
 			<?php wp_nonce_field( 'update_signature' ) ?>
 			<input type="hidden" name="action" value="update_signature" />
 			<textarea id="update_signature" name="update_signature_value" rows="7"><?php esc_html_e( $signature ) ?></textarea>
+			<input type="checkbox" name="insert_signature_default" id="insert_signature_default" <?php checked( $insert_signature_default ) ?> />
+			<label for="insert_signature_default" title="<?php _e( 'This will toggle on/off the insert signature checkbox in ticket page by default', 'supportflow' ) ?>">
+				<?php _e( 'Insert my signature by default', 'supportflow' ) ?>
+			</label>
 			<?php submit_button( __( 'Update my signature', 'supportflow' ) ); ?>
 		</form>
 	<?php
