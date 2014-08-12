@@ -66,7 +66,8 @@ class SupportFlow_Dashboard extends SupportFlow {
 			'post_type'   => SupportFlow()->post_type,
 			'post_parent' => 0,
 			'post_status' => $status_slugs,
-			'author'      => 0,
+			'orderby'     => 'modified',
+			'order'	      => "ASC",
 			'numberposts' => 10,
 		);
 
@@ -85,16 +86,16 @@ class SupportFlow_Dashboard extends SupportFlow {
 		$table->set_columns( array(
 			'title'    => __( 'Subject', 'supportflow' ),
 			'status'   => __( 'Status', 'supportflow' ),
-			'datetime' => __( 'Created', 'supportflow' ),
+			'datetime' => __( 'Last Updated', 'supportflow' ),
 		) );
 
 		$data = array();
 		foreach ( $tickets as $ticket ) {
-			$post_date    = strtotime( $ticket->post_date );
-			$time_created = time() - strtotime( $ticket->post_date );
-			if ( $time_created > 2 * DAY_IN_SECONDS ) {
+			$post_date_modified    = strtotime( $ticket->post_modified_gmt );
+			$time_modified = time() - strtotime( $ticket->post_modified_gmt );
+			if ( $time_modified > 2 * DAY_IN_SECONDS ) {
 				$class = 'two_day_old ';
-			} elseif ( $time_created > DAY_IN_SECONDS ) {
+			} elseif ( $time_modified > DAY_IN_SECONDS ) {
 				$class = 'one_two_day_old';
 			} else {
 				$class = 'one_day_old';
@@ -104,7 +105,7 @@ class SupportFlow_Dashboard extends SupportFlow {
 			$data[] = array(
 				'title'    => $title,
 				'status'   => esc_html( $statuses[$ticket->post_status]['label'] ),
-				'datetime' => sprintf( __( '%s ago', 'supportflow' ), human_time_diff( time(), $post_date ) ),
+				'datetime' => sprintf( __( '%s ago', 'supportflow' ), human_time_diff( time(), $post_date_modified ) ),
 			);
 		}
 
