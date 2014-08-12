@@ -896,7 +896,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type ) );
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => -1 ) );
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
