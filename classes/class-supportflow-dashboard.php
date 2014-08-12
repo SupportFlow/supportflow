@@ -68,7 +68,8 @@ class SupportFlow_Dashboard extends SupportFlow {
 			'post_status' => $status_slugs,
 			'orderby'     => 'modified',
 			'order'	      => "ASC",
-			'numberposts' => 10,
+			'author'      => 0,
+			'posts_per_page' => 10,
 		);
 
 		add_filter( 'posts_clauses', array( $this, 'filter_author_clause' ), 10, 2 );

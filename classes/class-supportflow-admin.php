@@ -578,7 +578,7 @@ class SupportFlow_Admin extends SupportFlow {
 				'post_type'    => SupportFlow()->post_type,
 				'post_parent'  => 0,
 				'post_status'  => $status_slugs,
-				'numberposts'  => 10,
+				'posts_per_page'  => 10,
 				'post__not_in' => array( get_the_id() ),
 				'tax_query'    => array(
 					array(
@@ -1107,7 +1107,7 @@ class SupportFlow_Admin extends SupportFlow {
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
 			case 'sf_excerpt':
-				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
+				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'posts_per_page' => 1, 'order' => 'ASC' ) );
 				if ( ! isset( $replies[0] ) ) {
 					echo '—';
 					break;

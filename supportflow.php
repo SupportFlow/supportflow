@@ -676,7 +676,7 @@ class SupportFlow {
 			'post_id'     => '',
 			'search'      => '',
 			'order'       => 'DESC', // 'DESC', 'ASC',
-			'numberposts' => - 1,
+			'posts_per_page' => - 1,
 		);
 
 		$args      = array_merge( $default_args, $args );
@@ -686,7 +686,7 @@ class SupportFlow {
 			'post_status'      => $args['status'],
 			'post_type'        => $this->reply_type,
 			'order'            => $args['order'],
-			'numberposts'      => $args['numberposts'],
+			'posts_per_page'      => $args['posts_per_page'],
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
