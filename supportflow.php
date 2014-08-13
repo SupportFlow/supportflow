@@ -262,6 +262,7 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 		add_action( 'init', array( $this, 'action_init_upgrade' ) );
+		add_action( 'edited_term_taxonomy', array( $this, 'action_edited_term_taxonomy' ), 10, 2 );
 
 		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
 
@@ -397,6 +398,36 @@ class SupportFlow {
 
 		// Update db_version to latest one
 		update_option( 'sf_version', $this->version );
+	}
+
+	/**
+	 * Update count of tickets using a particular tag.
+	 * WP include only post with `published` status when evaluating count. So it is causing problems since SF use different post_stasuses
+	 */
+	public function action_edited_term_taxonomy( $term, $taxonomy ) {
+		global $wpdb;
+
+		if ( $taxonomy->name != $this->tags_tax ) {
+			return;
+		}
+
+		$post_type = $this->post_type;
+
+		$statuses = $this->post_statuses;
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_tickets'] ) {
+				$status_slugs[] = $status;
+			}
+		}
+
+		$status_slugs = implode( "', '", $status_slugs );
+
+		$count = $wpdb->get_var(
+			"SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE "
+			. "$wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_type = '$post_type' AND post_status IN ('$status_slugs') AND term_taxonomy_id = $term"
+		);
+
+		$wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
 	}
 
 	public function filter_wp_insert_post_data( $data, $postarr ) {
