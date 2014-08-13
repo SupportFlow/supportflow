@@ -922,7 +922,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
 		$ticket_lock       = ( null == $email_account && '' != $email_account_id );
-		$disabled_attr     = $ticket_lock ? 'disabled' : '';
+		$disabled_attr     = disabled( $ticket_lock, true, false );
 		$submit_attr_array = $ticket_lock ? array( 'disabled' => 'true' ) : array();
 
 		if ( $ticket_lock ) {
@@ -960,7 +960,8 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</div>';
 		echo '<div id="submit-action">';
 		$signature_label_title = __( 'Append your signature at the bottom of the reply. Signature can be removed or changed in preferences page', 'supportflow' );
-		echo '<input type="checkbox" ' . $disabled_attr . '	checked="checked" id="insert-signature" name="insert-signature" />';
+		$insert_signature_default = (boolean) get_user_meta( get_current_user_id(), 'sf_insert_signature_default', true );
+		echo '<input type="checkbox" ' . $disabled_attr . checked( $insert_signature_default, true, false ) . ' id="insert-signature" name="insert-signature" />';
 		echo "<label for='insert-signature' title='$signature_label_title'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
 		echo '<input type="checkbox" ' . $disabled_attr . ' id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
