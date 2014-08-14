@@ -1037,8 +1037,8 @@ class SupportFlow_Admin extends SupportFlow {
 				}
 				echo '</div>';
 				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date(), get_the_time() );
-				$modified_gmt    = get_post_modified_time( 'U', true, get_the_ID() );
+				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
 				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
@@ -1071,8 +1071,8 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date(), get_the_time() );
-				$modified_gmt    = get_post_modified_time( 'U', true, get_the_ID() );
+				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
 				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
