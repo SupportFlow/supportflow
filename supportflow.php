@@ -172,6 +172,8 @@ class SupportFlow {
 
 		$this->ticket_secret_key = 'ticket_secret';
 
+		$this->cron_interval = apply_filters( 'supportflow_cron_interval', 5 * MINUTE_IN_SECONDS );
+
 		$this->post_statuses = apply_filters(
 			'supportflow_ticket_post_statuses', array(
 				'sf_new'     => array(
@@ -260,7 +262,11 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_post_type' ) );
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
+
 		add_action( 'init', array( $this, 'action_init_upgrade' ) );
+
+		add_filter( 'cron_schedules', array( $this, 'action_cron_schedules' ) );
+		add_action( 'init', array( $this, 'action_init_wp_schedule_event' ) );
 
 		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
 
@@ -978,17 +984,29 @@ class SupportFlow {
 		return $reply;
 	}
 
-	public static function action_cron_schedules( $schedules ) {
-		$schedules['five_minutes'] = array(
-			'interval' => 5 * MINUTE_IN_SECONDS,
-			'display'  => __( 'Five Minutes', 'supportflow' )
+	public function action_cron_schedules( $schedules ) {
+		$cron_interval = $this->cron_interval;
+
+		$schedules["sf_$cron_interval"] = array(
+			'interval' => $cron_interval,
+			'display'  => "sf_$cron_interval",
 		);
 
 		return $schedules;
 	}
 
-	public static function action_register_activation_hook() {
-		wp_schedule_event( time(), 'five_minutes', 'sf_cron_retrieve_email_replies' );
+	public function action_init_wp_schedule_event() {
+		$cron_interval = $this->cron_interval;
+
+		if ( ! wp_next_scheduled( 'sf_cron_retrieve_email_replies' ) ) {
+			// Set cron if not scheduled yet
+			wp_schedule_event( time(), "sf_$cron_interval", 'sf_cron_retrieve_email_replies' );
+
+		} elseif ( wp_get_schedule( 'sf_cron_retrieve_email_replies' ) != "sf_$cron_interval" ) {
+			// Reschedule cron if interval is changed
+			wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
+			wp_schedule_event( time(), "sf_$cron_interval", 'sf_cron_retrieve_email_replies' );
+		}
 	}
 
 	public static function action_register_deactivation_hook() {
@@ -1013,7 +1031,5 @@ function SupportFlow() {
 
 add_action( 'plugins_loaded', 'SupportFlow' );
 
-// Related to cron
-add_filter( 'cron_schedules', 'SupportFlow::action_cron_schedules' );
-register_activation_hook( __FILE__, 'SupportFlow::action_register_activation_hook' );
+// Remove SupportFlow cron job on deactivation of plugin
 register_deactivation_hook( __FILE__, 'SupportFlow::action_register_deactivation_hook' );
