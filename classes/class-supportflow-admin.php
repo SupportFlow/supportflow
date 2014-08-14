@@ -844,6 +844,16 @@ class SupportFlow_Admin extends SupportFlow {
 	public function render_meta_box_details_actions() {
 		global $pagenow;
 
+		$post_statuses     = SupportFlow()->post_statuses;
+		$current_status_id = get_post_status( get_the_ID() );
+
+		if ( ! isset( $post_statuses[$current_status_id] ) ) {
+			$post_statuses_key = array_keys( $post_statuses );
+			$current_status_id = $post_statuses_key[0];
+		}
+
+		$current_status_label = $post_statuses[$current_status_id]['label'];
+
 		$close_ticket_label = __( 'Close ticket', 'supportflow' );
 
 		// Get submit button label
