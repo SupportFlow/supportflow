@@ -74,7 +74,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$post_status    = SupportFlow()->post_statuses[$ticket->post_status]['label'];
 		$assigned_agent = ( $ticket->post_author ) ? get_user_by( 'id', $ticket->post_author )->display_name : __( 'None assigned', 'supportflow' );
 
-		$message = stripslashes( $reply->post_content );
+		$message = sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 		$message .= "\n\n-------";
 		$message .= "\n" . __( "Status: ", 'supportflow' ) . $post_status;
 		$message .= "\n" . __( "Agent: ", 'supportflow' ) . $assigned_agent;
@@ -121,7 +121,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
-		$message = stripslashes( $reply->post_content );
+		$message = sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
 		$messge .= "\n\n" . $this->get_quoted_text( $ticket );
 		$message = wpautop( $message );
@@ -165,7 +165,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
 			$msg .= '<br>';
-			$msg .= esc_html( $ticket_reply->post_content );
+			$msg .= sanitize_ticket_reply( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
 			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID ) ) ) {
@@ -236,7 +236,8 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 			$time_stamp = $ticket->post_date_gmt;
 			$heading    = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
-			$content    = '> ' . stripslashes( $quoted_reply->post_content );
+			$content    = SupportFlow()->sanitize_ticket_reply( stripslashes( $quoted_reply->post_content ) );
+			$content    = "> $content";
 			$content    = str_replace( "\n", "\n> ", $content );
 
 			return "$heading\n$content";
