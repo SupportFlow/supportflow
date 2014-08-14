@@ -262,7 +262,6 @@ class SupportFlow {
 		add_action( 'init', array( $this, 'action_init_register_taxonomies' ) );
 		add_action( 'init', array( $this, 'action_init_register_post_statuses' ) );
 		add_action( 'init', array( $this, 'action_init_upgrade' ) );
-		add_action( 'edited_term_taxonomy', array( $this, 'action_edited_term_taxonomy' ), 10, 2 );
 
 		add_filter( 'wp_insert_post_data', array( $this, 'filter_wp_insert_post_data' ), 10, 2 );
 
@@ -337,6 +336,7 @@ class SupportFlow {
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
 			'capabilities'      => $capabilities,
+			'update_count_callback' => array($this, 'callback_update_count_callback_tags' ),
 		);
 
 		register_taxonomy( $this->customers_tax, $this->post_type, $args_customers_tax );
@@ -401,15 +401,11 @@ class SupportFlow {
 	}
 
 	/**
-	 * Update count of tickets using a particular tag.
-	 * WP include only post with `published` status when evaluating count. So it is causing problems since SF use different post_stasuses
+	 * Updated count of tickets using a tag
+	 * WP include only post with `published` status when evaluating count. So it is causing problems as SF use different post_stasuses
 	 */
-	public function action_edited_term_taxonomy( $term, $taxonomy ) {
+	public function callback_update_count_callback_tags( $terms, $taxonomy ) {
 		global $wpdb;
-
-		if ( $taxonomy->name != $this->tags_tax ) {
-			return;
-		}
 
 		$post_type = $this->post_type;
 
@@ -422,12 +418,15 @@ class SupportFlow {
 
 		$status_slugs = implode( "', '", $status_slugs );
 
-		$count = $wpdb->get_var(
-			"SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE "
-			. "$wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_type = '$post_type' AND post_status IN ('$status_slugs') AND term_taxonomy_id = $term"
-		);
+		foreach ( $terms as $term ) {
+			$count = $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE "
+				. "$wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_type = '$post_type' AND post_status IN ('$status_slugs') AND term_taxonomy_id = %d",
+				$term
+			) );
 
-		$wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
+			$wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
+		}
 	}
 
 	public function filter_wp_insert_post_data( $data, $postarr ) {
