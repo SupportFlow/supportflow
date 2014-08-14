@@ -30,16 +30,12 @@ class SupportFlow_Emails extends SupportFlow {
 	 * When a new reply is added to the ticket, notify the agent on the ticket if there is one
 	 */
 	public function notify_agents_ticket_replies( $reply_id ) {
-
 		$reply = get_post( $reply_id );
 		if ( ! $reply ) {
 			return;
 		}
 
 		$ticket = SupportFlow()->get_ticket( $reply->post_parent );
-		// One agent by default, but easily allow notifications to a triage team
-		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $ticket->ID );
-		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $ticket, 'reply' );
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
@@ -48,6 +44,9 @@ class SupportFlow_Emails extends SupportFlow {
 		}
 		$smtp_account = $email_accounts[$email_account_id];
 
+
+		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $ticket->ID );
+		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $ticket, 'reply' );
 		if ( empty( $agent_ids ) ) {
 			return;
 		}
@@ -70,24 +69,20 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
-		$attachments = array();
-		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID, 'posts_per_page' => -1 ) ) ) {
-			foreach ( $ticket_attachments as $attachment ) {
-				$attachments[] = get_attached_file( $attachment->ID );
-			}
-		}
+		$attachments = $this->get_attached_files( $reply->ID );
 
-		$message = stripslashes( $reply->post_content );
-		// Ticket details that are relevant to the agent
-		$message .= "\n\n-------";
-		// Ticket status
-		$post_status = SupportFlow()->post_statuses[$ticket->post_status]['label'];
-		$message .= "\n" . sprintf( __( "Status: %s", 'supportflow' ), $post_status );
-		// Assigned agent
+		$post_status    = SupportFlow()->post_statuses[$ticket->post_status]['label'];
 		$assigned_agent = ( $ticket->post_author ) ? get_user_by( 'id', $ticket->post_author )->display_name : __( 'None assigned', 'supportflow' );
-		$message .= "\n" . sprintf( __( "Agent: %s", 'supportflow' ), $assigned_agent );
+
+		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
+		$message .= "\n\n-------";
+		$message .= "\n" . __( "Status: ", 'supportflow' ) . $post_status;
+		$message .= "\n" . __( "Agent: ", 'supportflow' ) . $assigned_agent;
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
+
+		$message .= "\n\n" . $this->get_quoted_text( $ticket );
+		$message = wpautop( $message );
 
 		self::mail( $agent_emails, $subject, $message, 'Content-Type: text/html', $attachments, $smtp_account );
 	}
@@ -102,7 +97,7 @@ class SupportFlow_Emails extends SupportFlow {
 			return;
 		}
 
-		$ticket      = SupportFlow()->get_ticket( $reply->post_parent );
+		$ticket    = SupportFlow()->get_ticket( $reply->post_parent );
 		$customers = SupportFlow()->get_ticket_customers( $ticket->ID, array( 'fields' => 'emails' ) );
 
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
@@ -121,32 +116,20 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
+		$attachments = $this->get_attached_files( $reply->ID );
+
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
-		$attachments = array();
-		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID, 'posts_per_page' => -1 ) ) ) {
-			foreach ( $ticket_attachments as $attachment ) {
-				$attachments[] = get_attached_file( $attachment->ID );
-			}
-		}
+		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 
-		$message = stripslashes( $reply->post_content );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
+		$message .= "\n\n" . $this->get_quoted_text( $ticket );
+		$message = wpautop( $message );
 
 		$headers = "Content-Type: text/html\r\n";
-
-		if ( is_array( $cc ) && ! empty( $cc ) ) {
-			$headers .= "Cc: " . implode( ', ', $cc ) . "\r\n";
-		} elseif ( is_string( $cc ) && ! empty( $cc ) ) {
-			$headers .= "Cc: $cc\r\n";
-		}
-
-		if ( is_array( $bcc ) && ! empty( $bcc ) ) {
-			$headers .= "Bcc: " . implode( ', ', $bcc ) . "\r\n";
-		} elseif ( is_string( $bcc ) && ! empty( $cc ) ) {
-			$headers .= "Bcc: $bcc\r\n";
-		}
+		$headers .= $this->get_cc_header( $cc );
+		$headers .= $this->get_bcc_header( $bcc );
 
 		self::mail( $customers, $subject, $message, $headers, $attachments, $smtp_account );
 	}
@@ -183,7 +166,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
 			$msg .= '<br>';
-			$msg .= esc_html( $ticket_reply->post_content );
+			$msg .= SupportFlow()->sanitize_ticket_reply( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
 			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID, 'posts_per_page' => -1 ) ) ) {
@@ -225,6 +208,53 @@ class SupportFlow_Emails extends SupportFlow {
 		$phpmailer->SMTPAuth   = true;
 	}
 
+	public function get_cc_header( $cc ) {
+		if ( is_array( $cc ) && ! empty( $cc ) ) {
+			return "Cc: " . implode( ', ', $cc ) . "\r\n";
+		} elseif ( is_string( $cc ) && ! empty( $cc ) ) {
+			return "Cc: $cc\r\n";
+		}
+	}
+
+	public function get_bcc_header( $bcc ) {
+		if ( is_array( $bcc ) && ! empty( $bcc ) ) {
+			return "Bcc: " . implode( ', ', $bcc ) . "\r\n";
+		} elseif ( is_string( $bcc ) && ! empty( $cc ) ) {
+			return "Bcc: $bcc\r\n";
+		}
+	}
+
+	public function get_quoted_text( $ticket ) {
+		// Insert last second reply as quoted text
+		$replies = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'numberposts' => 2, ) );
+		if ( empty( $replies[1] ) ) {
+			return '';
+		} else {
+			$quoted_reply = $replies[1];
+			$reply_author = get_post_meta( $quoted_reply->ID, 'reply_author', true );
+			if ( empty( $reply_author ) ) {
+				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
+			}
+			$time_stamp = $ticket->post_date_gmt;
+			$heading    = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
+			$content    = SupportFlow()->sanitize_ticket_reply( stripslashes( $quoted_reply->post_content ) );
+			$content    = "> $content";
+			$content    = str_replace( "\n", "\n> ", $content );
+
+			return "$heading\n$content";
+		}
+	}
+
+	public function get_attached_files( $reply_id ) {
+		$attachments = array();
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply_id, 'posts_per_page' => -1 ) ) ) {
+			foreach ( $ticket_attachments as $attachment ) {
+				$attachments[] = get_attached_file( $attachment->ID );
+			}
+		}
+
+		return $attachments;
+	}
 }
 
 SupportFlow()->extend->emails = new SupportFlow_Emails();
