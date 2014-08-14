@@ -321,7 +321,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Filter to specify tag
 		$tax_slug = SupportFlow()->tags_tax;
-		$terms    = get_terms( 'sf_tags', array( 'hide_empty' => false ) );
+		$terms    = get_terms( SupportFlow()->tags_tax, array( 'hide_empty' => false ) );
 
 		echo "<select name='" . esc_attr( $tax_slug ) . "' id='" . esc_attr( $tax_slug ) . "' class='postform'>";
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
@@ -578,7 +578,7 @@ class SupportFlow_Admin extends SupportFlow {
 				'post_type'    => SupportFlow()->post_type,
 				'post_parent'  => 0,
 				'post_status'  => $status_slugs,
-				'numberposts'  => 10,
+				'posts_per_page'  => 10,
 				'post__not_in' => array( get_the_id() ),
 				'tax_query'    => array(
 					array(
@@ -896,7 +896,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => 'sf_predefs' ) );
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => -1 ) );
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
@@ -1107,7 +1107,7 @@ class SupportFlow_Admin extends SupportFlow {
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
 			case 'sf_excerpt':
-				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
+				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'posts_per_page' => 1, 'order' => 'ASC' ) );
 				if ( ! isset( $replies[0] ) ) {
 					echo '—';
 					break;

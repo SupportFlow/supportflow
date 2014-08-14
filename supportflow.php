@@ -166,7 +166,6 @@ class SupportFlow {
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->customers_tax          = apply_filters( 'supportflow_customers_taxonomy', 'sf_customer' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
 		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
 
 		$this->email_term_prefix = 'sf-';
@@ -677,7 +676,7 @@ class SupportFlow {
 			'post_id'     => '',
 			'search'      => '',
 			'order'       => 'DESC', // 'DESC', 'ASC',
-			'numberposts' => - 1,
+			'posts_per_page' => - 1,
 		);
 
 		$args      = array_merge( $default_args, $args );
@@ -687,7 +686,7 @@ class SupportFlow {
 			'post_status'      => $args['status'],
 			'post_type'        => $this->reply_type,
 			'order'            => $args['order'],
-			'numberposts'      => $args['numberposts'],
+			'posts_per_page'      => $args['posts_per_page'],
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );

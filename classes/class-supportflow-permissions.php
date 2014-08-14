@@ -196,7 +196,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	}
 
 	public function get_user_permissions( $user_id, $return_allowed = true, $return_disallowed = true ) {
-		$tags             = get_terms( 'sf_tags', 'hide_empty=0' );
+		$tags             = get_terms( SupportFlow()->tags_tax, 'hide_empty=0' );
 		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$permissions      = array();
 		$user_permissions = array();
@@ -390,7 +390,7 @@ class SupportFlow_Permissions extends SupportFlow {
 	public function is_user_allowed_post( $user_id, $post_id ) {
 		$user_permissions   = $this->get_user_permissions_data( $user_id );
 		$post_email_account = get_post_meta( $post_id, 'email_account', true );
-		$post_tags          = wp_get_post_terms( $post_id, 'sf_tags' );
+		$post_tags          = wp_get_post_terms( $post_id, SupportFlow()->tags_tax );
 
 		if ( in_array( $post_email_account, $user_permissions['email_accounts'] ) ) {
 			return true;

@@ -71,7 +71,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
 		$attachments = array();
-		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID, 'posts_per_page' => -1 ) ) ) {
 			foreach ( $ticket_attachments as $attachment ) {
 				$attachments[] = get_attached_file( $attachment->ID );
 			}
@@ -125,7 +125,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
 		$attachments = array();
-		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID ) ) ) {
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply->ID, 'posts_per_page' => -1 ) ) ) {
 			foreach ( $ticket_attachments as $attachment ) {
 				$attachments[] = get_attached_file( $attachment->ID );
 			}
@@ -186,7 +186,7 @@ class SupportFlow_Emails extends SupportFlow {
 			$msg .= esc_html( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
-			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID ) ) ) {
+			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID, 'posts_per_page' => -1 ) ) ) {
 				foreach ( $ticket_attachments as $attachment ) {
 					$attachments[] = get_attached_file( $attachment->ID );
 				}
