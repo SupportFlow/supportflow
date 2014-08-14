@@ -166,7 +166,6 @@ class SupportFlow {
 		$this->predefinded_replies_type = apply_filters( 'supportflow_predefinded_replies_type', 'sf_predefs' );
 		$this->customers_tax          = apply_filters( 'supportflow_customers_taxonomy', 'sf_customer' );
 		$this->tags_tax                 = apply_filters( 'supportflow_tags_taxonomy', 'sf_tags' );
-		$this->comment_type             = apply_filters( 'supportflow_ticket_comment_type', 'sf_comment' );
 		$this->reply_type               = apply_filters( 'supportflow_ticket_reply_type', 'sf_ticket' );
 
 		$this->email_term_prefix = 'sf-';
@@ -342,6 +341,7 @@ class SupportFlow {
 			'show_in_nav_menus' => true,
 			'rewrite'           => false,
 			'capabilities'      => $capabilities,
+			'update_count_callback' => array($this, 'callback_update_count_callback_tags' ),
 		);
 
 		register_taxonomy( $this->customers_tax, $this->post_type, $args_customers_tax );
@@ -403,6 +403,35 @@ class SupportFlow {
 
 		// Update db_version to latest one
 		update_option( 'sf_version', $this->version );
+	}
+
+	/**
+	 * Updated count of tickets using a tag
+	 * WP include only post with `published` status when evaluating count. So it is causing problems as SF use different post_stasuses
+	 */
+	public function callback_update_count_callback_tags( $terms, $taxonomy ) {
+		global $wpdb;
+
+		$post_type = $this->post_type;
+
+		$statuses = $this->post_statuses;
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_tickets'] ) {
+				$status_slugs[] = $status;
+			}
+		}
+
+		$status_slugs = implode( "', '", $status_slugs );
+
+		foreach ( $terms as $term ) {
+			$count = $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE "
+				. "$wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_type = '$post_type' AND post_status IN ('$status_slugs') AND term_taxonomy_id = %d",
+				$term
+			) );
+
+			$wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
+		}
 	}
 
 	public function filter_wp_insert_post_data( $data, $postarr ) {
@@ -683,7 +712,7 @@ class SupportFlow {
 			'post_id'     => '',
 			'search'      => '',
 			'order'       => 'DESC', // 'DESC', 'ASC',
-			'numberposts' => - 1,
+			'posts_per_page' => - 1,
 		);
 
 		$args      = array_merge( $default_args, $args );
@@ -693,7 +722,7 @@ class SupportFlow {
 			'post_status'      => $args['status'],
 			'post_type'        => $this->reply_type,
 			'order'            => $args['order'],
-			'numberposts'      => $args['numberposts'],
+			'posts_per_page'      => $args['posts_per_page'],
 			'suppress_filters' => false,
 		);
 		add_filter( 'posts_clauses', array( $this, 'filter_reply_clauses' ), 10, 2 );
