@@ -61,7 +61,7 @@ class SupportFlow_Emails extends SupportFlow {
 		// Don't email the person adding the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
 			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email', true ), $agent_emails );
-			if ( false !== ( $key ) ) {
+			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
 			}
 		}
