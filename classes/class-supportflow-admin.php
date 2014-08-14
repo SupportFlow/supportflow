@@ -321,7 +321,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 		// Filter to specify tag
 		$tax_slug = SupportFlow()->tags_tax;
-		$terms    = get_terms( 'sf_tags', array( 'hide_empty' => false ) );
+		$terms    = get_terms( SupportFlow()->tags_tax, array( 'hide_empty' => false ) );
 
 		echo "<select name='" . esc_attr( $tax_slug ) . "' id='" . esc_attr( $tax_slug ) . "' class='postform'>";
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
@@ -578,7 +578,7 @@ class SupportFlow_Admin extends SupportFlow {
 				'post_type'    => SupportFlow()->post_type,
 				'post_parent'  => 0,
 				'post_status'  => $status_slugs,
-				'numberposts'  => 10,
+				'posts_per_page'  => 10,
 				'post__not_in' => array( get_the_id() ),
 				'tax_query'    => array(
 					array(
@@ -896,7 +896,7 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => 'sf_predefs' ) );
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => -1 ) );
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
@@ -922,7 +922,7 @@ class SupportFlow_Admin extends SupportFlow {
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
 		$ticket_lock       = ( null == $email_account && '' != $email_account_id );
-		$disabled_attr     = $ticket_lock ? 'disabled' : '';
+		$disabled_attr     = disabled( $ticket_lock, true, false );
 		$submit_attr_array = $ticket_lock ? array( 'disabled' => 'true' ) : array();
 
 		if ( $ticket_lock ) {
@@ -960,7 +960,8 @@ class SupportFlow_Admin extends SupportFlow {
 		echo '</div>';
 		echo '<div id="submit-action">';
 		$signature_label_title = __( 'Append your signature at the bottom of the reply. Signature can be removed or changed in preferences page', 'supportflow' );
-		echo '<input type="checkbox" ' . $disabled_attr . '	checked="checked" id="insert-signature" name="insert-signature" />';
+		$insert_signature_default = (boolean) get_user_meta( get_current_user_id(), 'sf_insert_signature_default', true );
+		echo '<input type="checkbox" ' . $disabled_attr . checked( $insert_signature_default, true, false ) . ' id="insert-signature" name="insert-signature" />';
 		echo "<label for='insert-signature' title='$signature_label_title'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
 		echo '<input type="checkbox" ' . $disabled_attr . ' id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
@@ -991,6 +992,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
+				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1025,6 +1027,7 @@ class SupportFlow_Admin extends SupportFlow {
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
 				$post_content = make_clickable( $post_content );
+				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1104,7 +1107,7 @@ class SupportFlow_Admin extends SupportFlow {
 				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				break;
 			case 'sf_excerpt':
-				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'numberposts' => 1, 'order' => 'ASC' ) );
+				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'posts_per_page' => 1, 'order' => 'ASC' ) );
 				if ( ! isset( $replies[0] ) ) {
 					echo '—';
 					break;
@@ -1257,6 +1260,36 @@ class SupportFlow_Admin extends SupportFlow {
 			SupportFlow()->add_ticket_reply( $ticket_id, $reply, $reply_args );
 		}
 
+	}
+
+	/**
+	 * Hide quoted content in a message and display a link to show it.
+	 * Line startings with ">" sign are considered quoted content
+	 */
+	public function hide_quoted_text( $text ) {
+
+		$ws     = '\s'; // Whitespace ( matches \r\n\t\f )
+		$gt     = '&gt;'; // Greater than sign
+		$br     = "<{$ws}*br[^>]*>"; // BR tag
+		$non_br = "<(\s|/)*(?:(?!br( |>)).)*[^>]>"; // Any tag other than BR
+
+		$regex = "(^|$br)($non_br|$ws)*$gt(.*?)($br(?!($non_br|$ws)*$gt)|$)";
+
+		$res = preg_replace_callback( "~$regex~is", array( $this, 'hide_quoted_text_regex_callback' ), $text );
+
+		return $res;
+	}
+
+	/**
+	 * Just a function used by hide_quoted_text() for its regex callback
+	 * Anonymous function are not used as they unavailable in PHP 5.2.x
+	 * create_function() is not used as it it not readable
+	 */
+	protected function hide_quoted_text_regex_callback( $matches ) {
+		$match    = esc_attr( $matches[0] );
+		$show_msg = __( 'Show quoted content', 'supportflow' );
+
+		return "<span><a href='' class='sf_toggle_quoted_text' data-quoted_text='$match'><br />$show_msg</a><br /></span>";
 	}
 }
 

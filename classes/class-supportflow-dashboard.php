@@ -26,9 +26,9 @@ class SupportFlow_Dashboard extends SupportFlow {
 			) );
 
 			wp_add_dashboard_widget(
-				'sf_recent_tickets',
-				__( "Recent tickets", 'supportflow' ),
-				array( $this, 'action_sf_recent_tickets' )
+				'sf_last_updated_tickets',
+				__( "Last Updated tickets", 'supportflow' ),
+				array( $this, 'sf_last_updated_tickets' )
 			);
 
 			wp_add_dashboard_widget(
@@ -52,7 +52,7 @@ class SupportFlow_Dashboard extends SupportFlow {
 	}
 
 
-	function action_sf_recent_tickets() {
+	function sf_last_updated_tickets() {
 		$statuses     = SupportFlow()->post_statuses;
 		$status_slugs = array();
 
@@ -66,8 +66,10 @@ class SupportFlow_Dashboard extends SupportFlow {
 			'post_type'   => SupportFlow()->post_type,
 			'post_parent' => 0,
 			'post_status' => $status_slugs,
+			'orderby'     => 'modified',
+			'order'	      => "ASC",
 			'author'      => 0,
-			'numberposts' => 10,
+			'posts_per_page' => 10,
 		);
 
 		add_filter( 'posts_clauses', array( $this, 'filter_author_clause' ), 10, 2 );
@@ -85,16 +87,16 @@ class SupportFlow_Dashboard extends SupportFlow {
 		$table->set_columns( array(
 			'title'    => __( 'Subject', 'supportflow' ),
 			'status'   => __( 'Status', 'supportflow' ),
-			'datetime' => __( 'Created', 'supportflow' ),
+			'datetime' => __( 'Last Updated', 'supportflow' ),
 		) );
 
 		$data = array();
 		foreach ( $tickets as $ticket ) {
-			$post_date    = strtotime( $ticket->post_date );
-			$time_created = time() - strtotime( $ticket->post_date );
-			if ( $time_created > 2 * DAY_IN_SECONDS ) {
+			$post_date_modified    = strtotime( $ticket->post_modified_gmt );
+			$time_modified = time() - strtotime( $ticket->post_modified_gmt );
+			if ( $time_modified > 2 * DAY_IN_SECONDS ) {
 				$class = 'two_day_old ';
-			} elseif ( $time_created > DAY_IN_SECONDS ) {
+			} elseif ( $time_modified > DAY_IN_SECONDS ) {
 				$class = 'one_two_day_old';
 			} else {
 				$class = 'one_day_old';
@@ -104,7 +106,7 @@ class SupportFlow_Dashboard extends SupportFlow {
 			$data[] = array(
 				'title'    => $title,
 				'status'   => esc_html( $statuses[$ticket->post_status]['label'] ),
-				'datetime' => sprintf( __( '%s ago', 'supportflow' ), human_time_diff( time(), $post_date ) ),
+				'datetime' => sprintf( __( '%s ago', 'supportflow' ), human_time_diff( time(), $post_date_modified ) ),
 			);
 		}
 
@@ -131,6 +133,7 @@ class SupportFlow_Dashboard extends SupportFlow {
 			$args = array(
 				'post_type'   => SupportFlow()->post_type,
 				'post_parent' => 0,
+				'posts_per_page' => 10,
 				'post_status' => $status_slug,
 				'author'      => $user_id,
 			);

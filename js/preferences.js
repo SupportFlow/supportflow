@@ -1,8 +1,8 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
 
 	// Update E-Mail notification settings on checkbox toggle
-	jQuery(document).on('change', '.sf_email_accounts_table .toggle_privilege', function () {
-		var checkbox = jQuery(this);
+	$(document).on('change', '.sf_email_accounts_table .toggle_privilege', function () {
+		var checkbox = $(this);
 		var checkbox_label = checkbox.siblings('.privilege_status');
 		var email_notfication_identifier = checkbox.data('email-notfication-identifier');
 
@@ -13,7 +13,7 @@ jQuery(document).ready(function () {
 		checkbox_label.html(SFPreferences.changing_state);
 		checkbox.prop('disabled', true);
 
-		jQuery.ajax(ajaxurl, {
+		$.ajax(ajaxurl, {
 			type    : 'post',
 			data    : {
 				action                      : 'set_email_notfication',

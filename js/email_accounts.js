@@ -1,12 +1,12 @@
-jQuery(document).ready(function () {
-	jQuery('.delete_email_account').click(function (e) {
+jQuery(document).ready(function ($) {
+	$('.delete_email_account').click(function (e) {
 		e.preventDefault();
 
 		if (!confirm(SFEmailAccounts.sure_delete_account)) {
 			return;
 		}
 
-		var account_key = jQuery(this).data('account-id');
+		var account_key = $(this).data('account-id');
 		var form_action = "edit.php?post_type=" + SFEmailAccounts.post_type + "&page=" + SFEmailAccounts.slug;
 
 		var form = '';
@@ -16,28 +16,28 @@ jQuery(document).ready(function () {
 		form += '<input type="hidden" name="account_id" value=' + account_key + ' />';
 		form += '</form>';
 
-		jQuery('body').append(form);
-		jQuery('#remove_email_account').submit();
+		$('body').append(form);
+		$('#remove_email_account').submit();
 	});
 
 
-	jQuery('#add_new_email_account #imap_ssl').change(function () {
+	$('#add_new_email_account #imap_ssl').change(function () {
 		if (this.checked) {
 			// Change to default IMAP SSL port on enabling SSL
-			jQuery('#add_new_email_account #imap_port').val('993');
+			$('#add_new_email_account #imap_port').val('993');
 		} else {
 			// Change to default IMAP non-SSL port on disabling SSL
-			jQuery('#add_new_email_account #imap_port').val('143');
+			$('#add_new_email_account #imap_port').val('143');
 		}
 	});
 
-	jQuery('#add_new_email_account #smtp_ssl').change(function () {
+	$('#add_new_email_account #smtp_ssl').change(function () {
 		if (this.checked) {
 			// Change to default SMTP SSL port on enabling SSL
-			jQuery('#add_new_email_account #smtp_port').val('465');
+			$('#add_new_email_account #smtp_port').val('465');
 		} else {
 			// Change to default SMTP non-SSL port on disabling SSL
-			jQuery('#add_new_email_account #smtp_port').val('25');
+			$('#add_new_email_account #smtp_port').val('25');
 		}
 	});
 });

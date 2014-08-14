@@ -122,6 +122,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
 		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
+
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
 		$messge .= "\n\n" . $this->get_quoted_text( $ticket );
 		$message = wpautop( $message );
@@ -168,7 +169,7 @@ class SupportFlow_Emails extends SupportFlow {
 			$msg .= SupportFlow()->sanitize_ticket_reply( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
-			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID ) ) ) {
+			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID, 'posts_per_page' => -1 ) ) ) {
 				foreach ( $ticket_attachments as $attachment ) {
 					$attachments[] = get_attached_file( $attachment->ID );
 				}
@@ -246,7 +247,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 	public function get_attached_files( $reply_id ) {
 		$attachments = array();
-		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply_id ) ) ) {
+		if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $reply_id, 'posts_per_page' => -1 ) ) ) {
 			foreach ( $ticket_attachments as $attachment ) {
 				$attachments[] = get_attached_file( $attachment->ID );
 			}
