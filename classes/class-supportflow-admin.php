@@ -551,7 +551,7 @@ class SupportFlow_Admin extends SupportFlow {
 		remove_meta_box( $customers_box, SupportFlow()->post_type, 'side' );
 		remove_meta_box( 'slugdiv', SupportFlow()->post_type, 'normal' );
 
-		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side' );
+		add_meta_box( 'supportflow-details', __( 'Details', 'supportflow' ), array( $this, 'meta_box_details' ), SupportFlow()->post_type, 'side', 'high' );
 		add_meta_box( 'supportflow-subject', __( 'Subject', 'supportflow' ), array( $this, 'meta_box_subject' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-customers', __( 'Customers', 'supportflow' ), array( $this, 'meta_box_customers' ), SupportFlow()->post_type, 'normal' );
 		add_meta_box( 'supportflow-cc-bcc', __( 'CC and BCC', 'supportflow' ), array( $this, 'meta_box_cc_bcc' ), SupportFlow()->post_type, 'normal' );
