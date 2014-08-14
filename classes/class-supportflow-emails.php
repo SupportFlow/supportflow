@@ -69,12 +69,12 @@ class SupportFlow_Emails extends SupportFlow {
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
-		$attachments = get_attached_files( $reply->ID );
+		$attachments = $this->get_attached_files( $reply->ID );
 
 		$post_status    = SupportFlow()->post_statuses[$ticket->post_status]['label'];
 		$assigned_agent = ( $ticket->post_author ) ? get_user_by( 'id', $ticket->post_author )->display_name : __( 'None assigned', 'supportflow' );
 
-		$message = sanitize_ticket_reply( stripslashes( $reply->post_content ) );
+		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 		$message .= "\n\n-------";
 		$message .= "\n" . __( "Status: ", 'supportflow' ) . $post_status;
 		$message .= "\n" . __( "Agent: ", 'supportflow' ) . $assigned_agent;
@@ -116,12 +116,12 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
-		$attachments = get_attached_files( $reply->ID );
+		$attachments = $this->get_attached_files( $reply->ID );
 
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'customer' );
 
-		$message = sanitize_ticket_reply( stripslashes( $reply->post_content ) );
+		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
 		$messge .= "\n\n" . $this->get_quoted_text( $ticket );
 		$message = wpautop( $message );
@@ -165,7 +165,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
 			$msg .= '<br>';
-			$msg .= sanitize_ticket_reply( $ticket_reply->post_content );
+			$msg .= SupportFlow()->sanitize_ticket_reply( $ticket_reply->post_content );
 			$msg .= '<br><br>';
 
 			if ( $ticket_attachments = get_posts( array( 'post_type' => 'attachment', 'post_parent' => $ticket_reply->ID ) ) ) {
