@@ -630,6 +630,66 @@ class SupportFlow_Admin extends SupportFlow {
 	 * Show details about the ticket, and allow the post status and agent to be changed
 	 */
 	public function meta_box_details() {
+		echo '<div id="minor-publishing">
+				<div id="misc-publishing-actions">';
+
+		$this->render_meta_box_details_email_account();
+		$this->render_meta_box_details_opened();
+		$this->render_meta_box_details_status();
+		$this->render_meta_box_details_author();
+		$this->render_meta_box_details_notifications();
+		$this->render_meta_box_details_actions();
+
+		echo '</div>
+				</div>';
+
+	}
+
+	public function render_meta_box_details_email_account() {
+		// Get post E-Mail account
+		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
+
+		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
+		$user_permissions = $user_permissions['email_accounts'];
+
+		$email_account_id = get_post_meta( get_the_id(), 'email_account', true );
+
+		if ( '' == $email_account_id ) {
+			$email_account_dropdown = '<select class="meta-item-dropdown">';
+			foreach ( $email_accounts as $id => $email_account ) {
+				if ( empty( $email_account ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
+					continue;
+				}
+				$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';
+			}
+			$email_account_dropdown .= '</select>';
+
+			$email_account_keys  = array_keys( $email_accounts );
+			$email_account_first = $email_account_keys[0];
+			$email_account_label = $email_accounts[$email_account_first]['username'];
+		}
+
+		if ( '' == $email_account_id ) {
+			?>
+			<div class="misc-pub-section meta-item">
+				<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
+				<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
+				<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
+					<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+				</a>
+				<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_first ?>" type="hidden" />
+
+				<div class="meta-item-toggle-content hide-if-js">
+					<?php echo $email_account_dropdown ?>
+					<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
+					<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+				</div>
+			</div>
+		<?php
+		}
+	}
+
+	public function render_meta_box_details_opened() {
 		global $pagenow;
 
 		// Get post creation and last update time
@@ -637,9 +697,22 @@ class SupportFlow_Admin extends SupportFlow {
 			$opened        = get_the_date() . ' ' . get_the_time();
 			$modified_gmt  = get_post_modified_time( 'U', true, get_the_ID() );
 			$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+			?>
+			<div class="misc-pub-section meta-item">
+				<label><?php _e( 'Opened', 'supportflow' ) ?>:</label>
+				<span class="meta-item-label"><?php esc_html_e( $opened ) ?></span>
+			</div>
+
+			<!--Last ticket update time-->
+			<div class="misc-pub-section meta-item">
+				<label><?php _e( 'Last Activity', 'supportflow' ) ?>:</label>
+				<span class="meta-item-label"><?php esc_html_e( $last_activity ) ?></span>
+			</div>
+		<?php
 		}
+	}
 
-
+	public function render_meta_box_details_status() {
 		// Get post status
 		$post_statuses     = SupportFlow()->post_statuses;
 		$current_status_id = get_post_status( get_the_ID() );
@@ -650,7 +723,30 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		$current_status_label = $post_statuses[$current_status_id]['label'];
+		?>
+		<!--Ticket status box-->
+		<div class="misc-pub-section meta-item">
+			<label class="meta-item-toggle-button"><?php _e( 'Status', 'supportflow' ) ?>:</label>
+			<span class="meta-item-label"><?php esc_html_e( $current_status_label, 'supportflow' ) ?></span>
+			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
+				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+			</a>
+			<input name="post_status" class="meta-item-name" value="<?php esc_attr_e( $current_status_id ) ?>" type="hidden" />
 
+			<div class="meta-item-toggle-content hide-if-js">
+				<select class="meta-item-dropdown">
+					<?php foreach ( $post_statuses as $slug => $post_status ) : ?>
+						<option value="<?php esc_attr_e( $slug ) ?>"<?php selected( $current_status_id, $slug ) ?>><?php esc_html_e( $post_status['label'] ) ?></option>;
+					<?php endforeach; ?>
+				</select>
+				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
+				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+			</div>
+		</div>
+	<?php
+	}
+
+	public function render_meta_box_details_author() {
 		// Get post authors
 		$post_author_id = get_post( get_the_ID() )->post_author;
 
@@ -674,30 +770,26 @@ class SupportFlow_Admin extends SupportFlow {
 			'echo'             => false
 		);
 		$post_authors_dropdown = wp_dropdown_users( $args );
+		?>
+		<div class="misc-pub-section meta-item">
+			<label class="meta-item-toggle-button"><?php _e( 'Owner', 'supportflow' ) ?>:</label>
+			<span class="meta-item-label"><?php _e( $post_author_label, 'supportflow' ) ?></span>
+			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
+				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+			</a>
+			<input name="post_author" class="meta-item-name" value="<?php esc_attr_e( $post_author_id ) ?>" type="hidden" />
 
+			<div class="meta-item-toggle-content hide-if-js">
+				<?php echo $post_authors_dropdown ?>
+				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
+				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+			</div>
+		</div>
+	<?php
+	}
 
-		// Get post E-Mail account
-		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
-
-		$user_permissions = SupportFlow()->extend->permissions->get_user_permissions_data( get_current_user_id() );
-		$user_permissions = $user_permissions['email_accounts'];
-
-		$email_account_id = get_post_meta( get_the_id(), 'email_account', true );
-
-		if ( '' == $email_account_id ) {
-			$email_account_dropdown = '<select class="meta-item-dropdown">';
-			foreach ( $email_accounts as $id => $email_account ) {
-				if ( empty( $email_account ) || ( ! current_user_can( 'manage_options' ) && ! in_array( $id, $user_permissions ) ) ) {
-					continue;
-				}
-				$email_account_dropdown .= '<option value="' . esc_attr( $id ) . '" ' . '>' . esc_html( $email_account['username'] ) . '</option>';
-			}
-			$email_account_dropdown .= '</select>';
-
-			$email_account_keys  = array_keys( $email_accounts );
-			$email_account_first = $email_account_keys[0];
-			$email_account_label = $email_accounts[$email_account_first]['username'];
-		}
+	public function render_meta_box_details_notifications() {
+		global $pagenow;
 
 		// Get E-Mail notification settings
 		$notification_id          = 0;
@@ -731,6 +823,26 @@ class SupportFlow_Admin extends SupportFlow {
 		}
 
 		$notification_dropdown .= '</select>';
+		?>
+		<div class="misc-pub-section meta-item">
+			<label class="meta-item-toggle-button" title="<?php _e( $notification_label_title, 'supportflow' ) ?>"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
+			<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
+			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
+				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+			</a>
+			<input name="post_email_notifications_override" class="meta-item-name" value="<?php echo $notification_id ?>" type="hidden" />
+
+			<div class="meta-item-toggle-content hide-if-js">
+				<?php echo $notification_dropdown ?>
+				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
+				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+			</div>
+		</div>
+	<?php
+	}
+
+	public function render_meta_box_details_actions() {
+		global $pagenow;
 
 		$close_ticket_label = __( 'Close ticket', 'supportflow' );
 
@@ -741,95 +853,6 @@ class SupportFlow_Admin extends SupportFlow {
 			$submit_text = __( 'Update Ticket', 'supportflow' );
 		}
 		?>
-
-		<div id="minor-publishing">
-			<div id="misc-publishing-actions">
-
-				<?php if ( '' == $email_account_id ) : ?>
-					<div class="misc-pub-section meta-item">
-						<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
-						<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
-						<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-							<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
-						</a>
-						<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_first ?>" type="hidden" />
-
-						<div class="meta-item-toggle-content hide-if-js">
-							<?php echo $email_account_dropdown ?>
-							<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-							<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<!--Ticket opening date/time-->
-				<?php if ( 'post.php' == $pagenow ) : ?>
-					<div class="misc-pub-section meta-item">
-						<label><?php _e( 'Opened', 'supportflow' ) ?>:</label>
-						<span class="meta-item-label"><?php esc_html_e( $opened ) ?></span>
-					</div>
-
-					<!--Last ticket update time-->
-					<div class="misc-pub-section meta-item">
-						<label><?php _e( 'Last Activity', 'supportflow' ) ?>:</label>
-						<span class="meta-item-label"><?php esc_html_e( $last_activity ) ?></span>
-					</div>
-				<?php endif; ?>
-
-				<!--Ticket status box-->
-				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button"><?php _e( 'Status', 'supportflow' ) ?>:</label>
-					<span class="meta-item-label"><?php esc_html_e( $current_status_label, 'supportflow' ) ?></span>
-					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
-					</a>
-					<input name="post_status" class="meta-item-name" value="<?php esc_attr_e( $current_status_id ) ?>" type="hidden" />
-
-					<div class="meta-item-toggle-content hide-if-js">
-						<select class="meta-item-dropdown">
-							<?php foreach ( $post_statuses as $slug => $post_status ) : ?>
-								<option value="<?php esc_attr_e( $slug ) ?>"<?php selected( $current_status_id, $slug ) ?>><?php esc_html_e( $post_status['label'] ) ?></option>;
-							<?php endforeach; ?>
-						</select>
-						<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-						<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
-					</div>
-				</div>
-
-				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button"><?php _e( 'Owner', 'supportflow' ) ?>:</label>
-					<span class="meta-item-label"><?php _e( $post_author_label, 'supportflow' ) ?></span>
-					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
-					</a>
-					<input name="post_author" class="meta-item-name" value="<?php esc_attr_e( $post_author_id ) ?>" type="hidden" />
-
-					<div class="meta-item-toggle-content hide-if-js">
-						<?php echo $post_authors_dropdown ?>
-						<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-						<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
-					</div>
-				</div>
-
-				<div class="misc-pub-section meta-item">
-					<label class="meta-item-toggle-button" title="<?php _e( $notification_label_title, 'supportflow' ) ?>"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
-					<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
-					<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-						<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
-					</a>
-					<input name="post_email_notifications_override" class="meta-item-name" value="<?php echo $notification_id ?>" type="hidden" />
-
-					<div class="meta-item-toggle-content hide-if-js">
-						<?php echo $notification_dropdown ?>
-						<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-						<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
-					</div>
-				</div>
-
-			</div>
-			<div class="clear"></div>
-		</div>
-
 		<div id="major-publishing-actions">
 			<?php if ( 'post.php' == $pagenow && $current_status_id != 'sf_closed' ) : ?>
 				<div id="delete-action">
