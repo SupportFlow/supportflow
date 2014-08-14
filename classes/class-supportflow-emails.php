@@ -81,7 +81,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
 
-		$messge .= "\n\n" . $this->get_quoted_text( $ticket );
+		$message .= "\n\n" . $this->get_quoted_text( $ticket );
 		$message = wpautop( $message );
 
 		self::mail( $agent_emails, $subject, $message, 'Content-Type: text/html', $attachments, $smtp_account );
@@ -124,7 +124,7 @@ class SupportFlow_Emails extends SupportFlow {
 		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'customer' );
-		$messge .= "\n\n" . $this->get_quoted_text( $ticket );
+		$message .= "\n\n" . $this->get_quoted_text( $ticket );
 		$message = wpautop( $message );
 
 		$headers = "Content-Type: text/html\r\n";
