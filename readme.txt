@@ -41,9 +41,22 @@ To contribute to SupportFlow visit [github] (http://github.com/SupportFlow/suppo
 Now you are ready to use SupportFlow.
 
 == Frequently Asked Questions ==
+
 ###How can I insert a SupportFlow contact form in my site.
 
 Just add **[supportflow_submissionform]** shortcode to the post you want to add SupportFlow form to.
+
+###I am unable to add an E-Mail account
+
+1. Check if connection settings are correct especially port number and SSL settings for both IMAP and SMTP.
+
+2. Some E-Mail providers disable IMAP access by default and allow it to enable through settings. So make sure it is enabled
+
+3 In case you use 2-steps authentication, you have to use application specific password.
+
+4. Ensure IMAP extension is installed and enabled. You may also want to ensure extension is build with SSL support
+
+5. Check if E-Mail hosting provider is not blocking connection thinking it is suspicious. You may also receive an E-Mail alert from your E-Mail provider for the same.
 
 == Changelog ==
 
