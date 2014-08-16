@@ -1,4 +1,4 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
 	// Close all the different stat tables and toggle the status of clicked stat table
 	$('.toggle-link').click(function (event) {
 		var current = $(this).siblings('.toggle-content').css('display');
