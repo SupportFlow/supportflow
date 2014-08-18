@@ -113,8 +113,19 @@ class SupportFlow_Email_Replies extends SupportFlow {
 				continue;
 			}
 
+			// Convert encoding to UTF-8
+			if ( ! empty( $email->structure->parameters ) ) {
+				foreach ( $email->structure->parameters as $parameter ) {
+					if ( 'CHARSET' == $parameter->attribute ) {
+						$email->body = iconv( $parameter->value, 'UTF-8', $email->body );
+						break;
+					}
+				}
+			}
+
 			// @todo Confirm this a message we want to process
 			$ret = $this->process_email( $imap_connection, $email, $i, $connection_details['username'], $connection_details['account_id'] );
+
 			// If it was successful, move the email to the archive
 			if ( $ret ) {
 				$archive_mails[] = $i;
