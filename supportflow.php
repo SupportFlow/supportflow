@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
  * Plugin URI:  https://wordpress.org/plugins/supportflow/
  * Description: Reinventing how you support your customers.
  * Author:      Daniel Bachhuber, Varun Agrawal, Alex Mills, Andrew Spittle
- * Version:     0.3
+ * Version:     0.4-alpha1
  *
  * Text Domain: supportflow
  * Domain Path: /languages/
@@ -146,7 +146,7 @@ class SupportFlow {
 
 		/** Version ***********************************************************/
 
-		$this->version = '0.3'; // SupportFlow version
+		$this->version = '0.4-alpha1'; // SupportFlow version
 
 		/** Paths *************************************************************/
 
