@@ -985,27 +985,42 @@ class SupportFlow {
 	}
 
 	public function action_cron_schedules( $schedules ) {
-		$cron_interval = $this->cron_interval;
 
-		$schedules["sf_$cron_interval"] = array(
-			'interval' => $cron_interval,
-			'display'  => "sf_$cron_interval",
+		$schedules["sf_cron"] = array(
+			'interval' => $this->cron_interval,
+			'display'  => "sf_cron",
 		);
 
 		return $schedules;
 	}
 
 	public function action_init_wp_schedule_event() {
-		$cron_interval = $this->cron_interval;
+		// Get interval of cron as per database setting
+		$crons_array = _get_cron_array();
+		foreach ( $crons_array as $time => $crons ) {
+			foreach ( $crons as $hook => $cron ) {
+				if ( 'sf_cron_retrieve_email_replies' == $hook ) {
+					$id       = current( $cron );
+					$interval = $id['interval'];
+				}
+			}
+		}
 
+		// Schedule cron if not scheduled earlier (plugin is activated)
 		if ( ! wp_next_scheduled( 'sf_cron_retrieve_email_replies' ) ) {
 			// Set cron if not scheduled yet
-			wp_schedule_event( time(), "sf_$cron_interval", 'sf_cron_retrieve_email_replies' );
+			wp_schedule_event( time(), "sf_cron", 'sf_cron_retrieve_email_replies' );
 
-		} elseif ( wp_get_schedule( 'sf_cron_retrieve_email_replies' ) != "sf_$cron_interval" ) {
+			return;
+		}
+
+		// Check if cron interval is changed via filters. If it is changed, reschedule the cron
+		if ( $interval != $this->cron_interval ) {
 			// Reschedule cron if interval is changed
 			wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
-			wp_schedule_event( time(), "sf_$cron_interval", 'sf_cron_retrieve_email_replies' );
+			wp_schedule_event( time(), "sf_cron", 'sf_cron_retrieve_email_replies' );
+
+			return;
 		}
 	}
 
