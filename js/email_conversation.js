@@ -34,7 +34,7 @@ jQuery(document).ready(function ($) {
 
 	$('#email_conversation_submit').click(email_conversion);
 	$('#email_conversation_to').keyup(function () {
-		if (event.keyCode == 10) {
+		if (event.keyCode == 10 || event.keyCode == 13) {
 			email_conversion();
 		}
 	});
