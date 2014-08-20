@@ -274,6 +274,9 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			// Save the attachment ID as post meta of reply
 			add_post_meta( $new_reply->ID, 'sf_attachments', $new_attachment_id );
 			SupportFlow()->extend->attachments->insert_attachment_secret_key( $new_attachment_id ) ;
+
+			// It doesn't do anything special other than making sure file is not shown as unattached in media page
+			wp_update_post( array( 'ID' => $new_attachment_id, 'post_parent' => $ticket_id ) );
 		}
 
 		// Store the original email ID so we don't accidentally dupe it
