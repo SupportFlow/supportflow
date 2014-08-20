@@ -885,6 +885,35 @@ class SupportFlow {
 	}
 
 	/**
+	 * Get reply author name
+	 * @param int $reply_id ID of reply
+	 * @param boolean $return_email_if_empty Should return author E-Mail if name not found
+	 * @return string Reply author name or reply author name or a empty string depending upon parameters
+	 */
+	public function get_reply_author_name( $reply_id, $return_email_if_empty = true ) {
+		$author = get_post_meta( $reply_id, 'reply_author', true );
+		if ( $return_email_if_empty && empty( $author ) ) {
+			$author = $this->get_reply_author_email( $reply_id, false );
+		}
+
+		return $author;
+	}
+
+	/**
+	 * Get reply author E-Mail
+	 * @param int $reply_id ID of reply
+	 * @return string Reply author E-Mail or empty string on failure
+	 */
+	public function get_reply_author_email( $reply_id, $return_name_if_empty = false ) {
+		$author = get_post_meta( $reply_id, 'reply_author_email', true );
+		if ( $return_name_if_empty && empty( $author ) ) {
+			$author = $this->get_reply_author_name( $reply_id, false );
+		}
+
+		return $author;
+	}
+
+	/**
 	 * SupportFlow alternate of wp_enqueue_script() to increase code reuse and save time. Enqueue a JS script
 	 *
 	 * @param string $handle         Name of the script.
