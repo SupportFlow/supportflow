@@ -87,8 +87,8 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		$post_type                = SupportFlow()->post_type;
 		$predefinded_replies_type = SupportFlow()->predefinded_replies_type;
 
-		add_submenu_page( "edit.php?post_type=$post_type", 'All predefined replies', 'All predefined replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
-		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", __( 'All predefined replies', 'supportflow' ), __( 'All predefined replies', 'supportflow' ), 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", __( 'New predefined reply', 'supportflow' ), __( 'New predefined reply', 'supportflow' ), 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
 
 	}
 
