@@ -42,7 +42,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		// Die if temp file is locked. i.e. cron is running
 		if ( 6 != fwrite( $fp, 'length' ) ) {
-			die;
+			return;
 		}
 
 		// Save current time to file
