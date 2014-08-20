@@ -40,6 +40,7 @@ class SupportFlow_Admin extends SupportFlow {
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'admin_action_change_status', array( $this, 'handle_action_change_status' ) );
 		add_action( 'restrict_manage_posts', array( $this, 'action_restrict_manage_posts' ) );
+		add_filter( 'user_has_cap', array( $this, 'filter_user_has_cap' ), 10, 3 );
 
 	}
 
@@ -178,6 +179,26 @@ class SupportFlow_Admin extends SupportFlow {
 		SupportFlow()->extend->attachments->secure_attachment_file( $attachment_id );
 	}
 
+	/*
+	 * Redirect to original ticket if someone try to view reply directly using URL
+	 */
+	public function filter_user_has_cap( $allcaps, $cap, $args ) {
+		global $pagenow, $post_type;
+
+		if (
+			'post.php' == $pagenow &&
+			SupportFlow()->post_type == $post_type &&
+			'edit_posts' == $cap[0] &&
+			'edit_post' == $args[0]
+		) {
+			$post = get_post( (int) $args[2] );
+			if ( 0 != $post->post_parent ) {
+				wp_redirect( get_edit_post_link( $post->post_parent, '' ), 301 );
+			}
+		}
+
+		return $allcaps;
+	}
 	/**
 	 * Filter the messages that appear to the user after they perform an action on a ticket
 	 */
