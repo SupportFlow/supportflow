@@ -34,6 +34,7 @@ SupportFlow is a web based help desk software. SupportFlow is a web based help d
 To contribute to SupportFlow visit [github] (http://github.com/SupportFlow/supportflow/).
 
 == Installation ==
+
 1. Install SupportFlow either via the WordPress.org plugin directory, or by uploading the files to your server and activate it.
 
 2. After activating open E-Mail accounts page in SupportFlow menu and add an E-Mail account you wish to use with SupportFlow.
@@ -52,11 +53,13 @@ Just add **[supportflow_submissionform]** shortcode to the post you want to add 
 
 2. Some E-Mail providers disable IMAP access by default and allow it to enable through settings. So make sure it is enabled
 
-3 In case you use 2-steps authentication, you have to use application specific password.
+3. In case you use 2-steps authentication, you have to use application specific password.
 
 4. Ensure IMAP extension is installed and enabled. You may also want to ensure extension is build with SSL support
 
 5. Check if E-Mail hosting provider is not blocking connection thinking it is suspicious. You may also receive an E-Mail alert from your E-Mail provider for the same.
+
+6. Gmail user should also see [this](https://support.google.com/accounts/answer/2461835?hl=en), [this](https://support.google.com/accounts/answer/2461835?hl=en) and [this](https://accounts.google.com/b/0/DisplayUnlockCaptcha).
 
 == Changelog ==
 
