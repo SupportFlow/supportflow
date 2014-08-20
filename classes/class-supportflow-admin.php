@@ -311,6 +311,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 	/**
 	 * Filter the actions available to the agent on the post type
+	 * They are shown in All tickets page in subject column
 	 */
 	function filter_post_row_actions( $row_actions, $post ) {
 
