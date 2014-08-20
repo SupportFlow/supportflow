@@ -635,7 +635,7 @@ class SupportFlow {
 	public function get_ticket_customers( $ticket_id, $args = array() ) {
 
 		$default_args = array(
-			'fields' => 'all', // 'all', 'emails'
+			'fields' => 'all', // 'all', 'emails', 'slugs'
 		);
 		$args         = array_merge( $default_args, $args );
 
@@ -645,7 +645,11 @@ class SupportFlow {
 		}
 
 		$customers = array();
-		if ( 'emails' == $args['fields'] ) {
+		if ( 'all' == $args['fields'] ) {
+			foreach ( $raw_customers as $raw_customer ) {
+				$customers[] = array( 'email' => $raw_customer->name, 'slug' => $raw_customer->slug );
+			}
+		} elseif ( 'emails' == $args['fields'] ) {
 			foreach ( $raw_customers as $raw_customer ) {
 				$customers[] = $raw_customer->name;
 			}
