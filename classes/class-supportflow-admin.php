@@ -238,29 +238,18 @@ class SupportFlow_Admin extends SupportFlow {
 	public function filter_views( $views ) {
 		$post_type = SupportFlow()->post_type;
 
-		$total_posts = SupportFlow()->get_tickets_count();
+		$total_posts    = SupportFlow()->get_tickets_count();
+		$class          = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
+		$view_all_title = sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) );
+		$view_all       = "<a href='edit.php?post_type=$post_type'$class>$view_all_title</a>";
 
-		$class    = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
-		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
+		$my_posts        = SupportFlow()->get_tickets_count( array( 'author' => get_current_user_id() ) );
+		$view_mine_title = sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) );
+		$view_mine       = '<a href="' . add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => get_current_user_id() ), admin_url( 'edit.php' ) ) . '">' . $view_mine_title . '</a>';
 
-		$post_statuses = SupportFlow()->post_statuses;
-		array_pop( $post_statuses );
-		$post_statuses = "'" . implode( "','", array_map( 'sanitize_key', array_keys( $post_statuses ) ) ) . "'";
-
-		// @todo Only show "Mine" if the user is an agent
-		$mine_args = array(
-			'post_type' => SupportFlow()->post_type,
-			'author'    => get_current_user_id(),
-		);
-		$my_posts  = SupportFlow()->get_tickets_count( array( 'author' => get_current_user_id() ) );
-		$view_mine = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
-
-		$unassigned_args  = array(
-			'post_type' => SupportFlow()->post_type,
-			'author'    => 0,
-		);
-		$unassigned_posts = SupportFlow()->get_tickets_count( array( 'author' => 0 ) );
-		$view_unassigned  = '<a href="' . add_query_arg( $unassigned_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) ) . '</a>';
+		$unassigned_posts      = SupportFlow()->get_tickets_count( array( 'author' => 0 ) );
+		$view_unassigned_title = sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) );
+		$view_unassigned       = '<a href="' . add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => 0 ), admin_url( 'edit.php' ) ) . '">' . $view_unassigned_title . '</a>';
 
 		// Put 'All' and 'Mine' at the beginning of the array
 		array_shift( $views );
@@ -269,7 +258,6 @@ class SupportFlow_Admin extends SupportFlow {
 		$views['mine']       = $view_mine;
 		$views['all']        = $view_all;
 		$views               = array_reverse( $views );
-
 		// Remove private option from filter links as they are just private replies to ticket
 		unset( $views['private'] );
 
