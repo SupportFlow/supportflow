@@ -956,53 +956,36 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	public function display_ticket_replies() {
-		$private_replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) );
+		$all_replies = array(
+			'private' => SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) ),
+			'public'  => SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'public' ) ),
+		);
 
-		if ( ! empty( $private_replies ) ) {
-			echo '<ul class="private-replies">';
-			foreach ( $private_replies as $reply ) {
-				echo '<li>';
-				echo '<div class="ticket-reply">';
-				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
-				$post_content = make_clickable( $post_content );
-				$post_content = $this->hide_quoted_text( $post_content );
-				echo $post_content;
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
-					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
-					}
-					echo '</ul>';
-				}
-				echo '</div>';
-				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
-				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
-				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
-				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
-				echo '</li>';
+		foreach ( $all_replies as $status => $replies ) {
+			if ( empty( $replies ) ) {
+				continue;
 			}
-			echo '</ul>';
-		}
 
-		$replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'public' ) );
-		if ( ! empty( $replies ) ) {
-			echo '<ul class="ticket-replies">';
+			$class = 'private' == $status ? 'private-replies' : 'ticket-replies';
+			echo "<ul class='$class'>";
+
 			foreach ( $replies as $reply ) {
-				$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
 				echo '<li>';
-				echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
-				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
-				echo '</div>';
+
+				if ( 'public' == $status ) {
+					$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
+					$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
+					echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
+					echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
+					echo '</div>';
+				}
+
 				echo '<div class="ticket-reply">';
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
+
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
@@ -1012,17 +995,23 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
-				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
-				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+
+				if ( 'private' == $status ) {
+					$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
+					$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				}
+				if ( 'public' == $status ) {
+					$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				}
+
+				$modified_gmt  = get_post_modified_time( 'U', true, $reply->ID );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
 		}
-
 		echo '<div class="clear"></div>';
-
 	}
 
 	/**
