@@ -37,13 +37,11 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$ticket = SupportFlow()->get_ticket( $reply->post_parent );
 
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
-		if ( '' == $email_account_id ) {
+		$smtp_account     = SupportFlow()->extend->email_accounts->get_email_account[$email_account_id];
+		if ( null == $smtp_account ) {
 			return;
 		}
-		$smtp_account = $email_accounts[$email_account_id];
-
 
 		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $ticket->ID );
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $ticket, 'reply' );
@@ -100,12 +98,11 @@ class SupportFlow_Emails extends SupportFlow {
 		$ticket    = SupportFlow()->get_ticket( $reply->post_parent );
 		$customers = SupportFlow()->get_ticket_customers( $ticket->ID, array( 'fields' => 'emails' ) );
 
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
-		if ( '' == $email_account_id ) {
+		$smtp_account     = SupportFlow()->extend->email_accounts->get_email_account[$email_account_id];
+		if ( null == $smtp_account ) {
 			return;
 		}
-		$smtp_account = $email_accounts[$email_account_id];
 
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
