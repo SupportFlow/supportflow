@@ -115,37 +115,38 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 	 */
 	public function get_dropdown_input($echo = true, $trim_length = 75) {
 		$predefined_replies = $this->get_predefined_replies();
-		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
+		$pre_defs           = array( array( 'trimmed_title' => __( 'Pre-defined Replies', 'supportflow' ), 'title' => '', 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
 			$content = $predefined_reply['content'];
-
-			if ( ! empty( $predefined_reply['title'] ) ) {
-				$title = $predefined_reply['title'];
-			} else {
-				$title = $predefined_reply['content'];
+			if ( 0 == strlen( $content ) ) {
+				continue;
 			}
+
+			$title = empty( $predefined_reply['title'] ) ? $content : $predefined_reply['title'];
 
 			// Limit size to $trim_length (default 75) characters
 			if ( strlen( $title ) > $trim_length ) {
-				$title = substr( $title, 0, $trim_length - 3 ) . '...';
+				$trimmed_title = substr( $title, 0, $trim_length - 3 ) . '...';
+			} else {
+				$trimmed_title = $title;
 			}
 
-			if ( 0 != strlen( $content ) ) {
-				$pre_defs[] = array( 'title' => $title, 'content' => $content );
-			}
+			$pre_defs[] = array( 'trimmed_title' => $trimmed_title, 'title' => $title, 'content' => $content );
 		}
 
 		$output = '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
 		foreach ( $pre_defs as $pre_def ) {
-			$output .= '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
+			$output .= '<option class="predef"'
+				. ' data-title="' . esc_attr( $pre_def['title'] ) . '"'
+				. ' data-content="' . esc_attr( $pre_def['content'] ) . '"'
+				. '>'
+				. esc_html( $pre_def['trimmed_title'] )
+				. "</option>";
 		}
 		$output .= '</select>';
 
-		if ( $echo ) {
-			echo $output;
-		}
-
+		echo ( $echo ) ? $output : '';
 		return $output;
 	}
 }
