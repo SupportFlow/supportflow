@@ -114,16 +114,16 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 	 * @param int $trim_length Limit the length of content shown in box
 	 */
 	public function get_dropdown_input($echo = true, $trim_length = 75) {
-		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => - 1 ) );
+		$predefined_replies = $this->get_predefined_replies();
 		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
 
 		foreach ( $predefined_replies as $predefined_reply ) {
-			$content = $predefined_reply->post_content;
+			$content = $predefined_reply['content'];
 
-			if ( ! empty( $predefined_reply->post_title ) ) {
-				$title = $predefined_reply->post_title;
+			if ( ! empty( $predefined_reply['title'] ) ) {
+				$title = $predefined_reply['title'];
 			} else {
-				$title = $predefined_reply->post_content;
+				$title = $predefined_reply['content'];
 			}
 
 			// Limit size to $trim_length (default 75) characters
