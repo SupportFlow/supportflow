@@ -233,7 +233,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 	/**
-	 *
+	 * Filters links shown over dropdowns in all tickets page
 	 */
 	public function filter_views( $views ) {
 		$post_type    = SupportFlow()->post_type;
