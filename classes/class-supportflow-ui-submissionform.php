@@ -106,8 +106,6 @@ class SupportFlow_UI_SubmissionForm extends SupportFlow {
 			return;
 		}
 
-		// Load required file
-		require_once( SupportFlow()->plugin_dir . 'classes/class-supportflow-admin.php' );
 
 		$ticket_id = SupportFlow()->create_ticket(
 			array(
