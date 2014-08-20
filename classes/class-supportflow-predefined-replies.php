@@ -93,6 +93,20 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 	}
 
 	/**
+	 * @return array Array of predefined replies. Each array contains subarray with keys "title" and "content"
+	 */
+	public function get_predefined_replies() {
+		$predefs            = array();
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => - 1 ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			$predefs[] = array( 'title' => $predefined_reply->post_title, 'content' => $predefined_reply->post_content );
+		}
+
+		return $predefs;
+	}
+
+	/**
 	 * Echo HTML dropdown box containing replies.
 	 * Returns predefined content as data property of option tags
 	 *
