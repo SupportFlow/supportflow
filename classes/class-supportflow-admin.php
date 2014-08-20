@@ -239,17 +239,22 @@ class SupportFlow_Admin extends SupportFlow {
 		$post_type = SupportFlow()->post_type;
 
 		$total_posts    = SupportFlow()->get_tickets_count();
-		$class          = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
+		$class          = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['author'] ) ? ' class="current"' : '';
+		$view_all_link  = add_query_arg( array( 'post_type' => SupportFlow()->post_type), admin_url( 'edit.php' ) );
 		$view_all_title = sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) );
-		$view_all       = "<a href='edit.php?post_type=$post_type'$class>$view_all_title</a>";
+		$view_all       = "<a href='$view_all_link' $class >$view_all_title</a>";
 
 		$my_posts        = SupportFlow()->get_tickets_count( array( 'author' => get_current_user_id() ) );
+		$class           = empty( $class ) && empty( $_REQUEST['post_status'] ) && ! empty( $_REQUEST['author'] ) && get_current_user_id() == $_REQUEST['author'] ? ' class="current"' : '';
+		$view_mine_link  = add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => get_current_user_id() ), admin_url( 'edit.php' ) );
 		$view_mine_title = sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) );
-		$view_mine       = '<a href="' . add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => get_current_user_id() ), admin_url( 'edit.php' ) ) . '">' . $view_mine_title . '</a>';
+		$view_mine       = "<a href='$view_mine_link' $class >$view_mine_title</a>";
 
 		$unassigned_posts      = SupportFlow()->get_tickets_count( array( 'author' => 0 ) );
+		$class                 = empty( $class ) && empty( $_REQUEST['post_status'] ) && isset( $_REQUEST['author'] ) && 0 == $_REQUEST['author'] ? ' class="current"' : '';
+		$view_mine_link        = add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => 0 ), admin_url( 'edit.php' ) );
 		$view_unassigned_title = sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) );
-		$view_unassigned       = '<a href="' . add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => 0 ), admin_url( 'edit.php' ) ) . '">' . $view_unassigned_title . '</a>';
+		$view_unassigned       = "<a href='$view_mine_link' $class >$view_unassigned_title</a>";
 
 		// Put 'All' and 'Mine' at the beginning of the array
 		array_shift( $views );
