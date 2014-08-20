@@ -757,6 +757,33 @@ class SupportFlow {
 	}
 
 	/**
+	 * Get the total number of tickets. They can be filtered using $args. By default include all tickets excluding closed and trashed
+	 * @return int Count of tickets
+	 */
+	public function get_tickets_count( $args = array() ) {
+		$statuses     = SupportFlow()->post_statuses;
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_tickets'] ) {
+				$status_slugs[] = $status;
+			}
+		}
+
+		$default_args = array(
+			'post_type'      => $this->post_type,
+			'post_parent'    => 0,
+			'posts_per_page' => 1,
+			'post_status'    => $status_slugs,
+		);
+
+		$args     = array_merge( $default_args, $args );
+		$wp_query = new WP_Query( $args );
+
+		return $wp_query->found_posts;
+	}
+
+	/**
 	 * Get the total number of replies associated with a ticket
 	 *
 	 * @todo support filtering to specific types or replier
