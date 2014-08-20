@@ -929,28 +929,6 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => -1 ) );
-		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
-
-		foreach ( $predefined_replies as $predefined_reply ) {
-			$content = $predefined_reply->post_content;
-
-			if ( ! empty( $predefined_reply->post_title ) ) {
-				$title = $predefined_reply->post_title;
-			} else {
-				$title = $predefined_reply->post_content;
-			}
-
-			// Limit size to 75 characters
-			if ( strlen( $title ) > 75 ) {
-				$title = substr( $title, 0, 75 - 3 ) . '...';
-			}
-
-			if ( 0 != strlen( $content ) ) {
-				$pre_defs[] = array( 'title' => $title, 'content' => $content );
-			}
-		}
-
 		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
@@ -971,11 +949,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
 		echo '<div class="alignright">';
-		echo '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
-		foreach ( $pre_defs as $pre_def ) {
-			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
-		}
-		echo '</select></div>';
+		SupportFlow()->extend->predefined_replies->get_dropdown_input();
+		echo '</div>';
 
 		echo '<div id="ticket-reply-box">';
 		echo "<textarea id='reply' name='reply' $disabled_attr class='ticket-reply sf_autosave' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";

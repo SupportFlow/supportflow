@@ -91,6 +91,49 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
 
 	}
+
+	/**
+	 * Echo HTML dropdown box containing replies.
+	 * Returns predefined content as data property of option tags
+	 *
+	 * @param boolean $echo Should echo the dropdown
+	 * @param int $trim_length Limit the length of content shown in box
+	 */
+	public function get_dropdown_input($echo = true, $trim_length = 75) {
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => - 1 ) );
+		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			$content = $predefined_reply->post_content;
+
+			if ( ! empty( $predefined_reply->post_title ) ) {
+				$title = $predefined_reply->post_title;
+			} else {
+				$title = $predefined_reply->post_content;
+			}
+
+			// Limit size to $trim_length (default 75) characters
+			if ( strlen( $title ) > $trim_length ) {
+				$title = substr( $title, 0, $trim_length - 3 ) . '...';
+			}
+
+			if ( 0 != strlen( $content ) ) {
+				$pre_defs[] = array( 'title' => $title, 'content' => $content );
+			}
+		}
+
+		$output = '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
+		foreach ( $pre_defs as $pre_def ) {
+			$output .= '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
+		}
+		$output .= '</select>';
+
+		if ( $echo ) {
+			echo $output;
+		}
+
+		return $output;
+	}
 }
 
 SupportFlow()->extend->predefined_replies = new SupportFlow_Predefined_Replies();
