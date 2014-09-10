@@ -821,8 +821,14 @@ class SupportFlow {
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
 			foreach ( $attachment_ids as $attachment_id ) {
+				// Associate attachment with the reply
 				add_post_meta( $reply_id, 'sf_attachments', $attachment_id );
+
 				SupportFlow()->extend->attachments->insert_attachment_secret_key( $attachment_id );
+
+				// It doesn't do anything special other than making sure file is not shown as unattached in media page
+				wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $ticket_id ) );
+
 			}
 		}
 
