@@ -87,9 +87,67 @@ class SupportFlow_Predefined_Replies extends SupportFlow {
 		$post_type                = SupportFlow()->post_type;
 		$predefinded_replies_type = SupportFlow()->predefinded_replies_type;
 
-		add_submenu_page( "edit.php?post_type=$post_type", 'All predefined replies', 'All predefined replies', 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
-		add_submenu_page( "edit.php?post_type=$post_type", 'New predefined reply', 'New predefined reply', 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", __( 'All predefined replies', 'supportflow' ), __( 'All predefined replies', 'supportflow' ), 'manage_options', "edit.php?post_type=$predefinded_replies_type" );
+		add_submenu_page( "edit.php?post_type=$post_type", __( 'New predefined reply', 'supportflow' ), __( 'New predefined reply', 'supportflow' ), 'manage_options', "post-new.php?post_type=$predefinded_replies_type" );
 
+	}
+
+	/**
+	 * @return array Array of predefined replies. Each array contains subarray with keys "title" and "content"
+	 */
+	public function get_predefined_replies() {
+		$predefs            = array();
+		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => - 1 ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			$predefs[] = array( 'title' => $predefined_reply->post_title, 'content' => $predefined_reply->post_content );
+		}
+
+		return $predefs;
+	}
+
+	/**
+	 * Echo HTML dropdown box containing replies.
+	 * Returns predefined content as data property of option tags
+	 *
+	 * @param boolean $echo Should echo the dropdown
+	 * @param int $trim_length Limit the length of content shown in box
+	 */
+	public function get_dropdown_input($echo = true, $trim_length = 75) {
+		$predefined_replies = $this->get_predefined_replies();
+		$pre_defs           = array( array( 'trimmed_title' => __( 'Pre-defined Replies', 'supportflow' ), 'title' => '', 'content' => '' ) );
+
+		foreach ( $predefined_replies as $predefined_reply ) {
+			$content = $predefined_reply['content'];
+			if ( 0 == strlen( $content ) ) {
+				continue;
+			}
+
+			$title = empty( $predefined_reply['title'] ) ? $content : $predefined_reply['title'];
+
+			// Limit size to $trim_length (default 75) characters
+			if ( strlen( $title ) > $trim_length ) {
+				$trimmed_title = substr( $title, 0, $trim_length - 3 ) . '...';
+			} else {
+				$trimmed_title = $title;
+			}
+
+			$pre_defs[] = array( 'trimmed_title' => $trimmed_title, 'title' => $title, 'content' => $content );
+		}
+
+		$output = '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
+		foreach ( $pre_defs as $pre_def ) {
+			$output .= '<option class="predef"'
+				. ' data-title="' . esc_attr( $pre_def['title'] ) . '"'
+				. ' data-content="' . esc_attr( $pre_def['content'] ) . '"'
+				. '>'
+				. esc_html( $pre_def['trimmed_title'] )
+				. "</option>";
+		}
+		$output .= '</select>';
+
+		echo ( $echo ) ? $output : '';
+		return $output;
 	}
 }
 

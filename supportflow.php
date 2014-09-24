@@ -635,7 +635,7 @@ class SupportFlow {
 	public function get_ticket_customers( $ticket_id, $args = array() ) {
 
 		$default_args = array(
-			'fields' => 'all', // 'all', 'emails'
+			'fields' => 'all', // 'all', 'emails', 'slugs'
 		);
 		$args         = array_merge( $default_args, $args );
 
@@ -645,7 +645,11 @@ class SupportFlow {
 		}
 
 		$customers = array();
-		if ( 'emails' == $args['fields'] ) {
+		if ( 'all' == $args['fields'] ) {
+			foreach ( $raw_customers as $raw_customer ) {
+				$customers[] = array( 'email' => $raw_customer->name, 'slug' => $raw_customer->slug );
+			}
+		} elseif ( 'emails' == $args['fields'] ) {
 			foreach ( $raw_customers as $raw_customer ) {
 				$customers[] = $raw_customer->name;
 			}
@@ -750,6 +754,33 @@ class SupportFlow {
 		}
 
 		return $clauses;
+	}
+
+	/**
+	 * Get the total number of tickets. They can be filtered using $args. By default include all tickets excluding closed and trashed
+	 * @return int Count of tickets
+	 */
+	public function get_tickets_count( $args = array() ) {
+		$statuses     = SupportFlow()->post_statuses;
+		$status_slugs = array();
+
+		foreach ( $statuses as $status => $status_data ) {
+			if ( true == $status_data['show_tickets'] ) {
+				$status_slugs[] = $status;
+			}
+		}
+
+		$default_args = array(
+			'post_type'      => $this->post_type,
+			'post_parent'    => 0,
+			'posts_per_page' => 1,
+			'post_status'    => $status_slugs,
+		);
+
+		$args     = array_merge( $default_args, $args );
+		$wp_query = new WP_Query( $args );
+
+		return $wp_query->found_posts;
 	}
 
 	/**
@@ -888,6 +919,35 @@ class SupportFlow {
 		} else {
 			return 0;
 		}
+	}
+
+	/**
+	 * Get reply author name
+	 * @param int $reply_id ID of reply
+	 * @param boolean $return_email_if_empty Should return author E-Mail if name not found
+	 * @return string Reply author name or reply author name or a empty string depending upon parameters
+	 */
+	public function get_reply_author_name( $reply_id, $return_email_if_empty = true ) {
+		$author = get_post_meta( $reply_id, 'reply_author', true );
+		if ( $return_email_if_empty && empty( $author ) ) {
+			$author = $this->get_reply_author_email( $reply_id, false );
+		}
+
+		return $author;
+	}
+
+	/**
+	 * Get reply author E-Mail
+	 * @param int $reply_id ID of reply
+	 * @return string Reply author E-Mail or empty string on failure
+	 */
+	public function get_reply_author_email( $reply_id, $return_name_if_empty = false ) {
+		$author = get_post_meta( $reply_id, 'reply_author_email', true );
+		if ( $return_name_if_empty && empty( $author ) ) {
+			$author = $this->get_reply_author_name( $reply_id, false );
+		}
+
+		return $author;
 	}
 
 	/**

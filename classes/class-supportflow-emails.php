@@ -37,13 +37,11 @@ class SupportFlow_Emails extends SupportFlow {
 
 		$ticket = SupportFlow()->get_ticket( $reply->post_parent );
 
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
-		if ( '' == $email_account_id ) {
+		$smtp_account     = SupportFlow()->extend->email_accounts->get_email_account[$email_account_id];
+		if ( null == $smtp_account ) {
 			return;
 		}
-		$smtp_account = $email_accounts[$email_account_id];
-
 
 		$agent_ids = SupportFlow()->extend->email_notifications->get_notified_user( $ticket->ID );
 		$agent_ids = apply_filters( 'supportflow_emails_notify_agent_ids', $agent_ids, $ticket, 'reply' );
@@ -60,7 +58,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		// Don't email the person adding the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
-			$key = array_search( get_post_meta( $reply->ID, 'reply_author_email', true ), $agent_emails );
+			$key = array_search( SupportFlow()->get_reply_author_email( $reply->ID ), $agent_emails );
 			if ( false !== $key ) {
 				unset( $agent_emails[$key] );
 			}
@@ -100,16 +98,15 @@ class SupportFlow_Emails extends SupportFlow {
 		$ticket    = SupportFlow()->get_ticket( $reply->post_parent );
 		$customers = SupportFlow()->get_ticket_customers( $ticket->ID, array( 'fields' => 'emails' ) );
 
-		$email_accounts   = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		$email_account_id = get_post_meta( $ticket->ID, 'email_account', true );
-		if ( '' == $email_account_id ) {
+		$smtp_account     = SupportFlow()->extend->email_accounts->get_email_account[$email_account_id];
+		if ( null == $smtp_account ) {
 			return;
 		}
-		$smtp_account = $email_accounts[$email_account_id];
 
 		// Don't email the person creating the reply, unless that's desired behavior
 		if ( ! apply_filters( 'supportflow_emails_notify_creator', false, 'reply' ) ) {
-			$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
+			$reply_author_email = SupportFlow()->get_reply_author_email( $reply->ID );
 			$key                = array_search( $reply_author_email, $customers );
 			if ( false !== $key ) {
 				unset( $customers[$key] );
@@ -159,10 +156,7 @@ class SupportFlow_Emails extends SupportFlow {
 
 		foreach ( array_reverse( $ticket_replies ) as $ticket_reply ) {
 			$date_time    = $ticket_reply->post_date_gmt . ' GMT';
-			$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author', true );
-			if ( empty( $reply_author ) ) {
-				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
-			}
+			$reply_author = SupportFlow()->get_reply_author_name( $ticket_reply->ID );
 
 			$msg .= '<b>' . sprintf( __( 'On %s, %s wrote:', 'supportflow' ), $date_time, esc_html( $reply_author ) ) . '</b>';
 			$msg .= '<br>';
@@ -227,15 +221,12 @@ class SupportFlow_Emails extends SupportFlow {
 			return '';
 		} else {
 			$quoted_reply = $replies[1];
-			$reply_author = get_post_meta( $quoted_reply->ID, 'reply_author', true );
-			if ( empty( $reply_author ) ) {
-				$reply_author = get_post_meta( $ticket_reply->ID, 'reply_author_email', true );
-			}
-			$time_stamp = $ticket->post_date_gmt;
-			$heading    = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
-			$content    = SupportFlow()->sanitize_ticket_reply( stripslashes( $quoted_reply->post_content ) );
-			$content    = "> $content";
-			$content    = str_replace( "\n", "\n> ", $content );
+			$reply_author = SupportFlow()->get_reply_author_name( $quoted_reply->ID );
+			$time_stamp   = $ticket->post_date_gmt;
+			$heading      = sprintf( "On %s GMT, %s wrote:", $time_stamp, $reply_author );
+			$content      = SupportFlow()->sanitize_ticket_reply( stripslashes( $quoted_reply->post_content ) );
+			$content      = "> $content";
+			$content      = str_replace( "\n", "\n> ", $content );
 
 			return "$heading\n$content";
 		}

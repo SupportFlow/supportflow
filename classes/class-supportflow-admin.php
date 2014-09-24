@@ -233,62 +233,28 @@ class SupportFlow_Admin extends SupportFlow {
 
 
 	/**
-	 *
+	 * Filters links shown over dropdowns in all tickets page
 	 */
 	public function filter_views( $views ) {
-		$post_type    = SupportFlow()->post_type;
-		$statuses     = SupportFlow()->post_statuses;
-		$status_slugs = array();
+		$post_type = SupportFlow()->post_type;
 
-		foreach ( $statuses as $status => $status_data ) {
-			if ( true == $status_data['show_tickets'] ) {
-				$status_slugs[] = $status;
-			}
-		}
+		$total_posts    = SupportFlow()->get_tickets_count();
+		$class          = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['author'] ) ? ' class="current"' : '';
+		$view_all_link  = add_query_arg( array( 'post_type' => SupportFlow()->post_type), admin_url( 'edit.php' ) );
+		$view_all_title = sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) );
+		$view_all       = "<a href='$view_all_link' $class >$view_all_title</a>";
 
-		$wp_query    = new WP_Query( array(
-			'post_type'      => $post_type,
-			'post_parent'    => 0,
-			'posts_per_page' => 1,
-			'post_status'    => $status_slugs,
-		) );
-		$total_posts = $wp_query->found_posts;
+		$my_posts        = SupportFlow()->get_tickets_count( array( 'author' => get_current_user_id() ) );
+		$class           = empty( $class ) && empty( $_REQUEST['post_status'] ) && ! empty( $_REQUEST['author'] ) && get_current_user_id() == $_REQUEST['author'] ? ' class="current"' : '';
+		$view_mine_link  = add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => get_current_user_id() ), admin_url( 'edit.php' ) );
+		$view_mine_title = sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) );
+		$view_mine       = "<a href='$view_mine_link' $class >$view_mine_title</a>";
 
-		$class    = empty( $class ) && empty( $_REQUEST['post_status'] ) && empty( $_REQUEST['show_sticky'] ) ? ' class="current"' : '';
-		$view_all = "<a href='edit.php?post_type=$post_type'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
-
-		$post_statuses = SupportFlow()->post_statuses;
-		array_pop( $post_statuses );
-		$post_statuses = "'" . implode( "','", array_map( 'sanitize_key', array_keys( $post_statuses ) ) ) . "'";
-
-		// @todo Only show "Mine" if the user is an agent
-		$mine_args = array(
-			'post_type' => SupportFlow()->post_type,
-			'author'    => get_current_user_id(),
-		);
-		$wp_query  = new WP_Query( array(
-			'post_type'      => SupportFlow()->post_type,
-			'author'         => get_current_user_id(),
-			'post_status'    => $post_statuses,
-			'posts_per_page' => 1,
-		) );
-
-		$my_posts  = $wp_query->found_posts;
-		$view_mine = '<a href="' . add_query_arg( $mine_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Mine <span class="count">(%s)</span>', 'Mine <span class="count">(%s)</span>', $my_posts, 'posts' ), number_format_i18n( $my_posts ) ) . '</a>';
-
-		$unassigned_args = array(
-			'post_type' => SupportFlow()->post_type,
-			'author'    => 0,
-		);
-		$wp_query        = new WP_Query( array(
-			'post_type'      => SupportFlow()->post_type,
-			'author'         => 0,
-			'post_status'    => $post_statuses,
-			'posts_per_page' => 1,
-		) );
-
-		$unassigned_posts = $wp_query->found_posts;
-		$view_unassigned  = '<a href="' . add_query_arg( $unassigned_args, admin_url( 'edit.php' ) ) . '">' . sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) ) . '</a>';
+		$unassigned_posts      = SupportFlow()->get_tickets_count( array( 'author' => 0 ) );
+		$class                 = empty( $class ) && empty( $_REQUEST['post_status'] ) && isset( $_REQUEST['author'] ) && 0 == $_REQUEST['author'] ? ' class="current"' : '';
+		$view_mine_link        = add_query_arg( array( 'post_type' => SupportFlow()->post_type, 'author' => 0 ), admin_url( 'edit.php' ) );
+		$view_unassigned_title = sprintf( _nx( 'Unassigned <span class="count">(%s)</span>', 'Unassigned <span class="count">(%s)</span>', $unassigned_posts, 'posts' ), number_format_i18n( $unassigned_posts ) );
+		$view_unassigned       = "<a href='$view_mine_link' $class >$view_unassigned_title</a>";
 
 		// Put 'All' and 'Mine' at the beginning of the array
 		array_shift( $views );
@@ -297,7 +263,6 @@ class SupportFlow_Admin extends SupportFlow {
 		$views['mine']       = $view_mine;
 		$views['all']        = $view_all;
 		$views               = array_reverse( $views );
-
 		// Remove private option from filter links as they are just private replies to ticket
 		unset( $views['private'] );
 
@@ -346,6 +311,7 @@ class SupportFlow_Admin extends SupportFlow {
 
 	/**
 	 * Filter the actions available to the agent on the post type
+	 * They are shown in All tickets page in subject column
 	 */
 	function filter_post_row_actions( $row_actions, $post ) {
 
@@ -929,28 +895,6 @@ class SupportFlow_Admin extends SupportFlow {
 	public function meta_box_replies() {
 		global $pagenow;
 
-		$predefined_replies = get_posts( array( 'post_type' => SupportFlow()->predefinded_replies_type, 'posts_per_page' => -1 ) );
-		$pre_defs           = array( array( 'title' => __( 'Pre-defined Replies', 'supportflow' ), 'content' => '' ) );
-
-		foreach ( $predefined_replies as $predefined_reply ) {
-			$content = $predefined_reply->post_content;
-
-			if ( ! empty( $predefined_reply->post_title ) ) {
-				$title = $predefined_reply->post_title;
-			} else {
-				$title = $predefined_reply->post_content;
-			}
-
-			// Limit size to 75 characters
-			if ( strlen( $title ) > 75 ) {
-				$title = substr( $title, 0, 75 - 3 ) . '...';
-			}
-
-			if ( 0 != strlen( $content ) ) {
-				$pre_defs[] = array( 'title' => $title, 'content' => $content );
-			}
-		}
-
 		$email_account_id = get_post_meta( get_the_ID(), 'email_account', true );
 		$email_account    = SupportFlow()->extend->email_accounts->get_email_account( $email_account_id );
 
@@ -971,11 +915,8 @@ class SupportFlow_Admin extends SupportFlow {
 
 		echo '<div class="alignleft"><h4>' . __( 'Conversation', 'supportflow' ) . '</h4></div>';
 		echo '<div class="alignright">';
-		echo '<select id="predefs" ' . $disabled_attr . ' class="predefined_replies_dropdown">';
-		foreach ( $pre_defs as $pre_def ) {
-			echo '<option class="predef" data-content="' . esc_attr( $pre_def['content'] ) . '">' . esc_html( $pre_def['title'] ) . "</option>\n";
-		}
-		echo '</select></div>';
+		SupportFlow()->extend->predefined_replies->get_dropdown_input();
+		echo '</div>';
 
 		echo '<div id="ticket-reply-box">';
 		echo "<textarea id='reply' name='reply' $disabled_attr class='ticket-reply sf_autosave' rows='4' placeholder='" . esc_attr( $placeholder ) . "'>";
@@ -1015,53 +956,36 @@ class SupportFlow_Admin extends SupportFlow {
 	}
 
 	public function display_ticket_replies() {
-		$private_replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) );
+		$all_replies = array(
+			'private' => SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'private' ) ),
+			'public'  => SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'public' ) ),
+		);
 
-		if ( ! empty( $private_replies ) ) {
-			echo '<ul class="private-replies">';
-			foreach ( $private_replies as $reply ) {
-				echo '<li>';
-				echo '<div class="ticket-reply">';
-				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
-				$post_content = make_clickable( $post_content );
-				$post_content = $this->hide_quoted_text( $post_content );
-				echo $post_content;
-				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
-					echo '<ul class="ticket-reply-attachments">';
-					foreach ( $attachment_ids as $attachment_id ) {
-						$attachment_link = SupportFlow()->extend->attachments->get_attachment_url( $attachment_id );
-						echo '<li><a target="_blank" href="' . esc_url( $attachment_link ) . '">' . esc_html( get_the_title( $attachment_id ) ) . '</a></li>';
-					}
-					echo '</ul>';
-				}
-				echo '</div>';
-				$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
-				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
-				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
-				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
-				echo '</li>';
+		foreach ( $all_replies as $status => $replies ) {
+			if ( empty( $replies ) ) {
+				continue;
 			}
-			echo '</ul>';
-		}
 
-		$replies = SupportFlow()->get_ticket_replies( get_the_ID(), array( 'status' => 'public' ) );
-		if ( ! empty( $replies ) ) {
-			echo '<ul class="ticket-replies">';
+			$class = 'private' == $status ? 'private-replies' : 'ticket-replies';
+			echo "<ul class='$class'>";
+
 			foreach ( $replies as $reply ) {
-				$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
-				$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
 				echo '<li>';
-				echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
-				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
-				echo '</div>';
+
+				if ( 'public' == $status ) {
+					$reply_author       = get_post_meta( $reply->ID, 'reply_author', true );
+					$reply_author_email = get_post_meta( $reply->ID, 'reply_author_email', true );
+					echo '<div class="reply-avatar">' . get_avatar( $reply_author_email, 72 );
+					echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
+					echo '</div>';
+				}
+
 				echo '<div class="ticket-reply">';
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
 				$post_content = make_clickable( $post_content );
 				$post_content = $this->hide_quoted_text( $post_content );
 				echo $post_content;
+
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
@@ -1071,17 +995,23 @@ class SupportFlow_Admin extends SupportFlow {
 					echo '</ul>';
 				}
 				echo '</div>';
-				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
-				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
-				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+
+				if ( 'private' == $status ) {
+					$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
+					$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				}
+				if ( 'public' == $status ) {
+					$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
+				}
+
+				$modified_gmt  = get_post_modified_time( 'U', true, $reply->ID );
+				$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
 		}
-
 		echo '<div class="clear"></div>';
-
 	}
 
 	/**

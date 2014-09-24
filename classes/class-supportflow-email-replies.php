@@ -42,7 +42,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		// Die if temp file is locked. i.e. cron is running
 		if ( 6 != fwrite( $fp, 'length' ) ) {
-			die;
+			return;
 		}
 
 		// Save current time to file
@@ -201,6 +201,25 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$reply_author       = isset( $email->headers->from[0]->personal ) ? $email->headers->from[0]->personal : '';
 		$reply_author_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
 
+
+		// Add anyone else that was in the 'to' or 'cc' fields as customers
+		$customers = array();
+		$fields      = array( 'to', 'cc' );
+		foreach ( $fields as $field ) {
+			if ( ! empty( $email->headers->$field ) ) {
+				foreach ( $email->headers->$field as $recipient ) {
+					$email_address = $recipient->mailbox . '@' . $recipient->host;
+					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address && strcasecmp( $email_address, $to ) != 0 ) {
+						$customers[] = $email_address;
+					}
+				}
+			}
+		}
+		$customers[] = $reply_author_email;
+
+
+		$message = $email->body;
+
 		// Parse out the reply body
 		if ( function_exists( 'What_The_Email' ) ) {
 			$message = What_The_Email()->get_message( $email->body );
@@ -222,28 +241,13 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			}
 		}
 
+		$message = SupportFlow()->sanitize_ticket_reply( $message );
+
 		// Check to see if this message was in response to an existing ticket
 		$ticket_id = false;
 		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) ) {
 			$ticket_id = SupportFlow()->get_ticket_from_secret( $matches[1] );
 		}
-
-		// Add anyone else that was in the 'to' or 'cc' fields as customers
-		$customers = array();
-		$fields      = array( 'to', 'cc' );
-		foreach ( $fields as $field ) {
-			if ( ! empty( $email->headers->$field ) ) {
-				foreach ( $email->headers->$field as $recipient ) {
-					$email_address = $recipient->mailbox . '@' . $recipient->host;
-					if ( is_email( $email_address ) && $email_address != SupportFlow()->extend->emails->from_address && strcasecmp( $email_address, $to ) != 0 ) {
-						$customers[] = $email_address;
-					}
-				}
-			}
-		}
-		$customers[] = $reply_author_email;
-
-		$message = SupportFlow()->sanitize_ticket_reply( $message );
 
 		if ( $ticket_id ) {
 			$reply_args = array(
