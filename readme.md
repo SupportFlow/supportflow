@@ -1,17 +1,9 @@
-=== SupportFlow ===
-Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle
-Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
-Tested up to: 3.9.2
-Stable tag: 0.3
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+###SupportFlow
 
-SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
-
-== Description ==
+####Description
 SupportFlow is a web based help desk software. SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
 
-###A few of its features are:
+####A few of its features are:
 
 + Allow agents to create/reply tickets using web interface.
 
@@ -33,21 +25,23 @@ SupportFlow is a web based help desk software. SupportFlow is a web based help d
 
 To contribute to SupportFlow visit [github] (http://github.com/SupportFlow/supportflow/).
 
-== Installation ==
+####Installation
+
 1. Install SupportFlow either via the WordPress.org plugin directory, or by uploading the files to your server and activate it.
 
 2. After activating open E-Mail accounts page in SupportFlow menu and add an E-Mail account you wish to use with SupportFlow.
 
 Now you are ready to use SupportFlow.
 
-== Frequently Asked Questions ==
-###How can I insert a SupportFlow contact form in my site.
+####Frequently Asked Questions
+#####How can I insert a SupportFlow contact form in my site.
 
 Just add **[supportflow_submissionform]** shortcode to the post you want to add SupportFlow form to.
 
-== Changelog ==
+####Changelog
 
-= 0.3 =
+#####0.3
+
 * Auto-saving tickets
 * Recently created tickets widget in dashboard
 * Ticket assigned to current agent widget in dashboard
@@ -58,12 +52,23 @@ Just add **[supportflow_submissionform]** shortcode to the post you want to add 
 * Securely saving attachments
 * Fixed bugs
 
-= 0.2 =
+#####0.2
+
 * Fix nonce and escaping bugs.
 * Add ability to forward a ticket to someone outside of SupportFlow.
 * Add a statistics page.
 * Various minor bug fixes.
 * Various UI and UX tweaks.
 
-= 0.1 =
+#####0.1
+
 * Initial release.
+
+####Project Specific Details
+
+Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle<br>
+Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket<br>
+Tested up to: 3.9.2<br>
+Stable tag: 0.3<br>
+License: GPLv2 or later<br>
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
