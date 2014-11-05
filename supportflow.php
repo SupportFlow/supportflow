@@ -146,7 +146,7 @@ class SupportFlow {
 
 		/** Version ***********************************************************/
 
-		$this->version = '0.4-alpha1'; // SupportFlow version
+		$this->version = '0.4-alpha2'; // SupportFlow version
 
 		/** Paths *************************************************************/
 
