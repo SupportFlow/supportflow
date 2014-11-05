@@ -191,6 +191,21 @@ class SupportFlow_Emails extends SupportFlow {
 			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
 		}
 
+		// Log the result, but redact the password to avoid unnecessarily exposing it
+		// translators: %s is the recipients e-mail address
+		$log_message = $result ? __( 'Sending mail to %s succeeded', 'supportflow' ) : __( 'Sending mail to %s failed', 'supportflow' );
+		$log_message = sprintf( $log_message, is_array( $to ) ? implode( ',', $to ) : $to );
+		$redacted_smtp_account = $smtp_account;
+		if ( ! empty( $redacted_smtp_account ) ) {
+			$redacted_smtp_account['password'] = '[redacted]';
+		}
+		SupportFlow()->extend->logger->log(
+			'email_send',
+			__METHOD__,
+			$log_message,
+			compact( 'to', 'subject', 'message', 'headers', 'attachments', 'redacted_smtp_account', 'result' )
+		);
+
 		return $result;
 	}
 

@@ -42,11 +42,25 @@ To contribute to SupportFlow visit [github] (http://github.com/SupportFlow/suppo
 Now you are ready to use SupportFlow.
 
 == Frequently Asked Questions ==
-###How can I insert a SupportFlow contact form in my site.
+### How can I insert a SupportFlow contact form in my site.
 
 Just add **[supportflow_submissionform]** shortcode to the post you want to add SupportFlow form to.
 
+### Why aren't messages being sent or received? =
+After successfully adding an e-mail account under SupportFlow > E-mail Accounts, make sure you wait for at least 5 minutes because the retrieval script only runs once every 5 minutes.
+
+If it still isn't working, check the log for any error messages or clues. To view the logs, add this line to a
+[functionality plugin](http://wpcandy.com/teaches/how-to-create-a-functionality-plugin/), and then visit the SupportFlow > Log page.
+
+`add_filter( 'supportflow_show_log', '__return_true' );`
+
+**Warning:** The logs will contain private data, so be very careful if you share them with anyone. Make sure you redact anything that you don't want to share.
+
+
 == Changelog ==
+
+= 0.4 =
+* Added some logging to help troubleshoot problems.
 
 = 0.3 =
 * Auto-saving tickets

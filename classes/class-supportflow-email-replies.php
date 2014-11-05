@@ -28,6 +28,8 @@ class SupportFlow_Email_Replies extends SupportFlow {
 	}
 
 	function retrieve_email_replies() {
+		SupportFlow()->extend->logger->log( 'email_retrieve', __METHOD__, __( 'Starting to retrieve new e-mail.', 'supportflow' ) );
+		$start_time = time();
 
 		// Opens a temp file
 		$tmp_file = sys_get_temp_dir() . '/sf_cron_lock.txt';
@@ -38,10 +40,18 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$file_time = (int) fgets( $fp );
 		if ( 0 != $file_time && $time > $file_time + 2 * HOUR_IN_SECONDS ) {
 			flock( $fp, LOCK_UN );
+
+			SupportFlow()->extend->logger->log(
+				'email_retrieve',
+				__METHOD__,
+				__( "Forcibly released the lock because it's been locked for 2+ hours.", 'supportflow' ),
+				compact( 'time', 'file_time' )
+			);
 		}
 
 		// Die if temp file is locked. i.e. cron is running
 		if ( 6 != fwrite( $fp, 'length' ) ) {
+			SupportFlow()->extend->logger->log( 'email_retrieve', __METHOD__, __( 'Exiting early because another job is already running.', 'supportflow' ) );
 			die;
 		}
 
@@ -51,7 +61,12 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		fwrite( $fp, (string) $time );
 
 		// Lock the file while running cron
-		flock( $fp, LOCK_EX );
+		$lock_acquired = flock( $fp, LOCK_EX );
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			$lock_acquired ? __( 'Successfully acquired the lock.', 'supportflow' ) : __( 'Failed to acquire the lock.', 'supportflow' )
+		);
 
 		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		foreach ( $email_accounts as $id => $email_account ) {
@@ -65,8 +80,18 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 
 		// Unlock the file and close it
-		flock( $fp, LOCK_UN );
+		$lock_released = flock( $fp, LOCK_UN );
 		fclose( $fp );
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			$lock_released ? __( 'Successfully released the lock.', 'supportflow' ) : __( 'Failed to release the lock.', 'supportflow' )
+		);
+
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			sprintf( __( 'Finished retrieving new e-mail after %d seconds', 'supportflow' ), time() - $start_time ) );
 	}
 
 	/**
@@ -82,6 +107,16 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		$archive_box = "{$mailbox}{$connection_details['archive']}";
 
 		$imap_connection = imap_open( $mailbox, $connection_details['username'], $connection_details['password'] );
+
+		$redacted_connection_details = $connection_details;
+		$redacted_connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			$imap_connection ? __( 'Successfully opened IMAP connection.', 'supportflow' ) : __( 'Failed to open IMAP connection.', 'supportflow' ),
+			compact( 'redacted_connection_details', 'mailbox' )
+		);
+
 		if ( ! $imap_connection ) {
 			return new WP_Error( 'connection-error', __( 'Error connecting to mailbox', 'supportflow' ) );
 		}
@@ -95,6 +130,13 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		// Make sure here are new emails to process
 		$email_count = imap_num_msg( $imap_connection );
 		if ( $email_count < 1 ) {
+			SupportFlow()->extend->logger->log(
+				'email_retrieve',
+				__METHOD__,
+				__( 'No new messages to process.', 'supportflow' ),
+				compact( 'mailboxes' )
+			);
+
 			return false;
 		}
 
@@ -110,6 +152,14 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			$email->body      = $this->get_body_from_connection( $imap_connection, $i );
 
 			if ( 0 === strcasecmp( $connection_details['username'], $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host ) ) {
+				$connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
+				SupportFlow()->extend->logger->log(
+					'email_retrieve',
+					__METHOD__,
+					__( 'Skipping message because it was sent from a SupportFlow account.', 'supportflow' ),
+					compact( 'email' )
+				);
+
 				continue;
 			}
 
@@ -139,7 +189,13 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		imap_close( $imap_connection, CL_EXPUNGE );
 
-		return sprintf( __( 'Processed %d emails', 'supportflow' ), $success );
+		$status_message = sprintf( __( 'Processed %d emails', 'supportflow' ), $success );
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			$status_message
+		);
+		return $status_message;
 	}
 
 	/**
@@ -217,6 +273,13 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			);
 			foreach ( $check_strings as $key => $value ) {
 				if ( What_The_Email()->is_robot( $key, $value ) ) {
+					SupportFlow()->extend->logger->log(
+						'email_retrieve',
+						__METHOD__,
+						__( 'Skipping e-mail because sender is a robot.', 'supportflow' ),
+						compact( 'email' )
+					);
+
 					return true;
 				}
 			}
@@ -284,6 +347,13 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		if ( is_object( $new_reply ) ) {
 			update_post_meta( $new_reply->ID, self::email_id_key, $email_id );
 		}
+
+		SupportFlow()->extend->logger->log(
+			'email_retrieve',
+			__METHOD__,
+			// translators: %s is the sender's e-mail address
+			sprintf( __( 'Successfully imported e-mail from %s.', 'supportflow' ), $reply_author_email )
+		);
 
 		return true;
 	}
