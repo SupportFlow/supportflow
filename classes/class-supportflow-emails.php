@@ -66,6 +66,17 @@ class SupportFlow_Emails extends SupportFlow {
 			}
 		}
 
+		if ( empty( $agent_emails ) ) {
+			SupportFlow()->extend->logger->log(
+				'email_send',
+				__METHOD__,
+				__( 'Returning early because no customers to notify.', 'supportflow' ),
+				compact( 'customers' )
+			);
+
+			return;
+		}
+
 		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
@@ -114,6 +125,17 @@ class SupportFlow_Emails extends SupportFlow {
 			if ( false !== $key ) {
 				unset( $customers[$key] );
 			}
+		}
+
+		if ( empty( $customers ) ) {
+			SupportFlow()->extend->logger->log(
+				'email_send',
+				__METHOD__,
+				__( 'Returning early because no customers to notify.', 'supportflow' ),
+				compact( 'customers' )
+			);
+
+			return;
 		}
 
 		$attachments = $this->get_attached_files( $reply->ID );
