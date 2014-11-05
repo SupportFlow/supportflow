@@ -218,6 +218,7 @@ class SupportFlow {
 
 		/** Core **************************************************************/
 
+		require_once( $this->plugin_dir . 'classes/class-supportflow-logger.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-json-api.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-attachments.php' );
 		require_once( $this->plugin_dir . 'classes/class-supportflow-emails.php' );
