@@ -97,7 +97,7 @@ class SupportFlow_Logger extends SupportFlow {
 				<tbody>
 					<?php foreach ( $log_entries as $entry ) : ?>
 						<tr>
-							<td><?php echo esc_html( get_date_from_gmt( date_i18n( $datetime_format, $entry['timestamp'] ), $datetime_format ) ); ?></td>
+							<td><?php echo esc_html( get_date_from_gmt( date_i18n( 'Y-m-d H:i:s', $entry['timestamp'] ), $datetime_format ) ); ?></td>
 							<td><?php echo esc_html( $entry['category'] ); ?></td>
 							<td><?php echo esc_html( $entry['method'] ); ?></td>
 							<td>
