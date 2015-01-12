@@ -110,11 +110,12 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		$redacted_connection_details = $connection_details;
 		$redacted_connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
+		$imap_errors = print_r( imap_errors(), true );
 		SupportFlow()->extend->logger->log(
 			'email_retrieve',
 			__METHOD__,
 			$imap_connection ? __( 'Successfully opened IMAP connection.', 'supportflow' ) : __( 'Failed to open IMAP connection.', 'supportflow' ),
-			compact( 'redacted_connection_details', 'mailbox' )
+			compact( 'redacted_connection_details', 'mailbox', 'imap_errors' )
 		);
 
 		if ( ! $imap_connection ) {
