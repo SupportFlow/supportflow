@@ -320,6 +320,13 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 		$password       = sanitize_text_field( $password );
 
 		if ( $this->email_account_exists( $imap_host, $smtp_host, $username ) ) {
+			SupportFlow()->extend->logger->log(
+				'email_accounts',
+				__METHOD__,
+				__( 'Account already exists.', 'supportflow' ),
+				compact( 'imap_host', 'imap_port', 'imap_ssl', 'smtp_host', 'smtp_port', 'smtp_ssl', 'username' )
+			);
+
 			return self::ACCOUNT_EXISTS;
 		}
 
@@ -328,10 +335,25 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			$ssl     = $imap_ssl ? '/ssl' : '';
 			$mailbox = '{' . $imap_host . ':' . $imap_port . $ssl . '}';
 			if ( $imap_stream = imap_open( $mailbox, $username, $password, 0, 0 ) ) {
+				SupportFlow()->extend->logger->log(
+					'email_accounts',
+					__METHOD__,
+					__( 'Successfully opened IMAP connection.', 'supportflow' ),
+					compact( 'imap_host', 'imap_port', 'imap_ssl', 'smtp_host', 'smtp_port', 'smtp_ssl', 'username', 'mailbox' )
+				);
+
 				imap_close( $imap_stream );
 			} else {
-				$error = imap_errors();
-				$error = $error[0];
+				$imap_errors = imap_errors();
+				$error       = $imap_errors[0];
+
+				SupportFlow()->extend->logger->log(
+					'email_accounts',
+					__METHOD__,
+					__( 'Failed to open IMAP connection.', 'supportflow' ),
+					compact( 'imap_host', 'imap_port', 'imap_ssl', 'smtp_host', 'smtp_port', 'smtp_ssl', 'username', 'mailbox', 'imap_errors' )
+				);
+
 				if ( (string) strpos( $error, 'Host not found' ) != '' ) {
 					return self::IMAP_HOST_NOT_FOUND;
 				} elseif ( (string) strpos( $error, 'Timed out' ) != '' ) {
@@ -361,6 +383,13 @@ class SupportFlow_Email_Accounts extends SupportFlow {
 			} catch ( Exception $e ) {
 
 			}
+
+			SupportFlow()->extend->logger->log(
+				'email_accounts',
+				__METHOD__,
+				$smtp_authentication ? __( 'Successfully authenticated with SMTP server.', 'supportflow' ) : __( 'Failed to authenticate with SMTP server.', 'supportflow' ),
+				compact( 'imap_host', 'imap_port', 'imap_ssl', 'smtp_host', 'smtp_port', 'smtp_ssl', 'username', 'mailbox' )
+			);
 
 			if ( ! isset( $smtp_authentication ) || ! $smtp_authentication ) {
 				return self::SMTP_AUTHENTICATION_FAILED;
