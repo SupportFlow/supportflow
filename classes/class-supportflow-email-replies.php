@@ -110,7 +110,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 
 		$redacted_connection_details = $connection_details;
 		$redacted_connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
-		$imap_errors = print_r( imap_errors(), true );
+		$imap_errors = imap_errors();
 		SupportFlow()->extend->logger->log(
 			'email_retrieve',
 			__METHOD__,
