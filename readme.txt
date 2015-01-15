@@ -3,7 +3,7 @@ Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 0.3
+Stable tag: 0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,7 +60,13 @@ If it still isn't working, check the log for any error messages or clues. To vie
 == Changelog ==
 
 = 0.4 =
+* Uploads are now attached when sending a reply.
+* Fix the timestamps on replies.
+* Added ctrl-enter keyboard shortcut to submit replies.
+* The original message is now quoted in replies.
+* Added a filter to modify the IMAP cron interval.
 * Added some logging to help troubleshoot problems.
+* [Full changelog](https://github.com/SupportFlow/supportflow/compare/c1535678da9a8380e42672ceef71174f2d01fc88...5675f1d7e2c1dd3e7e8359d409a1e80ca8a8b141)
 
 = 0.3 =
 * Auto-saving tickets
