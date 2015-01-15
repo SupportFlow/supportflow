@@ -200,6 +200,7 @@ class SupportFlow_Emails extends SupportFlow {
 	 * Send an email from SupportFlow
 	 */
 	public function mail( $to, $subject, $message, $headers = '', $attachments = array(), $smtp_account = null ) {
+		global $phpmailer;
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
@@ -221,11 +222,13 @@ class SupportFlow_Emails extends SupportFlow {
 		if ( ! empty( $redacted_smtp_account ) ) {
 			$redacted_smtp_account['password'] = '[redacted]';
 		}
+		$errors = $phpmailer->ErrorInfo;
+
 		SupportFlow()->extend->logger->log(
 			'email_send',
 			__METHOD__,
 			$log_message,
-			compact( 'to', 'subject', 'message', 'headers', 'attachments', 'redacted_smtp_account', 'result' )
+			compact( 'to', 'subject', 'message', 'headers', 'attachments', 'redacted_smtp_account', 'result', 'errors' )
 		);
 
 		return $result;
