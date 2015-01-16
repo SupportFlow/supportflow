@@ -29,7 +29,7 @@ class SupportFlow_Table extends WP_List_Table {
 		$this->display_col_headers = $display_col_headers;
 	}
 
-	protected function column_default( $item, $column_name ) {
+	public function column_default( $item, $column_name ) {
 		return $item[$column_name];
 	}
 
@@ -63,7 +63,7 @@ class SupportFlow_Table extends WP_List_Table {
 		}
 	}
 
-	function display_tablenav( $which ) {
+	protected function display_tablenav( $which ) {
 		if ( $this->display_nav ) {
 			parent::display_tablenav( $which );
 		}
