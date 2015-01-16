@@ -47,7 +47,7 @@ class SupportFlow_Table extends WP_List_Table {
 		$this->no_item_message = wp_kses( $msg, $allowed_html );
 	}
 
-	function no_items() {
+	public function no_items() {
 		$no_item_message = $this->no_item_message;
 
 		if ( $no_item_message === null ) {
@@ -57,7 +57,7 @@ class SupportFlow_Table extends WP_List_Table {
 		}
 	}
 
-	function print_column_headers( $with_id = true ) {
+	public function print_column_headers( $with_id = true ) {
 		if ( $this->display_col_headers ) {
 			parent::print_column_headers( $with_id );
 		}
@@ -74,7 +74,7 @@ class SupportFlow_Table extends WP_List_Table {
 	 *
 	 * @param array $columns
 	 */
-	function set_columns( $columns ) {
+	public function set_columns( $columns ) {
 		$this->_column_headers = array( $columns, array(), array() );
 	}
 
@@ -83,7 +83,7 @@ class SupportFlow_Table extends WP_List_Table {
 	 *
 	 * @param array $data
 	 */
-	function set_data( $data ) {
+	public function set_data( $data ) {
 		$this->items = $data;
 	}
 }
