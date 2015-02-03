@@ -306,6 +306,7 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			}
 		}
 		$customers[] = $reply_author_email;
+		$customers = apply_filters( 'supportflow_new_email_customers', $customers, $email, $ticket_id, $email_account_id );
 
 		$message = SupportFlow()->sanitize_ticket_reply( $message );
 
