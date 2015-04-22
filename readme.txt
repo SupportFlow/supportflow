@@ -1,5 +1,5 @@
 === SupportFlow ===
-Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle
+Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle, iandunn
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
 Tested up to: 4.1
