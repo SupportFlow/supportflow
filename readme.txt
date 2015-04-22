@@ -2,7 +2,7 @@
 Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle, iandunn
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: 0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
