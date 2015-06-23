@@ -871,9 +871,16 @@ class SupportFlow {
 		);
 
 		$reply = apply_filters( 'supportflow_pre_insert_ticket_reply', $reply );
-		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		$reply_id = wp_insert_post( $reply );
-		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+
+		// Remove the save_post admin action callback if it exists.
+		if ( ! empty( SupportFlow()->extend->admin ) && is_callable( array( SupportFlow()->extend->admin, 'action_save_post' ) ) ) {
+			remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+			$reply_id = wp_insert_post( $reply );
+			add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+		} else {
+			$reply_id = wp_insert_post( $reply );
+		}
+
 		// If there are attachment IDs store them as meta
 		if ( is_array( $attachment_ids ) ) {
 			foreach ( $attachment_ids as $attachment_id ) {
@@ -895,9 +902,14 @@ class SupportFlow {
 		delete_post_meta( $ticket_id, '_sf_autosave_reply' );
 
 		// Adding a ticket reply updates the post modified time for the ticket
-		remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-		wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
-		add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+		if ( ! empty( SupportFlow()->extend->admin ) && is_callable( array( SupportFlow()->extend->admin, 'action_save_post' ) ) ) {
+			remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+			wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
+			add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
+		} else {
+			wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
+		}
+
 		clean_post_cache( $ticket_id );
 		do_action( 'supportflow_ticket_reply_added', $reply_id, $details['cc'], $details['bcc'] );
 
