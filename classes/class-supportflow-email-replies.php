@@ -142,15 +142,19 @@ class SupportFlow_Email_Replies extends SupportFlow {
 		}
 
 		$emails        = imap_search( $imap_connection, 'ALL', SE_UID );
-		$archive_mails = array();
+		$email_count   = min( $email_count, apply_filters( 'supportflow_max_email_process_count', 20 ) );
+		$emails        = array_slice( $emails, 0, $email_count );
+		$processed     = 0;
 
-		// Process each new email and put it in the archive mailbox when done
-		$success = 0;
-		for ( $i = 1; $i <= $email_count; $i ++ ) {
+		// Process each new email and put it in the archive mailbox when done.
+		foreach ( $emails as $uid ) {
 			$email            = new stdClass;
-			$email->headers   = imap_headerinfo( $imap_connection, $i );
-			$email->structure = imap_fetchstructure( $imap_connection, $i );
-			$email->body      = $this->get_body_from_connection( $imap_connection, $i );
+			$email->uid       = $uid;
+			$email->msgno     = imap_msgno( $imap_connection, $email->uid );
+
+			$email->headers   = imap_headerinfo( $imap_connection, $email->msgno );
+			$email->structure = imap_fetchstructure( $imap_connection, $email->msgno );
+			$email->body      = $this->get_body_from_connection( $imap_connection, $email->msgno );
 
 			if ( 0 === strcasecmp( $connection_details['username'], $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host ) ) {
 				$connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
@@ -175,22 +179,18 @@ class SupportFlow_Email_Replies extends SupportFlow {
 			}
 
 			// @todo Confirm this a message we want to process
-			$ret = $this->process_email( $imap_connection, $email, $i, $connection_details['username'], $connection_details['account_id'] );
+			$result = $this->process_email( $imap_connection, $email, $email->msgno, $connection_details['username'], $connection_details['account_id'] );
 
 			// If it was successful, move the email to the archive
-			if ( $ret ) {
-				$archive_mails[] = $i;
+			if ( $result ) {
+				imap_mail_move( $imap_connection, $email->uid, $connection_details['archive'], CP_UID );
+				$processed++;
 			}
-		}
-
-		foreach ( $archive_mails as $msg_number ) {
-			imap_mail_move( $imap_connection, $emails[$msg_number - 1], $connection_details['archive'], CP_UID );
-			$success ++;
 		}
 
 		imap_close( $imap_connection, CL_EXPUNGE );
 
-		$status_message = sprintf( __( 'Processed %d emails', 'supportflow' ), $success );
+		$status_message = sprintf( __( 'Processed %d emails', 'supportflow' ), $processed );
 		SupportFlow()->extend->logger->log(
 			'email_retrieve',
 			__METHOD__,
