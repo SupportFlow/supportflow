@@ -6,7 +6,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Preferences extends SupportFlow {
+class SupportFlow_Preferences {
 
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );

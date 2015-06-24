@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 /**
  * Setting page to add/remove new E-Mail accounts to get replies
  */
-class SupportFlow_Email_Accounts extends SupportFlow {
+class SupportFlow_Email_Accounts {
 	var $email_accounts;
 	var $existing_email_accounts;
 

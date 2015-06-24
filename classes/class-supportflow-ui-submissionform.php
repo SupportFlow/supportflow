@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_UI_SubmissionForm extends SupportFlow {
+class SupportFlow_UI_SubmissionForm {
 
 	public $messages = array();
 

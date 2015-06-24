@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Permissions extends SupportFlow {
+class SupportFlow_Permissions {
 
 	/**
 	 * Holds all of the capabilities managed by SupportFlow.

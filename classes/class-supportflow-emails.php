@@ -5,7 +5,9 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Emails extends SupportFlow {
+class SupportFlow_Emails {
+
+	public $from_address = null;
 
 	function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );

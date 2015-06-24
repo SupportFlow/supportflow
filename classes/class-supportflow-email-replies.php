@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Email_Replies extends SupportFlow {
+class SupportFlow_Email_Replies {
 
 	const email_id_key = 'orig_email_id';
 

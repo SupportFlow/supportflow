@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_UI_Widget extends SupportFlow {
+class SupportFlow_UI_Widget {
 
 	public $script_slug = 'supportflow-user-widget';
 

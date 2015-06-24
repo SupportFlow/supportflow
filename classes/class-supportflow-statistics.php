@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Statistics extends SupportFlow {
+class SupportFlow_Statistics {
 
 	public function __construct() {
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );

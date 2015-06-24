@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Attachments extends SupportFlow {
+class SupportFlow_Attachments {
 
 	function __construct() {
 		add_action( 'init', array( $this, 'action_init_download_attachment' ) );

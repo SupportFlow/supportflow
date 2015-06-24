@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_JSON_API extends SupportFlow {
+class SupportFlow_JSON_API {
 
 	public $action = 'supportflow_json';
 

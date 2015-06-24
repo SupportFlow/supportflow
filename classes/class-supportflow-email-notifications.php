@@ -11,7 +11,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class SupportFlow_Email_Notifications extends SupportFlow {
+class SupportFlow_Email_Notifications {
 
 	/**
 	 * Return an array containing tag/E-Mail account user opted to receive E-Mail notifications.

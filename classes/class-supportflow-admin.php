@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
 
-class SupportFlow_Admin extends SupportFlow {
+class SupportFlow_Admin {
 
 	function __construct() {
 		add_action( 'wp_ajax_sf_forward_conversation', array( $this, 'action_wp_ajax_sf_email_conversation' ) );
