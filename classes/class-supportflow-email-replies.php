@@ -70,11 +70,13 @@ class SupportFlow_Email_Replies {
 
 		$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 		foreach ( $email_accounts as $id => $email_account ) {
-			$imap_account = array_merge( $email_account, array(
-				'inbox'      => 'INBOX',
-				'archive'    => 'ARCHIVE',
-				'account_id' => $id,
-			) );
+			$imap_account = array_merge( $email_account,
+				apply_filters( 'supportflow_imap_folders', array(
+					'inbox'      => 'INBOX',
+					'archive'    => 'ARCHIVE',
+					'account_id' => $id,
+				), $email_account )
+			);
 
 			$this->download_and_process_email_replies( $imap_account );
 		}
