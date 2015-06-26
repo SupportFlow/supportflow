@@ -101,6 +101,7 @@ class SupportFlow_Email_Replies {
 		imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
 
 		$ssl = $connection_details['imap_ssl'] ? '/ssl' : '';
+		$ssl = apply_filters( 'supportflow_imap_ssl', $ssl, $connection_details['imap_host'] );
 
 		$mailbox     = "{{$connection_details['imap_host']}:{$connection_details['imap_port']}{$ssl}}";
 		$inbox       = "{$mailbox}{$connection_details['inbox']}";

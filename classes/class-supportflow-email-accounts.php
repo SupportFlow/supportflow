@@ -333,6 +333,7 @@ class SupportFlow_Email_Accounts {
 		if ( $test_login ) {
 			imap_timeout( IMAP_OPENTIMEOUT, apply_filters( 'supportflow_imap_open_timeout', 5 ) );
 			$ssl     = $imap_ssl ? '/ssl' : '';
+			$ssl     = apply_filters( 'supportflow_imap_ssl', $ssl, $imap_host );
 			$mailbox = '{' . $imap_host . ':' . $imap_port . $ssl . '}';
 			if ( $imap_stream = imap_open( $mailbox, $username, $password, 0, 0 ) ) {
 				SupportFlow()->extend->logger->log(
