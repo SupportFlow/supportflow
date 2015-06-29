@@ -214,6 +214,11 @@
 	width: 200px;
 }
 
+.sf-delivery-failed {
+	font-size: 0.9em;
+	line-height: 20px;
+}
+
 .metabox-holder .postbox-container .empty-container {
 	border: none;
 }

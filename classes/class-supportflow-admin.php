@@ -1057,6 +1057,12 @@ class SupportFlow_Admin {
 				echo '<p class="reply-author">' . esc_html( $reply_author ) . '</p>';
 				echo '</div>';
 				echo '<div class="ticket-reply">';
+
+				$mail_status = get_post_meta( $reply->ID, '_sf_mail_status', true );
+				if ( isset( $mail_status['result'] ) && $mail_status['result'] === false ) {
+					printf( '<span class="sf-delivery-failed"><span class="dashicons dashicons-info"></span> %s</span>', esc_html__( 'Delivery failed! Please check your SMTP settings and try again.' ) );
+				}
+
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
 				// Make link clickable
 				$post_content = make_clickable( $post_content );

@@ -160,7 +160,8 @@ class SupportFlow_Emails {
 		$headers .= $this->get_cc_header( $cc );
 		$headers .= $this->get_bcc_header( $bcc );
 
-		self::mail( $customers, $subject, $message, $headers, $attachments, $smtp_account );
+		$result = self::mail( $customers, $subject, $message, $headers, $attachments, $smtp_account );
+		add_post_meta( $reply->ID, '_sf_mail_status', array( 'result' => $result ) );
 	}
 
 	/**
