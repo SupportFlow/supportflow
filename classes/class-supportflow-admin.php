@@ -1060,7 +1060,7 @@ class SupportFlow_Admin {
 
 				$mail_status = get_post_meta( $reply->ID, '_sf_mail_status', true );
 				if ( isset( $mail_status['result'] ) && $mail_status['result'] === false ) {
-					printf( '<span class="sf-delivery-failed"><span class="dashicons dashicons-info"></span> %s</span>', esc_html__( 'Delivery failed! Please check your SMTP settings and try again.' ) );
+					printf( '<span class="sf-delivery-failed"><span class="dashicons dashicons-info"></span> %s</span>', esc_html__( 'Delivery failed! Please check your SMTP settings and try again.', 'supportflow' ) );
 				}
 
 				$post_content = wpautop( stripslashes( $reply->post_content ) );
