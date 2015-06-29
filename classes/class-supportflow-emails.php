@@ -177,7 +177,7 @@ class SupportFlow_Emails {
 
 		$attachments = array();
 		$msg         = '';
-		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID ) . ' ' . __( 'Conversation summery', 'supportflow' );
+		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID ) . ' ' . __( 'Conversation summary', 'supportflow' );
 
 		$msg .= '<b>' . __( 'Title', 'supportflow' ) . ':</b> ' . esc_html( $ticket->post_title ) . '<br>';
 		$msg .= '<b>' . __( 'Status', 'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$ticket->post_status]['label'] . '<br>';
