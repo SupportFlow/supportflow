@@ -256,6 +256,7 @@ class SupportFlow_Emails {
 		$phpmailer->Username   = $this->smtp_account['username'];
 		$phpmailer->Password   = $this->smtp_account['password'];
 		$phpmailer->SMTPAuth   = true;
+		$phpmailer->FromName   = get_bloginfo( 'name' );
 	}
 
 	public function get_cc_header( $cc ) {
