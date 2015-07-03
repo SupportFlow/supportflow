@@ -951,7 +951,7 @@ class SupportFlow {
 
 		$posts = get_posts( array(
 			'post_type'   => SupportFlow()->post_type,
-			'post_status' => key( $post_statuses ),
+			'post_status' => array_keys( $post_statuses ),
 			'meta_query'  => array(
 				array(
 					'key'   => $this->ticket_secret_key,
