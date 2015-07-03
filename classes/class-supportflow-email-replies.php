@@ -14,17 +14,7 @@ class SupportFlow_Email_Replies {
 	}
 
 	public function setup_actions() {
-
-		add_filter( 'supportflow_emails_reply_notify_subject', array( $this, 'filter_reply_notify_subject' ), 10, 3 );
 		add_action( 'sf_cron_retrieve_email_replies', array( $this, 'retrieve_email_replies' ) );
-
-	}
-
-	public function filter_reply_notify_subject( $subject, $reply_id, $ticket_id ) {
-
-		$subject = rtrim( $subject ) . ' [' . SupportFlow()->get_secret_for_ticket( $ticket_id ) . ']';
-
-		return $subject;
 	}
 
 	function retrieve_email_replies() {
@@ -291,7 +281,20 @@ class SupportFlow_Email_Replies {
 
 		// Check to see if this message was in response to an existing ticket
 		$ticket_id = false;
-		if ( preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) ) {
+
+		if ( preg_match( '/#(\d+):/', $subject, $matches ) ) {
+			$ticket_id = $matches[1];
+			$ticket = get_post( $ticket_id );
+
+			// Make sure the ticket ID is a SupportFlow ticket with a valid status.
+			if ( $ticket->post_type != SupportFlow()->post_type
+				 || ! array_key_exists( $ticket->post_status, SupportFlow()->post_statuses ) ) {
+				$ticket_id = false;
+			}
+		}
+
+		// Back-compat with old-style secrets.
+		if ( ! $ticket_id && preg_match( '#\[([a-zA-Z0-9]{8})\]$#', $subject, $matches ) ) {
 			$ticket_id = SupportFlow()->get_ticket_from_secret( $matches[1] );
 		}
 

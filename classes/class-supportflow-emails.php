@@ -79,7 +79,7 @@ class SupportFlow_Emails {
 			return;
 		}
 
-		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
+		$subject = sprintf( '#%d: %s', $ticket->ID, get_the_title( $ticket->ID ) );
 		$subject = apply_filters( 'supportflow_emails_reply_notify_subject', $subject, $reply_id, $ticket->ID, 'agent' );
 
 		$attachments = $this->get_attached_files( $reply->ID );
@@ -147,8 +147,7 @@ class SupportFlow_Emails {
 
 		$attachments = $this->get_attached_files( $reply->ID );
 		$num_replies = SupportFlow()->get_ticket_replies_count( $ticket->ID );
-
-		$subject = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID );
+		$subject = sprintf( '#%d: %s', $ticket->ID, get_the_title( $ticket->ID ) );
 
 		// Prefix with Re: if it's a reply.
 		if ( $num_replies > 1 ) {
