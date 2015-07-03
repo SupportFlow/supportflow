@@ -906,7 +906,7 @@ class SupportFlow {
 		);
 
 		// Allow plugins to override this behavior.
-		if ( add_filter( 'supportflow_reopen_ticket_on_reply', true, $reply_id, $ticket_id ) ) {
+		if ( get_post_status( $ticket_id ) == 'sf_closed' && add_filter( 'supportflow_reopen_ticket_on_reply', true, $reply_id, $ticket_id ) ) {
 			$update_args['post_status'] = 'sf_open';
 		}
 
