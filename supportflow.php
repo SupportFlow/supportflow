@@ -900,14 +900,19 @@ class SupportFlow {
 
 		// Empty autosaved reply
 		delete_post_meta( $ticket_id, '_sf_autosave_reply' );
+		$update_args = array(
+			'ID' => $ticket_id,
+			'post_modified' => current_time( 'mysql' ),
+			'post_status' => 'sf_open',
+		);
 
 		// Adding a ticket reply updates the post modified time for the ticket
 		if ( ! empty( SupportFlow()->extend->admin ) && is_callable( array( SupportFlow()->extend->admin, 'action_save_post' ) ) ) {
 			remove_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
-			wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
+			wp_update_post( $update_args );
 			add_action( 'save_post', array( SupportFlow()->extend->admin, 'action_save_post' ) );
 		} else {
-			wp_update_post( array( 'ID' => $ticket_id, 'post_modified' => current_time( 'mysql' ) ) );
+			wp_update_post( $update_args );
 		}
 
 		clean_post_cache( $ticket_id );
