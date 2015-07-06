@@ -20,6 +20,7 @@ class SupportFlow_Admin {
 		// Creating or updating a ticket
 		add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
+		add_action( 'map_meta_cap', array( $this, 'filter_map_meta_cap' ), 10, 4 );
 
 		if ( ! $this->is_edit_screen() ) {
 			return;
@@ -56,6 +57,20 @@ class SupportFlow_Admin {
 		if ( 'edit.php' == $pagenow ) {
 			add_filter( 'get_the_excerpt', array( $this, 'filter_get_the_excerpt' ) );
 		}
+	}
+
+	/**
+	 * Do not allow users to view/edit replies outside of a ticket context.
+	 */
+	public function filter_map_meta_cap( $caps, $cap, $user_id, $args ) {
+		if ( $cap == 'edit_post' && ! empty( $args[0] ) ) {
+			$post = get_post( absint( $args[0] ) );
+			if ( $post->post_type == SupportFlow()->reply_type && $post->post_parent > 0 ) {
+				$caps[] = 'do_not_allow';
+			}
+		}
+
+		return $caps;
 	}
 
 	/**
