@@ -147,7 +147,13 @@ class SupportFlow_Email_Replies {
 
 			$email->headers   = imap_headerinfo( $imap_connection, $email->msgno );
 			$email->structure = imap_fetchstructure( $imap_connection, $email->msgno );
-			$email->body      = $this->get_body_from_connection( $imap_connection, $email->msgno );
+			$email->body      = imap_qprint( imap_body( $imap_connection, $email->msgno ) );
+
+			if ( imap_base64( $email->body ) ) {
+				$email->body = imap_base64( $email->body );
+			}
+
+			$email->body = imap_utf8( $email->body );
 
 			if ( 0 === strcasecmp( $connection_details['username'], $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host ) ) {
 				$connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
@@ -159,16 +165,6 @@ class SupportFlow_Email_Replies {
 				);
 
 				continue;
-			}
-
-			// Convert encoding to UTF-8
-			if ( ! empty( $email->structure->parameters ) ) {
-				foreach ( $email->structure->parameters as $parameter ) {
-					if ( 'CHARSET' == $parameter->attribute ) {
-						$email->body = iconv( $parameter->value, 'UTF-8', $email->body );
-						break;
-					}
-				}
 			}
 
 			// @todo Confirm this a message we want to process
