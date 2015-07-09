@@ -147,13 +147,7 @@ class SupportFlow_Email_Replies {
 
 			$email->headers   = imap_headerinfo( $imap_connection, $email->msgno );
 			$email->structure = imap_fetchstructure( $imap_connection, $email->msgno );
-			$email->body      = imap_qprint( imap_body( $imap_connection, $email->msgno ) );
-
-			if ( imap_base64( $email->body ) ) {
-				$email->body = imap_base64( $email->body );
-			}
-
-			$email->body = imap_utf8( $email->body );
+			$email->body      = $this->get_body_from_connection( $imap_connection, $email->msgno );
 
 			if ( 0 === strcasecmp( $connection_details['username'], $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host ) ) {
 				$connection_details['password'] = '[redacted]';  // redact the password to avoid unnecessarily exposing it in logs
@@ -367,11 +361,16 @@ class SupportFlow_Email_Replies {
 	 */
 	public function get_body_from_connection( $connection, $num, $type = 'text/plain' ) {
 		// Hacky way to get the email body. We should support more MIME types in the future
-		$body = imap_fetchbody( $connection, $num, 1.1 );
+		$body = imap_fetchbody( $connection, $num, '1.1' );
 		if ( empty( $body ) ) {
-			$body = imap_fetchbody( $connection, $num, 1 );
+			$body = imap_fetchbody( $connection, $num, '1' );
 		}
 
+		$body = imap_qprint( $body );
+		if ( imap_base64( $body ) )
+			$body = imap_base64( $body );
+
+		$body = imap_utf8( $body );
 		return $body;
 	}
 
