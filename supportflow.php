@@ -324,6 +324,7 @@ class SupportFlow {
 				'menu_position'      => 3,
 				'publicly_queryable' => false,
 				'supports'           => false,
+				'menu_icon'          => 'dashicons-sos',
 			)
 		);
 	}
