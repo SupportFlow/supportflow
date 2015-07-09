@@ -243,7 +243,7 @@ class SupportFlow_Email_Replies {
 		}
 
 		if ( ! empty( $email->headers->subject ) ) {
-			$subject = $email->headers->subject;
+			$subject = imap_utf8( $email->headers->subject );
 		} else {
 			$subject = sprintf( __( 'New ticket from %s', 'supportflow' ), $email->headers->fromaddress );
 		}
