@@ -1037,10 +1037,9 @@ class SupportFlow_Admin {
 			foreach ( $private_replies as $reply ) {
 				echo '<li>';
 				echo '<div class="ticket-reply">';
-				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
-				$post_content = make_clickable( $post_content );
+				$post_content = stripslashes( $reply->post_content );
 				$post_content = $this->hide_quoted_text( $post_content );
+				$post_content = wpautop( make_clickable( $post_content ) );
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1078,10 +1077,10 @@ class SupportFlow_Admin {
 					printf( '<span class="sf-delivery-failed"><span class="dashicons dashicons-info"></span> %s</span>', esc_html__( 'Delivery failed! Please check your SMTP settings and try again.', 'supportflow' ) );
 				}
 
-				$post_content = wpautop( stripslashes( $reply->post_content ) );
-				// Make link clickable
-				$post_content = make_clickable( $post_content );
+				$post_content = stripslashes( $reply->post_content );
 				$post_content = $this->hide_quoted_text( $post_content );
+				$post_content = wpautop( make_clickable( $post_content ) );
+
 				echo $post_content;
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
@@ -1321,16 +1320,7 @@ class SupportFlow_Admin {
 	 * Line startings with ">" sign are considered quoted content
 	 */
 	public function hide_quoted_text( $text ) {
-
-		$ws     = '\s'; // Whitespace ( matches \r\n\t\f )
-		$gt     = '&gt;'; // Greater than sign
-		$br     = "<{$ws}*br[^>]*>"; // BR tag
-		$non_br = "<(\s|/)*(?:(?!br( |>)).)*[^>]>"; // Any tag other than BR
-
-		$regex = "(^|$br)($non_br|$ws)*$gt(.*?)($br(?!($non_br|$ws)*$gt)|$)";
-
-		$res = preg_replace_callback( "~$regex~is", array( $this, 'hide_quoted_text_regex_callback' ), $text );
-
+		$res = preg_replace_callback( "#(?:^(?:&gt;)+\s.+$\s*)+#im", array( $this, 'hide_quoted_text_regex_callback' ), $text );
 		return $res;
 	}
 
