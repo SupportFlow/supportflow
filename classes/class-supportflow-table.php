@@ -57,6 +57,18 @@ class SupportFlow_Table extends WP_List_Table {
 		}
 	}
 
+	/**
+	 * Get the table's column keys and labels
+	 *
+	 * Normally the columns would be hardcoded in this function, but since this is a generic table class, the
+	 * columns are set dynamically via set_columns().
+	 *
+	 * @return array
+	 */
+	public function get_columns() {
+		return $this->_column_headers[0];
+	}
+
 	public function print_column_headers( $with_id = true ) {
 		if ( $this->display_col_headers ) {
 			parent::print_column_headers( $with_id );
