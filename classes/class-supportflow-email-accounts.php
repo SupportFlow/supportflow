@@ -84,7 +84,7 @@ class SupportFlow_Email_Accounts {
 	 */
 	function settings_page() {
 		echo '<div class="wrap">
-			<h2>' . __( 'E-Mail Accounts', 'supportflow' ) . '</h2>';
+			<h1>' . __( 'E-Mail Accounts', 'supportflow' ) . '</h1>';
 
 		// Add/remove E-Mail accounts if submitted by user
 		$this->process_form_submission();

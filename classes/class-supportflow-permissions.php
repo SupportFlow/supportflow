@@ -75,7 +75,7 @@ class SupportFlow_Permissions {
 		$this->insert_script();
 		?>
 		<div class="wrap">
-		<h2><?php _e( 'Permissions', 'supportflow' ) ?></h2>
+		<h1><?php _e( 'Permissions', 'supportflow' ) ?></h1>
 
 		<table class="form-table">
 			<tr valign="top">

@@ -77,7 +77,7 @@ class SupportFlow_Logger {
 
 		<div class="wrap">
 			<div id="icon-options-general" class="icon32"><br /></div>
-			<h2><?php _e( 'SupportFlow Log', 'supportflow' ); ?></h2>
+			<h1><?php _e( 'SupportFlow Log', 'supportflow' ); ?></h1>
 
 			<p>
 				<strong><?php _e( 'Warning:', 'supportflow' ); ?></strong>

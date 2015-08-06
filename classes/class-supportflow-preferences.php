@@ -71,7 +71,7 @@ class SupportFlow_Preferences {
 		}
 
 		?>
-		<h2><?php _e( 'My signature', 'supportflow' ) ?></h2>
+		<h1><?php _e( 'My signature', 'supportflow' ) ?></h1>
 		<p><?php _e( 'Please enter your signature you wish to add to your ticket reply. To remove signature clear the text box and then update it. Note: It will be automatically appended at the end of your ticket replies', 'supportflow' ) ?></p>
 		<?php if ( ! empty( $sign_updated ) ) {
 			echo '<h3>' . __( 'Signature updated successfully.', 'supportflow' ) . '</h3>';
@@ -122,7 +122,7 @@ class SupportFlow_Preferences {
 		$email_notifications_table->set_no_items( $no_items );
 		$email_notifications_table->set_data( $data );
 
-		echo '<h2>' . __( 'E-Mail Notifications', 'supportflow' ) . '</h2>';
+		echo '<h1>' . __( 'E-Mail Notifications', 'supportflow' ) . '</h1>';
 		echo '<p>' . __( 'Please check the tags/E-Mail accounts for which you want to receive E-Mail notifications of replies. You will be able to override E-Mail notifications settings for individual tickets.', 'supportflow' ) . '</p>';
 		echo '<div id="email_notification_table">';
 		$email_notifications_table->display();
