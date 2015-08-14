@@ -2,8 +2,8 @@
 Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle, iandunn, kovshenin
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
-Tested up to: 4.2
-Stable tag: 0.4
+Tested up to: 4.3
+Stable tag: 0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,15 @@ If it still isn't working, check the log for any error messages or clues. To vie
 
 
 == Changelog ==
+
+= 0.5 =
+* Improved handling of large mailboxes during initial message download.
+* Tickets are now re-opened when new replies are added.
+* Better handling of non-ASCII messages.
+* Outgoing messages are now prefixed with a sequential ticket number instead of a random code.
+* Agents are now notified if a message failed to send.
+* Several minor bug fixes.
+* [Full changelog](https://github.com/SupportFlow/supportflow/compare/518832bf05df04a5f4af6787b253f99269773bd6...a93947b597d5c5a14ec35ef15ec2ca38af60253e)
 
 = 0.4 =
 * Uploads are now attached when sending a reply.
