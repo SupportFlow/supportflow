@@ -383,6 +383,12 @@ class SupportFlow_Email_Accounts {
 				$smtp_authentication = $phpmailer->smtpConnect();
 			} catch ( Exception $e ) {
 
+				SupportFlow()->extend->logger->log(
+					'email_accounts',
+					__METHOD__,
+					sprintf( __( 'PHPMailer exception: %s.', 'supportflow' ), $e->getMessage() ),
+					compact( 'smtp_host', 'smtp_port', 'smtp_ssl', 'username' )
+				);
 			}
 
 			SupportFlow()->extend->logger->log(
