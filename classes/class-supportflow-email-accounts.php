@@ -374,6 +374,7 @@ class SupportFlow_Email_Accounts {
 			$phpmailer->Host       = $smtp_host;
 			$phpmailer->Port       = $smtp_port;
 			$phpmailer->SMTPSecure = $smtp_ssl ? 'ssl' : '';
+			$phpmailer->SMTPAutoTLS = $smtp_ssl;
 			$phpmailer->Username   = $username;
 			$phpmailer->Password   = $password;
 			$phpmailer->SMTPAuth   = true;
