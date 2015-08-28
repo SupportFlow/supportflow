@@ -371,13 +371,13 @@ class SupportFlow_Email_Accounts {
 
 			// Set PHPMailer SMTP settings
 			$phpmailer->IsSMTP();
-			$phpmailer->Host       = $smtp_host;
-			$phpmailer->Port       = $smtp_port;
-			$phpmailer->SMTPSecure = $smtp_ssl ? 'ssl' : '';
+			$phpmailer->Host        = $smtp_host;
+			$phpmailer->Port        = $smtp_port;
+			$phpmailer->SMTPSecure  = $smtp_ssl ? 'ssl' : '';
 			$phpmailer->SMTPAutoTLS = $smtp_ssl;
-			$phpmailer->Username   = $username;
-			$phpmailer->Password   = $password;
-			$phpmailer->SMTPAuth   = true;
+			$phpmailer->Username    = $username;
+			$phpmailer->Password    = $password;
+			$phpmailer->SMTPAuth    = true;
 
 			// $phpmail raise fatal error on SMTP connect failure
 			try {
