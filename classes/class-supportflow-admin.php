@@ -10,7 +10,6 @@ class SupportFlow_Admin {
 	function __construct() {
 		add_action( 'wp_ajax_sf_forward_conversation', array( $this, 'action_wp_ajax_sf_email_conversation' ) );
 		add_filter( 'heartbeat_received', array( $this, 'filter_heartbeat_received' ), 10, 2 );
-		add_action( 'wp_ajax_ticket_attachment_upload', array( $this, 'action_wp_ajax_ticket_attachment_upload' ) );
 		add_action( 'supportflow_after_setup_actions', array( $this, 'setup_actions' ) );
 		add_action( 'add_attachment', array( $this, 'action_add_attachment' ) );
 	}
