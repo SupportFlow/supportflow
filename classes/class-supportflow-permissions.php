@@ -133,6 +133,10 @@ class SupportFlow_Permissions {
 	public function action_wp_ajax_get_user_permissions() {
 		check_ajax_referer( 'get_user_permissions', '_get_user_permissions_nonce' );
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Access denied.', 'supportflow' ) );
+		}
+
 		if (
 			! isset( $_POST['user_id'], $_POST['status'] ) ||
 			! is_numeric( $_POST['user_id'] ) ||
@@ -254,6 +258,10 @@ class SupportFlow_Permissions {
 
 	public function action_wp_ajax_set_user_permission() {
 		check_ajax_referer( 'set_user_permission', '_set_user_permission_nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Access denied.', 'supportflow' ) );
+		}
 
 		if ( ! isset( $_POST['user_id'] )
 			|| ! isset( $_POST['privilege_type'] )
