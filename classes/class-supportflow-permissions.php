@@ -324,16 +324,12 @@ class SupportFlow_Permissions {
 			}
 		}
 
-		if (
-			// Return if required capability is not one of them
-			! in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ) ) ||
+		// Return early in some cases
+		$relevant_capability   = in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ), true );
+		$user_is_admin         = ! empty( $allcaps['manage_options'] ) && true === $allcaps['manage_options'];
+		$is_supportflow_ticket = SupportFlow()->post_type === $post_type;
 
-			// Return if user is admin
-			( ! empty( $allcaps['manage_options'] ) && true == $allcaps['manage_options'] ) ||
-
-			// Return if posts are not supportflow tickets
-			SupportFlow()->post_type != $post_type
-		) {
+		if ( ! $relevant_capability || $user_is_admin || ! $is_supportflow_ticket ) {
 			return $allcaps;
 		}
 
