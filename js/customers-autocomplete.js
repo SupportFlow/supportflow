@@ -18,7 +18,7 @@ jQuery(document).ready(function ($) {
 				"api-action"          : 'get-customers',
 				"get_customers_nonce" : SFCustomersAc.get_customers_nonce
 			};
-		}
+		};
 
 		$('#customers').autocomplete({
 
@@ -63,5 +63,5 @@ jQuery(document).ready(function ($) {
 			},
 			minLength: 2
 		});
-	};
+	}
 });
