@@ -15,17 +15,24 @@ class SupportFlow_JSON_API {
 	}
 
 	public function action_wp_ajax_supportflow_json() {
-
 		$response = array(
 			'api-action' => ( ! empty( $_REQUEST['api-action'] ) ) ? sanitize_key( $_REQUEST['api-action'] ) : '',
 			'status'     => 'error',
 			'message'    => '',
 			'html'       => '',
 		);
+
 		switch ( $response['api-action'] ) {
 			case 'get-customers':
-				$search_for         = sanitize_text_field( isset( $_REQUEST['customers'] ) ? $_REQUEST['customers'] : '' );
-				$customer_matches = SupportFlow()->get_customers( array( 'search' => $search_for ) );
+				check_ajax_referer( 'get_customers', 'get_customers_nonce' );
+
+				if ( current_user_can( 'sf_get_customers' ) ) {
+					$search_for       = sanitize_text_field( isset( $_REQUEST['customers'] ) ? $_REQUEST['customers'] : '' );
+					$customer_matches = SupportFlow()->get_customers( array( 'search' => $search_for ) );
+				} else {
+					$customer_matches = new WP_Error( 'sf_access_denied', __( 'Access denied.', 'supportflow' ) );
+				}
+
 				if ( is_wp_error( $customer_matches ) ) {
 					$response['message'] = $customer_matches->get_error_message();
 				} else {

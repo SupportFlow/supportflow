@@ -325,11 +325,12 @@ class SupportFlow_Permissions {
 		}
 
 		// Return early in some cases
-		$relevant_capability   = in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post' ), true );
+		$relevant_capability   = in_array( $args[0], array( 'edit_post', 'edit_posts', 'delete_post', 'sf_get_customers' ), true );
 		$user_is_admin         = ! empty( $allcaps['manage_options'] ) && true === $allcaps['manage_options'];
 		$is_supportflow_ticket = SupportFlow()->post_type === $post_type;
+		$is_api_call           = isset( $_REQUEST['action'] ) && SupportFlow()->extend->jsonapi->action === $_REQUEST['action'];
 
-		if ( ! $relevant_capability || $user_is_admin || ! $is_supportflow_ticket ) {
+		if ( ! $relevant_capability || $user_is_admin || ( ! $is_supportflow_ticket && ! $is_api_call ) ) {
 			return $allcaps;
 		}
 
@@ -382,6 +383,13 @@ class SupportFlow_Permissions {
 				// Disallow in other cases
 			} else {
 				$allcaps["edit_posts"] = false;
+			}
+		}
+
+		// Allow users with access to at least one e-mail account or tag to get the full customer list
+		if ( 'sf_get_customers' == $args[0] ) {
+			if ( ! empty ( $user_permissions['email_accounts'] ) || ! empty ( $user_permissions['tags'] ) ) {
+				$allcaps['sf_get_customers'] = true;
 			}
 		}
 

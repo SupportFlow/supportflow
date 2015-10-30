@@ -13,8 +13,11 @@ jQuery(document).ready(function ($) {
 				search_for = resps[0];
 			}
 
-			return { "customers": search_for, "api-action": 'get-customers' };
-
+			return {
+				"customers"           : search_for,
+				"api-action"          : 'get-customers',
+				"get_customers_nonce" : SFCustomersAc.get_customers_nonce
+			};
 		}
 
 		$('#customers').autocomplete({

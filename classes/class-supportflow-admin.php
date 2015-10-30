@@ -89,7 +89,8 @@ class SupportFlow_Admin {
 			$auto_save_handle                = SupportFlow()->enqueue_script( 'supportflow-auto-save', 'auto_save.js', array( 'jquery', 'heartbeat' ) );
 
 			wp_localize_script( $customers_autocomplete_handle, 'SFCustomersAc', array(
-				'ajax_url' => add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) )
+				'ajax_url'            => add_query_arg( 'action', SupportFlow()->extend->jsonapi->action, admin_url( 'admin-ajax.php' ) ),
+				'get_customers_nonce' => wp_create_nonce( 'get_customers' ),
 			) );
 
 			wp_localize_script( $ticket_attachment_handle, 'SFTicketAttachments', array(
