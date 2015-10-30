@@ -3,7 +3,7 @@ Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle, iandunn, k
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
 Tested up to: 4.3
-Stable tag: 0.5
+Stable tag: 0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,11 @@ If it still isn't working, check the log for any error messages or clues. To vie
 
 
 == Changelog ==
+
+= 0.6 =
+* Security: Tightened access controls to read and set SupportFlow permissions.
+* Privacy: Prevented leaking e-mail subject lines in search results.
+* Privacy: Prevented leaking customer e-mail addresses to WordPress users that lacked SupportFlow permissions.
 
 = 0.5 =
 * Improved handling of large mailboxes during initial message download.
