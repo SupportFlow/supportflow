@@ -305,12 +305,12 @@ class SupportFlow_Permissions {
 	}
 
 	/*
-	 * Limited under-privileged user acces to only allowed E-Mail accounts
+	 * Limited under-privileged user access to only allowed E-Mail accounts
 	 */
 	function limit_user_permissions( $allcaps, $cap, $args ) {
 		global $pagenow, $post_type;
 
-		// Check if atleast one E-Mail account exists before showing ticket creation page
+		// Check if at least one E-Mail account exists before showing ticket creation page
 		if (
 			'post-new.php' == $pagenow &&
 			SupportFlow()->post_type == $post_type
@@ -318,7 +318,7 @@ class SupportFlow_Permissions {
 			$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 			if ( empty( $email_accounts ) ) {
 				$link = "edit.php?post_type=$post_type&page=sf_accounts";
-				$msg  = 'Please add atleast one E-Mail account before creating a ticket.';
+				$msg  = 'Please add at least one E-Mail account before creating a ticket.';
 
 				wp_die( "<a href='$link'>" . __( $msg, 'supportflow' ) . "</a>" );
 			}
