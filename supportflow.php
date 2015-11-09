@@ -740,7 +740,7 @@ class SupportFlow {
 			} else {
 				$term       = wp_insert_term( $email, $this->customers_tax, array( 'slug' => $this->get_email_hash( $email ) ) );
 				if ( ! is_wp_error( $term ) ) {
-					$term_ids[] = $term['term_id'];
+					$term_ids[] = (int) $term['term_id'];
 				}
 
 			}
