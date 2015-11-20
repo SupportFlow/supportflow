@@ -69,6 +69,7 @@ class SupportFlow {
 				self::$instance->setup_globals();
 				self::$instance->includes();
 				self::$instance->setup_actions();
+				self::$instance->setup_late_globals();
 			}
 		}
 
@@ -194,8 +195,6 @@ class SupportFlow {
 		$this->email_term_prefix = 'sf-';
 
 		$this->ticket_secret_key = 'ticket_secret';
-
-		$this->cron_interval = apply_filters( 'supportflow_cron_interval', 5 * MINUTE_IN_SECONDS );
 
 		$this->post_statuses = apply_filters(
 			'supportflow_ticket_post_statuses', array(
@@ -1109,6 +1108,18 @@ class SupportFlow {
 
 	public static function action_register_deactivation_hook() {
 		wp_clear_scheduled_hook( 'sf_cron_retrieve_email_replies' );
+	}
+
+	/**
+	 * Setup globals that require some of the other classes to be loaded
+	 */
+	protected function setup_late_globals() {
+		/*
+		 * Gmail might block access if a client checks more than every 10 minutes.
+		 * https://support.google.com/mail/answer/14257?p=client_login&rd=1
+		 */
+		$this->cron_interval = SupportFlow()->extend->email_accounts->has_gmail_account() ? 10 * MINUTE_IN_SECONDS : 5 * MINUTE_IN_SECONDS;
+		$this->cron_interval = apply_filters( 'supportflow_cron_interval', $this->cron_interval );
 	}
 }
 

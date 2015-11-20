@@ -461,6 +461,28 @@ class SupportFlow_Email_Accounts {
 
 		return false;
 	}
+
+	/**
+	 * Determines if any active account is using Gmail
+	 *
+	 * @return bool
+	 */
+	public function has_gmail_account() {
+		$gmail    = false;
+		$accounts = $this->get_email_accounts( true );
+
+		foreach( $accounts as $account ) {
+			$gmail_imap = false !== strpos( $account['imap_host'], 'gmail.com' );
+			$gmail_smtp = false !== strpos( $account['smtp_host'], 'gmail.com' );
+
+			if ( $gmail_imap || $gmail_smtp ) {
+				$gmail = true;
+				break;
+			}
+		}
+
+		return $gmail;
+	}
 }
 
 SupportFlow()->extend->email_accounts = new SupportFlow_Email_Accounts();
