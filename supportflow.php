@@ -321,7 +321,6 @@ class SupportFlow {
 					'not_found_in_trash' => __( 'No tickets found in trash', 'supportflow' ),
 				),
 				'public'             => false,
-				'menu_position'      => 3,
 				'show_ui'            => true,
 				'supports'           => false,
 				'menu_icon'          => 'dashicons-sos',
