@@ -239,7 +239,12 @@ class SupportFlow_Email_Replies {
 		}
 
 		$reply_author       = isset( $email->headers->from[0]->personal ) ? $email->headers->from[0]->personal : '';
-		$reply_author_email = $email->headers->from[0]->mailbox . '@' . $email->headers->from[0]->host;
+
+		if ( empty( $email->headers->reply_to ) ) {
+			$reply_author_email = $email->headers->from[0]->mailbox     . '@' . $email->headers->from[0]->host;
+		} else {
+			$reply_author_email = $email->headers->reply_to[0]->mailbox . '@' . $email->headers->reply_to[0]->host;
+		}
 
 		// Parse out the reply body
 		if ( function_exists( 'What_The_Email' ) ) {
