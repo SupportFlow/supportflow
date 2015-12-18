@@ -1,6 +1,6 @@
 #SupportFlow
 
-== Description ==
+###Description
 SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
 
 ###A few of its features are:
