@@ -1141,5 +1141,12 @@ function SupportFlow() {
 add_action( 'plugins_loaded', 'SupportFlow' );
 
 
+public function load_plugin_textdomain() {
+	load_plugin_textdomain( 'supportflow', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+}
+
+add_action( 'plugins_loaded', 'load_plugin_textdomain' );
+
+
 // Remove SupportFlow cron job on deactivation of plugin
 register_deactivation_hook( __FILE__, 'SupportFlow::action_register_deactivation_hook' );
