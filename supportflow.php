@@ -1,7 +1,6 @@
 <?php
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
-
 /**
  * Plugin Name: SupportFlow
  * Plugin URI:  https://wordpress.org/plugins/supportflow/
@@ -12,7 +11,6 @@ defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
  * Text Domain: supportflow
  * Domain Path: /languages/
  */
-
 class SupportFlow {
 
 	/** Magic *****************************************************************/
