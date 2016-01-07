@@ -88,6 +88,12 @@ class SupportFlow {
 	private function __construct() {
 		/* Do nothing here */
 	}
+	
+	public function load_plugin_textdomain() {
+		load_plugin_textdomain( 'supportflow', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+	}
+	
+	add_action( 'plugins_loaded', 'load_plugin_textdomain' );
 
 	/**
 	 * A dummy magic method to prevent SupportFlow from being cloned
