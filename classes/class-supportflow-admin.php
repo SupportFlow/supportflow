@@ -175,7 +175,10 @@ class SupportFlow_Admin {
 
 		$url  = parse_url( $referer );
 		$path = $url['scheme'] . '://' . $url['host'] . $url['path'];
-		parse_str( $url['query'], $query );
+
+		if ( isset( $url['query'] ) ) {
+			parse_str( $url['query'], $query );
+		}
 
 		// Check if referred by SupportFlow ticket page
 		if ( admin_url( 'post-new.php' ) == $path ) {
