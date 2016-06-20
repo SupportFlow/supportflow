@@ -58,41 +58,57 @@ class SupportFlow_UI_Widget {
 	public function render_single_reply_html( $reply ) {
 		$reply_timestamp = mysql2date( 'M. n', $reply->post_date_gmt );
 		$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
-		$output          = '<div class="ticket-reply-body">'
-			. wpautop( stripslashes( $reply->post_content ) )
-			. '</div>'
-			. '<div class="ticket-reply-meta">'
-			. '<span class="ticket-reply-author">' . esc_html( $reply_author ) . '</span>'
-			. '<span class="ticket-reply-timestamp">' . esc_html( $reply_timestamp ) . '</span>'
-			. '</div>';
 
-		return $output;
+		?>
+
+		<div class="ticket-reply-body">
+			<?php echo wp_kses( wpautop( stripslashes( $reply->post_content ) ), 'post' ); ?>
+		</div>
+
+		<div class="ticket-reply-meta">
+			<span class="ticket-reply-author"><?php echo esc_html( $reply_author ); ?></span>
+			<span class="ticket-reply-timestamp"><?php echo esc_html( $reply_timestamp ); ?></span>
+		</div>
+
+		<?php
 	}
 
 	public function render_all_tickets_html() {
 		$user = wp_get_current_user();
-
 		$tickets = SupportFlow()->get_tickets( array( 'customer_email' => $user->user_email ) );
 
-		if ( empty( $tickets ) ) {
-			$output = '<div class="ticket notickets">' . __( 'No open tickets.', 'supportflow' ) . '</div>';
-		} else {
-			$output = '<ul id="customer-tickets">';
-			foreach ( $tickets as $ticket ) {
-				$output .= '<li id="ticket-' . $ticket->ID . '">';
-				$output .= '<h4 class="ticket-title">' . get_the_title( $ticket->ID ) . '</h4>';
-				$output .= '<div class="ticket-replies">';
-				$replies    = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'status' => 'public' ) );
-				$last_reply = array_shift( $replies );
-				$output .= $this->render_single_reply_html( $last_reply );
-				$output .= '</div>';
-				$output .= '</li>';
-			}
-			$output .= '</ul>';
-		}
+		?>
 
-		return $output;
+		<?php if ( empty( $tickets ) ) : ?>
 
+			<div class="ticket notickets">
+				<?php esc_html_e( 'No open tickets.', 'supportflow' ); ?>
+			</div>
+
+		<?php else : ?>
+
+			<ul id="customer-tickets">
+				<?php foreach ( $tickets as $ticket ) : ?>
+					<?php
+						$replies    = SupportFlow()->get_ticket_replies( $ticket->ID, array( 'status' => 'public' ) );
+						$last_reply = array_shift( $replies );
+					?>
+
+					<li id="ticket-<?php echo esc_attr( $ticket->ID ); ?>">
+						<h4 class="ticket-title">
+							<?php echo esc_html( get_the_title( $ticket->ID ) ); ?>
+						</h4>
+
+						<div class="ticket-replies">
+							<?php $this->render_single_reply_html( $last_reply ); ?>
+						</div>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+
+		<?php endif; ?>
+
+		<?php
 	}
 
 	// @todo: Pretty URLs
@@ -143,7 +159,7 @@ class SupportFlow_UI_Widget {
 
 		<div id="supportflow-widget">
 			<button id="supportflow-back"><?php _e( 'All Tickets', 'supportflow' ); ?></button>
-			<h1 id="widget-title"><?php echo $widget_title; ?></h1>
+			<h1 id="widget-title"><?php echo esc_html( $widget_title ); ?></h1>
 
 			<div id="supportflow-newticket-box">
 				<button id="supportflow-newticket"><?php _e( 'Start a new ticket', 'supportflow' ); ?></button>
@@ -155,7 +171,7 @@ class SupportFlow_UI_Widget {
 			</div>
 
 			<div id="supportflow-all-tickets">
-				<?php echo $this->render_all_tickets_html(); ?>
+				<?php $this->render_all_tickets_html(); ?>
 			</div>
 
 			<div id="supportflow-single-ticket">

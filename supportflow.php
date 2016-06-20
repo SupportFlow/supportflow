@@ -356,7 +356,7 @@ class SupportFlow {
 			$message = '<p>' . esc_html__( 'An unknown SupportFlow error has occurred.', 'supportflow' ) . '</p>';
 		}
 
-		printf( '<div class="error">%s</div>', $message );
+		printf( '<div class="error">%s</div>', wp_kses( $message, 'post' ) );
 	}
 
 	/**

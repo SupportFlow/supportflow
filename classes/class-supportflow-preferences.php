@@ -147,7 +147,7 @@ class SupportFlow_Preferences {
 		$privilege_id   = $_POST['privilege_id'];
 		$allowed        = 'true' == $_POST['allowed'] ? true : false;
 
-		echo SupportFlow()->extend->email_notifications->set_notfication_settings( $privilege_type, $privilege_id, $allowed );
+		echo absint( SupportFlow()->extend->email_notifications->set_notfication_settings( $privilege_type, $privilege_id, $allowed ) );
 		exit;
 	}
 

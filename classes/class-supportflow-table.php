@@ -53,7 +53,7 @@ class SupportFlow_Table extends WP_List_Table {
 		if ( $no_item_message === null ) {
 			parent::no_items();
 		} else {
-			echo $no_item_message;
+			echo esc_html( $no_item_message );
 		}
 	}
 

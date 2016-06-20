@@ -166,7 +166,7 @@ class SupportFlow_Dashboard {
 			$table->set_data( $data );
 
 			echo '<div class="container">';
-			echo "<h3 class='toggle-link'>" . $statuses[$status_slug]['label'] . "</h3>";
+			echo "<h3 class='toggle-link'>" . esc_html( $statuses[$status_slug]['label'] ) . "</h3>";
 
 			echo "<div class='toggle-content'>";
 			$table->display();

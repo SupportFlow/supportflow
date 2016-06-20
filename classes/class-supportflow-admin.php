@@ -240,7 +240,7 @@ class SupportFlow_Admin {
 				update_post_meta( $ticket_id, "_sf_autosave_$element_id", $element_value );
 			}
 
-			echo $data['supportflow-autosave']['post_title'];
+			echo esc_html( $data['supportflow-autosave']['post_title'] );
 			if ( ! empty( $data['supportflow-autosave']['post_title'] ) ) {
 				wp_update_post( array( 'ID' => $ticket_id, 'post_title' => $data['supportflow-autosave']['post_title'] ) );
 			}
@@ -345,7 +345,7 @@ class SupportFlow_Admin {
 		echo "<option value=''>" . __( 'Show All tags', 'supportflow' ) . "</option>";
 		foreach ( $terms as $term ) {
 			$selected = selected( isset( $_REQUEST[$tax_slug] ) && ( $_REQUEST[$tax_slug] == $term->slug ), true, false );
-			echo "<option value='" . esc_attr( $term->slug ) . "' $selected>" . esc_html( $term->name ) . '</option>';
+			echo "<option value='" . esc_attr( $term->slug ) . "' ". esc_attr( $selected ) .">" . esc_html( $term->name ) . '</option>';
 		}
 		echo "</select>";
 
@@ -356,7 +356,7 @@ class SupportFlow_Admin {
 		echo "<option value=''>" . __( 'Show All Accounts', 'supportflow' ) . "</option>";
 		foreach ( $email_accounts as $id => $email_account ) {
 			$selected = selected( isset( $_REQUEST['email_account'] ) && ( $_REQUEST['email_account'] == $id ), true, false );
-			echo "<option value='" . esc_attr( $id ) . "'$selected>" . esc_html( $email_account['username'] ) . '</option>';
+			echo "<option value='" . esc_attr( $id ) . "'". esc_attr( $selected ) .">" . esc_html( $email_account['username'] ) . '</option>';
 		}
 		echo "</select>";
 
@@ -691,16 +691,16 @@ class SupportFlow_Admin {
 			?>
 			<div class="misc-pub-section meta-item">
 				<label class="meta-item-toggle-button"><?php _e( 'Account', 'supportflow' ) ?>:</label>
-				<span class="meta-item-label"><?php _e( $email_account_label, 'supportflow' ) ?></span>
+				<span class="meta-item-label"><?php esc_html_e( $email_account_label, 'supportflow' ) ?></span>
 				<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 					<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
 				</a>
-				<input name="post_email_account" class="meta-item-name" value="<?php echo $email_account_first ?>" type="hidden" />
+				<input name="post_email_account" class="meta-item-name" value="<?php echo esc_attr( $email_account_first ); ?>" type="hidden" />
 
 				<div class="meta-item-toggle-content hide-if-js">
-					<?php echo $email_account_dropdown ?>
-					<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-					<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+					<?php echo esc_html( $email_account_dropdown ); ?>
+					<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php esc_html_e( 'OK', 'supportflow' ) ?></a>
+					<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php esc_html_e( 'Cancel', 'supportflow' ) ?></a>
 				</div>
 			</div>
 		<?php
@@ -717,13 +717,13 @@ class SupportFlow_Admin {
 			$last_activity = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
 			?>
 			<div class="misc-pub-section meta-item">
-				<label><?php _e( 'Opened', 'supportflow' ) ?>:</label>
+				<label><?php esc_html_e( 'Opened', 'supportflow' ) ?>:</label>
 				<span class="meta-item-label"><?php esc_html_e( $opened ) ?></span>
 			</div>
 
 			<!--Last ticket update time-->
 			<div class="misc-pub-section meta-item">
-				<label><?php _e( 'Last Activity', 'supportflow' ) ?>:</label>
+				<label><?php esc_html_e( 'Last Activity', 'supportflow' ) ?>:</label>
 				<span class="meta-item-label"><?php esc_html_e( $last_activity ) ?></span>
 			</div>
 		<?php
@@ -744,10 +744,10 @@ class SupportFlow_Admin {
 		?>
 		<!--Ticket status box-->
 		<div class="misc-pub-section meta-item">
-			<label class="meta-item-toggle-button"><?php _e( 'Status', 'supportflow' ) ?>:</label>
+			<label class="meta-item-toggle-button"><?php esc_html_e( 'Status', 'supportflow' ) ?>:</label>
 			<span class="meta-item-label"><?php esc_html_e( $current_status_label, 'supportflow' ) ?></span>
 			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+				<span aria-hidden="true"><?php esc_html_e( 'Edit', 'supportflow' ) ?></span>
 			</a>
 			<input name="post_status" class="meta-item-name" value="<?php esc_attr_e( $current_status_id ) ?>" type="hidden" />
 
@@ -757,8 +757,8 @@ class SupportFlow_Admin {
 						<option value="<?php esc_attr_e( $slug ) ?>"<?php selected( $current_status_id, $slug ) ?>><?php esc_html_e( $post_status['label'] ) ?></option>;
 					<?php endforeach; ?>
 				</select>
-				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php esc_html_e( 'OK', 'supportflow' ) ?></a>
+				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php esc_html_e( 'Cancel', 'supportflow' ) ?></a>
 			</div>
 		</div>
 	<?php
@@ -785,22 +785,21 @@ class SupportFlow_Admin {
 			'name'             => '',
 			'who'              => 'author',
 			'class'            => 'meta-item-dropdown',
-			'echo'             => false
+			'echo'             => true
 		);
-		$post_authors_dropdown = wp_dropdown_users( $args );
 		?>
 		<div class="misc-pub-section meta-item">
-			<label class="meta-item-toggle-button"><?php _e( 'Owner', 'supportflow' ) ?>:</label>
-			<span class="meta-item-label"><?php _e( $post_author_label, 'supportflow' ) ?></span>
+			<label class="meta-item-toggle-button"><?php esc_html_e( 'Owner', 'supportflow' ) ?>:</label>
+			<span class="meta-item-label"><?php esc_html_e( $post_author_label, 'supportflow' ) ?></span>
 			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
-				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
+				<span aria-hidden="true"><?php esc_html_e( 'Edit', 'supportflow' ) ?></span>
 			</a>
 			<input name="post_author" class="meta-item-name" value="<?php esc_attr_e( $post_author_id ) ?>" type="hidden" />
 
 			<div class="meta-item-toggle-content hide-if-js">
-				<?php echo $post_authors_dropdown ?>
-				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
-				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
+				<?php wp_dropdown_users( $args ); ?>
+				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php esc_html_e( 'OK', 'supportflow' ) ?></a>
+				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php esc_html_e( 'Cancel', 'supportflow' ) ?></a>
 			</div>
 		</div>
 	<?php
@@ -813,14 +812,8 @@ class SupportFlow_Admin {
 		$notification_id          = 0;
 		$notification_label       = 'Default';
 		$notification_label_title = 'Choose default if you want to receive E-Mail notifications based on what you set in `E-Mail notification` page. Choose Enable/Disable if you want to override those settings';
-		$notification_dropdown    = '';
-		$notification_dropdown .= '<select class="meta-item-dropdown">';
 
-		if ( 'post-new.php' == $pagenow ) {
-			$notification_dropdown .= '<option value="default">' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable">' . __( 'Subscribed', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable">' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
-		} elseif ( 'post.php' == $pagenow ) {
+		if ( 'post.php' == $pagenow ) {
 			$email_notifications_override = get_post_meta( get_the_ID(), 'email_notifications_override', true );
 			$current_user_id              = get_current_user_id();
 
@@ -834,24 +827,43 @@ class SupportFlow_Admin {
 					$notification_id    = 2;
 				}
 			}
-
-			$notification_dropdown .= '<option value="default"' . selected( $notification_id, 0, false ) . '>' . __( 'Default', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="enable"' . selected( $notification_id, 1, false ) . '>' . __( 'Subscribed', 'supportflow' ) . '</option>';
-			$notification_dropdown .= '<option value="disable"' . selected( $notification_id, 2, false ) . '>' . __( 'Unsubscribed', 'supportflow' ) . '</option>';
 		}
 
-		$notification_dropdown .= '</select>';
 		?>
+
 		<div class="misc-pub-section meta-item">
 			<label class="meta-item-toggle-button" title="<?php _e( $notification_label_title, 'supportflow' ) ?>"><?php _e( 'E-Mail Notifications', 'supportflow' ) ?>:</label>
 			<span class="meta-item-label"><?php esc_html_e( $notification_label, 'supportflow' ) ?></span>
 			<a href="#" class="meta-item-toggle-button meta-item-toggle-content hide-if-no-js">
 				<span aria-hidden="true"><?php _e( 'Edit' ) ?></span>
 			</a>
-			<input name="post_email_notifications_override" class="meta-item-name" value="<?php echo $notification_id ?>" type="hidden" />
+			<input name="post_email_notifications_override" class="meta-item-name" value="<?php echo esc_attr( $notification_id ); ?>" type="hidden" />
 
 			<div class="meta-item-toggle-content hide-if-js">
-				<?php echo $notification_dropdown ?>
+				<select class="meta-item-dropdown">
+					<?php if ( 'post-new.php' == $pagenow ) : ?>
+
+						<option value="default"><?php esc_html_e( 'Default',      'supportflow' ); ?></option>
+						<option value="enable" ><?php esc_html_e( 'Subscribed',   'supportflow' ); ?></option>
+						<option value="disable"><?php esc_html_e( 'Unsubscribed', 'supportflow' ); ?></option>
+
+					<?php elseif ( 'post.php' == $pagenow ) : ?>
+
+						<option value="default" <?php selected( $notification_id, 0 ); ?> >
+							<?php esc_html_e( 'Default', 'supportflow' ); ?>
+						</option>
+
+						<option value="enable" <?php selected( $notification_id, 1 ); ?> >
+							<?php esc_html_e( 'Subscribed', 'supportflow' ); ?>
+						</option>
+
+						<option value="disable" <?php selected( $notification_id, 2 ); ?> >
+							<?php esc_html_e( 'Unsubscribed', 'supportflow' ); ?>
+						</option>
+
+					<?php endif; ?>
+				</select>
+
 				<a href="#" class="hide-if-no-js button meta-item-ok-button meta-item-toggle-button"><?php _e( 'OK' ) ?></a>
 				<a href="#" class="hide-if-no-js button-cancel meta-item-cancel-button meta-item-toggle-button"><?php _e( 'Cancel' ) ?></a>
 			</div>
@@ -925,7 +937,7 @@ class SupportFlow_Admin {
 	 */
 	public function meta_box_customers() {
 
-		$placeholder = __( 'Who are you starting a conversation with?', 'supportflow' );
+		$placeholder = 'Who are you starting a conversation with?';
 		if ( 'draft' == get_post_status( get_the_ID() ) ) {
 			$customers_string = get_post_meta( get_the_ID(), '_sf_autosave_customers', true );
 		} else {
@@ -934,7 +946,7 @@ class SupportFlow_Admin {
 			$customers_string .= empty( $customers_string ) ? '' : ', ';
 		}
 		echo '<h4>' . __( 'Customer(s)', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="customers" name="customers" class="sf_autosave" placeholder="' . $placeholder . '" value="' . esc_attr( $customers_string ) . '" autocomplete="off" />';
+		echo '<input type="text" id="customers" name="customers" class="sf_autosave" placeholder="' . esc_attr__( $placeholder, 'supportflow' ) . '" value="' . esc_attr( $customers_string ) . '" autocomplete="off" />';
 		echo '<p class="description">' . __( 'Enter each customer email address, separated with a comma', 'supportflow' ) . '</p>';
 	}
 
@@ -942,14 +954,14 @@ class SupportFlow_Admin {
 	 * Add a form element where you can choose cc and bcc receiver of reply
 	 */
 	public function meta_box_cc_bcc() {
-		$cc_value = esc_attr( get_post_meta( get_the_ID(), '_sf_autosave_cc', true ) );
-		$bcc      = esc_attr( get_post_meta( get_the_ID(), '_sf_autosave_bcc', true ) );
+		$cc_value = get_post_meta( get_the_ID(), '_sf_autosave_cc', true );
+		$bcc      = get_post_meta( get_the_ID(), '_sf_autosave_bcc', true );
 		?>
 		<p class="description"> <?php _e( "Please add all the E-Mail ID's seperated by comma.", 'supportflow' ) ?></p>
 		<h4 class="inline"><?php _e( "CC: ", 'supportflow' ) ?></h4>
-		<input type="text" class="sf_autosave" id="cc" name="cc" value="<?php echo $cc_value ?>" />
+		<input type="text" class="sf_autosave" id="cc" name="cc" value="<?php echo esc_attr( $cc_value ); ?>" />
 		<h4 class="inline"> <?php _e( "BCC: ", 'supportflow' ) ?></h4>
-		<input type="text" class="sf_autosave" id="bcc" name="bcc" value="<?php echo $bcc ?>" />
+		<input type="text" class="sf_autosave" id="bcc" name="bcc" value="<?php echo esc_attr( $bcc ); ?>" />
 	<?php
 	}
 
@@ -1026,7 +1038,7 @@ class SupportFlow_Admin {
 		$signature_label_title = __( 'Append your signature at the bottom of the reply. Signature can be removed or changed in preferences page', 'supportflow' );
 		$insert_signature_default = (boolean) get_user_meta( get_current_user_id(), 'sf_insert_signature_default', true );
 		echo '<input type="checkbox" ' . $disabled_attr . checked( $insert_signature_default, true, false ) . ' id="insert-signature" name="insert-signature" />';
-		echo "<label for='insert-signature' title='$signature_label_title'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
+		echo "<label for='insert-signature' title='". esc_attr( $signature_label_title ) ."'>" . __( 'Insert signature', 'supportflow' ) . '</label>';
 		echo '<input type="checkbox" ' . $disabled_attr . ' id="mark-private" name="mark-private" />';
 		echo '<label for="mark-private">' . __( 'Mark private', 'supportflow' ) . '</label>';
 		if ( 'post-new.php' == $pagenow ) {
@@ -1056,7 +1068,7 @@ class SupportFlow_Admin {
 				$post_content = stripslashes( $reply->post_content );
 				$post_content = $this->hide_quoted_text( $post_content );
 				$post_content = wpautop( make_clickable( $post_content ) );
-				echo $post_content;
+				echo wp_kses( $post_content, 'post' );
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
@@ -1070,7 +1082,7 @@ class SupportFlow_Admin {
 				$reply_timestamp = sprintf( __( 'Noted by %1$s on %2$s at %3$s', 'supportflow' ), $reply_author, get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
 				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
 				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
-				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
+				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . esc_html( $last_activity ) . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
@@ -1097,7 +1109,7 @@ class SupportFlow_Admin {
 				$post_content = $this->hide_quoted_text( $post_content );
 				$post_content = wpautop( make_clickable( $post_content ) );
 
-				echo $post_content;
+				echo wp_kses( $post_content, 'post' );
 				if ( $attachment_ids = get_post_meta( $reply->ID, 'sf_attachments' ) ) {
 					echo '<ul class="ticket-reply-attachments">';
 					foreach ( $attachment_ids as $attachment_id ) {
@@ -1110,7 +1122,7 @@ class SupportFlow_Admin {
 				$reply_timestamp = sprintf( __( '%s at %s', 'supportflow' ), get_the_date( '', $reply->ID ), get_the_time( '', $reply->ID ) );
 				$modified_gmt    = get_post_modified_time( 'U', true, $reply->ID );
 				$last_activity   = sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
-				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . $last_activity . ')' . '</span></div>';
+				echo '<div class="ticket-meta"><span class="reply-timestamp">' . esc_html( $reply_timestamp ) . ' (' . esc_html( $last_activity ) . ')' . '</span></div>';
 				echo '</li>';
 			}
 			echo '</ul>';
@@ -1173,7 +1185,7 @@ class SupportFlow_Admin {
 		switch ( $column_name ) {
 			case 'updated':
 				$modified_gmt = get_post_modified_time( 'U', true, $ticket_id );
-				echo sprintf( __( '%s ago', 'supportflow' ), human_time_diff( $modified_gmt ) );
+				echo sprintf( __( '%s ago', 'supportflow' ), esc_html( human_time_diff( $modified_gmt ) ) );
 				break;
 			case 'sf_excerpt':
 				$replies = SupportFlow()->get_ticket_replies( $ticket_id, array( 'posts_per_page' => 1, 'order' => 'ASC' ) );
@@ -1202,7 +1214,7 @@ class SupportFlow_Admin {
 					$customer_link   = '<a class="customer_link" href="' . esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ) . '">' . $customer_email . '</a>';
 					$customers[$key] = $customer_photo . '&nbsp;' . $customer_link;
 				}
-				echo implode( '<br />', $customers );
+				echo wp_kses( implode( '<br />', $customers ), 'comment' );
 				break;
 			case 'status':
 				$post_status = get_post_status( $ticket_id );
@@ -1232,13 +1244,13 @@ class SupportFlow_Admin {
 			case 'sf_replies':
 				$replies = SupportFlow()->get_ticket_replies_count( $ticket_id );
 				echo '<div class="post-com-count-wrapper">';
-				echo "<span class='replies-count'>{$replies}</span>";
+				echo "<span class='replies-count'>". esc_html( $replies ) ."</span>";
 				echo '</div>';
 				break;
 			case 'created':
 				$created_time = get_the_time( get_option( 'time_format' ) . ' T', $ticket_id );
 				$created_date = get_the_time( get_option( 'date_format' ), $ticket_id );
-				echo sprintf( __( '%s<br />%s', 'supportflow' ), $created_time, $created_date );
+				echo sprintf( __( '%s<br />%s', 'supportflow' ), esc_html( $created_time ), esc_html( $created_date ) );
 				break;
 		}
 	}

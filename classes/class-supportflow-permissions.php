@@ -89,7 +89,14 @@ class SupportFlow_Permissions {
 								$user_id       = $user->data->ID;
 								$user_nicename = esc_html( $user->data->user_nicename );
 								$user_email    = esc_html( $user->data->user_email );
-								echo "<option data-user-id=$user_id>$user_nicename ($user_email)</option>";
+								?>
+
+								<option data-user-id="<?php echo esc_attr( $user_id ); ?>">
+									<?php echo esc_html( $user_nicename ); ?>
+									(<?php echo esc_html( $user_email ); ?>)
+								</option>
+
+								<?php
 							}
 						}
 						?>
@@ -277,7 +284,7 @@ class SupportFlow_Permissions {
 		$privilege_id   = $_POST['privilege_id'];
 		$allowed        = 'true' == $_POST['allowed'] ? true : false;
 
-		echo $this->set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed );
+		echo absint( $this->set_user_permission( $user_id, $privilege_type, $privilege_id, $allowed ) );
 		exit;
 	}
 
@@ -318,9 +325,12 @@ class SupportFlow_Permissions {
 			$email_accounts = SupportFlow()->extend->email_accounts->get_email_accounts( true );
 			if ( empty( $email_accounts ) ) {
 				$link = "edit.php?post_type=$post_type&page=sf_accounts";
-				$msg  = 'Please add at least one E-Mail account before creating a ticket.';
 
-				wp_die( "<a href='$link'>" . __( $msg, 'supportflow' ) . "</a>" );
+				wp_die( sprintf(
+					"<a href='%s'>%s</a>",
+					esc_html( $link ),
+					__( 'Please add at least one E-Mail account before creating a ticket.', 'supportflow' )
+				) );
 			}
 		}
 
