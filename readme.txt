@@ -2,8 +2,8 @@
 Contributors: VarunAgw, danielbachhuber, Viper007Bond, andrewspittle, iandunn, kovshenin
 Tags: Ticket, support, admin, customer, customer support, help desk, helpdesk, IT, support, ticket
 Requires at least: 3.5
-Tested up to: 4.3
-Stable tag: 0.6
+Tested up to: 4.5
+Stable tag: 0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,6 +59,13 @@ If it still isn't working, check the log for any error messages or clues. To vie
 
 == Changelog ==
 
+= 0.7 (2016-06-28) =
+* Security: Fix two XSS vulnerabilities: [#145091-h1](https://hackerone.com/reports/145091) with CVSS score [6.1 (Medium)](https://www.first.org/cvss/calculator/3.0#CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N), and [#145086-h1](https://hackerone.com/reports/145086) with CVSS score [4.7 (Medium)](https://www.first.org/cvss/calculator/3.0#CVSS:3.0/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N). Thanks to [whitehatter](https://hackerone.com/whitehatter) for discovering and disclosing them responsibly.
+* Security: Add extra output escaping throughout plugin.
+* Fix: Respect the Reply-To header.
+* Update: Increase Gmail synchronization interval to 10 minutes.
+* [Full changelog](https://github.com/SupportFlow/supportflow/compare/bb204abf5e48d0b3f6d12ebf4435613622ba10bd...fe706ccdb9859af32dddfff1c94c4c7048d794ea)
+
 = 0.6 =
 * Security: Tightened access controls to read and set SupportFlow permissions.
 * Privacy: Prevented leaking e-mail subject lines in search results.
@@ -102,3 +109,8 @@ If it still isn't working, check the log for any error messages or clues. To vie
 
 = 0.1 =
 * Initial release.
+
+== Upgrade Notice ==
+
+= 0.7 =
+Version 0.7 contains fixes for two medium-severity security bugs. We strongly recommend that you upgrade.
