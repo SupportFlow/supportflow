@@ -1185,7 +1185,7 @@ class SupportFlow_Admin {
 				if ( strlen( $first_reply ) > 50 ) {
 					$first_reply = substr( $first_reply, 0, 50 );
 				}
-				echo $first_reply;
+				echo esc_html( $first_reply );
 				break;
 			case 'customers':
 				$customers = SupportFlow()->get_ticket_customers( $ticket_id, array( 'fields' => 'emails' ) );
