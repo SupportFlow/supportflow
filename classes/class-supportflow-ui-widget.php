@@ -57,7 +57,7 @@ class SupportFlow_UI_Widget {
 
 	public function render_single_reply_html( $reply ) {
 		$reply_timestamp = mysql2date( 'M. n', $reply->post_date_gmt );
-		$reply_author    = get_post_meta( $reply->ID, 'reply_author' );
+		$reply_author    = get_post_meta( $reply->ID, 'reply_author', true );
 		$output          = '<div class="ticket-reply-body">'
 			. wpautop( stripslashes( $reply->post_content ) )
 			. '</div>'
