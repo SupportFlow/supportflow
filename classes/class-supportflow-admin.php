@@ -899,12 +899,25 @@ class SupportFlow_Admin {
 	 * A box that appears at the top
 	 */
 	public function meta_box_subject() {
+		?>
 
-		$placeholder = __( 'What is your conversation about?', 'supportflow' );
-		echo '<h4>' . __( 'Subject', 'supportflow' ) . '</h4>';
-		echo '<input type="text" id="subject" name="post_title" class="sf_autosave" placeholder="' . $placeholder . '" value="' . get_the_title() . '" autocomplete="off" />';
-		echo '<p class="description">' . __( 'Please describe what this ticket is about in several words', 'supportflow' ) . '</p>';
+		<h4><?php _e( 'Subject', 'supportflow' ); ?></h4>
 
+		<input
+			type="text"
+			id="subject"
+			name="post_title"
+			class="sf_autosave"
+			placeholder="<?php _e( 'What is your conversation about?', 'supportflow' ); ?>"
+			value="<?php echo esc_attr( get_the_title() ); ?>"
+			autocomplete="off"
+		/>
+
+		<p class="description">
+			<?php _e( 'Please describe what this ticket is about in several words', 'supportflow' ) ?>
+		</p>
+
+		<?php
 	}
 
 	/**
