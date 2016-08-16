@@ -39,21 +39,19 @@ class SupportFlow_Table extends WP_List_Table {
 	 * @param string $msg
 	 */
 	public function set_no_items( $msg ) {
+		$this->no_item_message = $msg;
+	}
+
+	public function no_items() {
 		$allowed_html = array_merge(
 			wp_kses_allowed_html( 'data' ),
 			array( 'br' => array() )
 		);
 
-		$this->no_item_message = wp_kses( $msg, $allowed_html );
-	}
-
-	public function no_items() {
-		$no_item_message = $this->no_item_message;
-
-		if ( $no_item_message === null ) {
+		if ( null === $this->no_item_message ) {
 			parent::no_items();
 		} else {
-			echo esc_html( $no_item_message );
+			echo wp_kses( $this->no_item_message, $allowed_html );
 		}
 	}
 
