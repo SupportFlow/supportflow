@@ -221,7 +221,12 @@ class SupportFlow_Email_Replies {
 					$upload_result = media_handle_sideload( $file_array, null );
 
 					if ( is_wp_error( $upload_result ) ) {
-						WP_CLI::warning( $upload_result->get_error_message() );
+						SupportFlow()->extend->logger->log(
+							'email_retrieve',
+							__METHOD__,
+							__( 'Error sideloading attachment.', 'supportflow' ),
+							compact( 'file_array', 'upload_result', 'email' )
+						);
 					} else {
 						SupportFlow()->extend->attachments->secure_attachment_file( $upload_result );
 						$new_attachment_ids[] = $upload_result;
