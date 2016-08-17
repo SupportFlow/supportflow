@@ -219,6 +219,8 @@ class SupportFlow_Emails {
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
 			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+			add_action( 'wp_mail_from',      array( $this, 'action_set_smtp_from_address' ) );
+			add_action( 'wp_mail_from_name', array( $this, 'action_set_smtp_from_name' ) );
 		}
 
 		$result = wp_mail( $to, $subject, $message, $headers, $attachments );
@@ -226,6 +228,8 @@ class SupportFlow_Emails {
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = null;
 			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+			remove_action( 'wp_mail_from',      array( $this, 'action_set_smtp_from_address' ) );
+			remove_action( 'wp_mail_from_name', array( $this, 'action_set_smtp_from_name' ) );
 		}
 
 		// Log the result, but redact the password to avoid unnecessarily exposing it
@@ -248,6 +252,11 @@ class SupportFlow_Emails {
 		return $result;
 	}
 
+	/**
+	 * Configure PHPMailer to send the message via the configured SMTP account
+	 *
+	 * @param PHPMailer $phpmailer
+	 */
 	public function action_set_smtp_settings( $phpmailer ) {
 		$phpmailer->IsSMTP();
 		$phpmailer->Host        = $this->smtp_account['smtp_host'];
@@ -257,7 +266,31 @@ class SupportFlow_Emails {
 		$phpmailer->Username    = $this->smtp_account['username'];
 		$phpmailer->Password    = $this->smtp_account['password'];
 		$phpmailer->SMTPAuth    = true;
-		$phpmailer->FromName    = get_bloginfo( 'name' );
+	}
+
+	/**
+	 * Override the default address in the From header
+	 *
+	 * We want to display the actual SMTP account rather than wordpress@siteurl
+	 *
+	 * @param string $from_address
+	 *
+	 * @return string
+	 */
+	public function action_set_smtp_from_address( $from_address ) {
+		return $this->smtp_account['username'];
+
+	}
+
+	/**
+	 * Override the default name in the From header
+	 *
+	 * @param string $from_name
+	 *
+	 * @return string
+	 */
+	public function action_set_smtp_from_name( $from_name ) {
+		return get_bloginfo( 'name' );
 	}
 
 	public function get_cc_header( $cc ) {
