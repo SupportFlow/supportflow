@@ -90,7 +90,7 @@ class SupportFlow_Emails {
 		$message = SupportFlow()->sanitize_ticket_reply( stripslashes( $reply->post_content ) );
 		$message .= "\n\n-------";
 		$message .= "\n" . __( "Status: ", 'supportflow' ) . $post_status;
-		$message .= "\n" . __( "Agent: ", 'supportflow' ) . $assigned_agent;
+		$message .= "\n" . __( "Agent: ",  'supportflow' ) . $assigned_agent;
 
 		$message = apply_filters( 'supportflow_emails_reply_notify_message', $message, $reply_id, $ticket->ID, 'agent' );
 
@@ -186,10 +186,10 @@ class SupportFlow_Emails {
 		$msg         = '';
 		$subject     = '[' . get_bloginfo( 'name' ) . '] ' . get_the_title( $ticket->ID ) . ' ' . __( 'Conversation summary', 'supportflow' );
 
-		$msg .= '<b>' . __( 'Title', 'supportflow' ) . ':</b> ' . esc_html( $ticket->post_title ) . '<br>';
-		$msg .= '<b>' . __( 'Status', 'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$ticket->post_status]['label'] . '<br>';
-		$msg .= '<b>' . __( 'Owner', 'supportflow' ) . ':</b> ' . esc_html( $ticket_owner ) . '<br>';
-		$msg .= '<b>' . __( 'Created on', 'supportflow' ) . ':</b> ' . $ticket->post_date_gmt . ' GMT<br>';
+		$msg .= '<b>' . __( 'Title',           'supportflow' ) . ':</b> ' . esc_html( $ticket->post_title ) . '<br>';
+		$msg .= '<b>' . __( 'Status',          'supportflow' ) . ':</b> ' . SupportFlow()->post_statuses[$ticket->post_status]['label'] . '<br>';
+		$msg .= '<b>' . __( 'Owner',           'supportflow' ) . ':</b> ' . esc_html( $ticket_owner ) . '<br>';
+		$msg .= '<b>' . __( 'Created on',      'supportflow' ) . ':</b> ' . $ticket->post_date_gmt . ' GMT<br>';
 		$msg .= '<b>' . __( 'Last Updated on', 'supportflow' ) . ':</b> ' . $ticket->post_modified_gmt . ' GMT<br>';
 		$msg .= '<br><br>';
 
@@ -218,7 +218,8 @@ class SupportFlow_Emails {
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = $smtp_account;
-			add_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+
+			add_action( 'phpmailer_init',    array( $this, 'action_set_smtp_settings' ) );
 			add_action( 'wp_mail_from',      array( $this, 'action_set_smtp_from_address' ) );
 			add_action( 'wp_mail_from_name', array( $this, 'action_set_smtp_from_name' ) );
 		}
@@ -227,7 +228,8 @@ class SupportFlow_Emails {
 
 		if ( ! empty( $smtp_account ) ) {
 			$this->smtp_account = null;
-			remove_action( 'phpmailer_init', array( $this, 'action_set_smtp_settings' ) );
+
+			remove_action( 'phpmailer_init',    array( $this, 'action_set_smtp_settings' ) );
 			remove_action( 'wp_mail_from',      array( $this, 'action_set_smtp_from_address' ) );
 			remove_action( 'wp_mail_from_name', array( $this, 'action_set_smtp_from_name' ) );
 		}
@@ -237,6 +239,7 @@ class SupportFlow_Emails {
 		$log_message = $result ? __( 'Sending mail to %s succeeded', 'supportflow' ) : __( 'Sending mail to %s failed', 'supportflow' );
 		$log_message = sprintf( $log_message, is_array( $to ) ? implode( ',', $to ) : $to );
 		$redacted_smtp_account = $smtp_account;
+
 		if ( ! empty( $redacted_smtp_account ) ) {
 			$redacted_smtp_account['password'] = '[redacted]';
 		}
@@ -259,6 +262,7 @@ class SupportFlow_Emails {
 	 */
 	public function action_set_smtp_settings( $phpmailer ) {
 		$phpmailer->IsSMTP();
+
 		$phpmailer->Host        = $this->smtp_account['smtp_host'];
 		$phpmailer->Port        = (int) $this->smtp_account['smtp_port'];
 		$phpmailer->SMTPSecure  = $this->smtp_account['smtp_ssl'] ? 'ssl' : '';
