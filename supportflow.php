@@ -213,6 +213,11 @@ class SupportFlow {
 					'label'        => __( 'Pending', 'supportflow' ),
 					'label_count'  => _n_noop( 'Pending <span class="count">(%s)</span>', 'Pending <span class="count">(%s)</span>', 'supportflow' ),
 				),
+				'sf_spam' => array(
+					'show_tickets' => false,
+					'label'        => __( 'Spam', 'supportflow' ),
+					'label_count'  => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'supportflow' ),
+				),
 				'sf_closed'  => array(
 					'show_tickets' => false,
 					'label'        => __( 'Closed', 'supportflow' ),
@@ -263,8 +268,6 @@ class SupportFlow {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			require_once( $this->plugin_dir . '/classes/class-supportflow-wp-cli.php' );
 		}
-
-		# TODO: Akismet plugin?
 
 		/** Admin *************************************************************/
 
