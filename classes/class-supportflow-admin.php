@@ -1304,20 +1304,27 @@ class SupportFlow_Admin {
 			update_post_meta( $ticket_id, 'email_notifications_override', $email_notifications_override );
 		}
 
-		if ( isset( $_POST['reply'] ) && ! empty( $_POST['reply'] ) && ! $ticket_lock ) {
-			$reply = $_POST['reply'];
+		// Ticket is locked (possibly E-Mail account associated with it is deleted)
+		if ( ! $ticket_lock ) {
 
-			if ( isset( $_POST['insert-signature'] ) && 'on' == $_POST['insert-signature'] ) {
-				$agent_signature = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
-				if ( ! empty( $agent_signature ) ) {
-					$reply .= "\n\n-----\n$agent_signature";
+			if ( empty( $_POST['reply'] ) ) {
+				$reply = '';
+			} else {
+				$reply = $_POST['reply'];
+
+				if ( isset( $_POST['insert-signature'] ) && 'on' == $_POST['insert-signature'] ) {
+					$agent_signature = get_user_meta( get_current_user_id(), 'sf_user_signature', true );
+					if ( ! empty( $agent_signature ) ) {
+						$reply .= "\n\n-----\n$agent_signature";
+					}
 				}
+
+				$reply = SupportFlow()->sanitize_ticket_reply( $reply );
 			}
 
-			$reply = SupportFlow()->sanitize_ticket_reply( $reply );
-
-			$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
-			if ( ! empty( $_POST['reply-attachments'] ) ) {
+			if ( empty( $_POST['reply-attachments'] ) ) {
+				$attachment_ids = '';
+			} else {
 				$attachements   = explode( ',', trim( $_POST['reply-attachments'], ',' ) );
 				// Remove same attachment added more than once
 				$attachements   = array_unique($attachements);
@@ -1326,19 +1333,22 @@ class SupportFlow_Admin {
 					return (string) (int) $val === (string) $val;
 				} );
 				$attachment_ids = array_map( 'intval', $attachements );
-			} else {
-				$attachment_ids = '';
 			}
-			$cc  = ( ! empty( $_POST['cc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['cc'] ) : '';
-			$bcc = ( ! empty( $_POST['bcc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['bcc'] ) : '';
 
-			$reply_args = array(
-				'post_status'    => $visibility,
-				'attachment_ids' => $attachment_ids,
-				'cc'             => $cc,
-				'bcc'            => $bcc,
-			);
-			SupportFlow()->add_ticket_reply( $ticket_id, $reply, $reply_args );
+			if ( ! empty( $reply ) || ! empty( $attachment_ids ) ) {
+				$cc  = ( ! empty( $_POST['cc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['cc'] ) : '';
+				$bcc = ( ! empty( $_POST['bcc'] ) ) ? SupportFlow()->extract_email_ids( $_POST['bcc'] ) : '';
+
+				$visibility = ( ! empty( $_POST['mark-private'] ) ) ? 'private' : 'public';
+
+				$reply_args = array(
+					'post_status'    => $visibility,
+					'attachment_ids' => $attachment_ids,
+					'cc'             => $cc,
+					'bcc'            => $bcc,
+				);
+				SupportFlow()->add_ticket_reply( $ticket_id, $reply, $reply_args );
+			}
 		}
 
 	}
