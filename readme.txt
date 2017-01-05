@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
 
 == Description ==
-SupportFlow is a web based help desk software. SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
+SupportFlow is a web based help desk software. It allows teams to manage support tickets using a web interface.
 
 ###A few of its features are:
 

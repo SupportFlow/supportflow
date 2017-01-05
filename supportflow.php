@@ -1,7 +1,6 @@
 <?php
 
 defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
-
 /**
  * Plugin Name: SupportFlow
  * Plugin URI:  https://wordpress.org/plugins/supportflow/
@@ -12,7 +11,6 @@ defined( 'ABSPATH' ) or die( "Cheatin' uh?" );
  * Text Domain: supportflow
  * Domain Path: /languages/
  */
-
 class SupportFlow {
 
 	/** Magic *****************************************************************/
@@ -1139,6 +1137,14 @@ function SupportFlow() {
 }
 
 add_action( 'plugins_loaded', 'SupportFlow' );
+
+
+function supportflow_plugin_textdomain() {
+	load_plugin_textdomain( 'supportflow', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+}
+
+add_action( 'plugins_loaded', 'supportflow_plugin_textdomain' );
+
 
 // Remove SupportFlow cron job on deactivation of plugin
 register_deactivation_hook( __FILE__, 'SupportFlow::action_register_deactivation_hook' );
